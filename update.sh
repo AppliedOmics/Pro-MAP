@@ -2,5 +2,5 @@
 
 bash push.sh
 
-cd /srv/shiny-server/analysis/antibody_arrays/SCaMP/
+cd /srv/shiny-server/analysis/antibody_arrays/SPOTPro_FUll/
 bash pull.sh

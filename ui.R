@@ -47,7 +47,7 @@ shinyUI(fluidPage(
        
         )))),
     mainPanel(
-        uiOutput('example_data_text_ui'),
+        #uiOutput('example_data_text_ui'),
         column(3,uiOutput('select_conditions_column_ui')),
         column(9,uiOutput('condition_select_ui')),
         column(2,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE)),

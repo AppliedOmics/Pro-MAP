@@ -839,14 +839,14 @@ shinyServer(function(input, output) {
     })
     
     output$spot_file_upload_ui = renderUI({
-      if(!is.null(input$gpr_files$datapath)){
+      #if(!is.null(input$gpr_files$datapath)){
         fileInput(
           inputId = "spot_file", 
           label = "Upload Spots File", 
           #multiple = TRUE,
           accept = c(".txt")
         )
-      }
+      #}
     })
     
     # spot_names = reactive({
