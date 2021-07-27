@@ -122,17 +122,17 @@ shinyUI(fluidPage(
                               )
                             )
                       ),
-                   tabPanel('Spot Filtering 2sd',
-                            textOutput('spot_filtering_threshold_text'),
-                            tabsetPanel(selected = 'Plot',
-                              tabPanel('Table',
-                                       DT::dataTableOutput('spot_filtering_table')
-                              ),
-                              tabPanel('Plot',
-                                       uiOutput('spot_filtering_heatmap_ui')
-                              )
-                            )
-                   ),
+                   # tabPanel('Spot Filtering 2sd',
+                   #          textOutput('spot_filtering_threshold_text'),
+                   #          tabsetPanel(selected = 'Plot',
+                   #            tabPanel('Table',
+                   #                     DT::dataTableOutput('spot_filtering_table')
+                   #            ),
+                   #            tabPanel('Plot',
+                   #                     uiOutput('spot_filtering_heatmap_ui')
+                   #            )
+                   #          )
+                   # ),
                    tabPanel('Spot Filtering Elist',
                             #textOutput('spot_filtering_threshold_text'),
                             tabsetPanel(selected = 'Plot',
@@ -143,13 +143,13 @@ shinyUI(fluidPage(
                                                  uiOutput('spot_filtering_E_heatmap_ui')
                                         )
                             )
-                   ),
-                   tabPanel('Signal to Noise',
-                            tabsetPanel(selected = 'Plot',
-                                        tabPanel('Table'),
-                                        tabPanel('Plot'))
-                            
-                            )
+                   )#,
+                   # tabPanel('Signal to Noise',
+                   #          tabsetPanel(selected = 'Plot',
+                   #                      tabPanel('Table'),
+                   #                      tabPanel('Plot'))
+                   #          
+                   #          )
                  )),
   
         tabPanel('Pre Processing Pipeline',
