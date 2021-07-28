@@ -278,7 +278,7 @@ shinyUI(fluidPage(
                  tags$h4('Precision Plots'),
                  plotOutput('precision_plot_1',height = multi_plot_height),
                  plotOutput('precision_plot_2',height = multi_plot_height),
-                 plotOutput('multi_line_plot',height = multi_plot_height)
+                 #plotOutput('multi_line_plot',height = multi_plot_height)
                  
                  
         ),

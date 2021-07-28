@@ -1444,7 +1444,7 @@ shinyServer(function(input, output) {
     cont_matrix_function = function(df,targets){
       time = factor(paste(targets$Condition), levels = unique(targets$Condition))
       time
-      design = model.matrix(~time)
+      design = model.matrix(~0+time)
       colnames(design) = levels(time)
       
       conditions = unique(targets$Condition)
@@ -1466,6 +1466,8 @@ shinyServer(function(input, output) {
       #print(cmd)
       eval(parse(text = cmd))
       cont.matrix
+      result = list(design = design, cont.matrix = cont.matrix,cmd = cmd)
+      return(result)
     }
     
     MA_plot_function = function(df,spots){
@@ -1487,10 +1489,10 @@ shinyServer(function(input, output) {
         as.tbl(plot_df)
         if(length(unique(plot_df$Category))>1){
           MA_plot = ggplot(plot_df) + 
-            geom_point(aes(x = log(F), y = log(Amean),col = Category,group = spot))
+            geom_point(aes(y = log(F), x = log(Amean),col = Category,group = spot))
         }else{
           MA_plot = ggplot(plot_df) + 
-            geom_point(aes(x = log(F), y = log(Amean),group = spot))
+            geom_point(aes(y = log(F), x = log(Amean),group = spot))
         }
         MA_plot
     }
@@ -1660,7 +1662,9 @@ shinyServer(function(input, output) {
     })
     
     E_corr = reactive({
-        backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method, offset = 0)
+        #backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method, offset = 0)
+      backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method)
+      
     })
     
     output$E_corr_boxplot = renderPlot({
@@ -1885,7 +1889,7 @@ shinyServer(function(input, output) {
     }
     
     E_norm = reactive({     
-        norm_list = pre_norm_function(E_filter(),spot_names(),target_names(),removed_spots(),input$log_rb)
+        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),removed_spots(),input$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
         
@@ -2611,10 +2615,12 @@ shinyServer(function(input, output) {
   
     
   corr = reactive({ 
-    E_corr <-  backgroundCorrect(E(), method = "none")
-    S_corr <-  backgroundCorrect(E(), method = "subtract")
-    M_corr <-  backgroundCorrect(E(), method = "movingmin")
-    N_corr <-  backgroundCorrect(E(), method = "normexp")
+    E = E_filter_before()
+    
+    E_corr <-  backgroundCorrect(E, method = "none")
+    S_corr <-  backgroundCorrect(E, method = "subtract")
+    M_corr <-  backgroundCorrect(E, method = "movingmin")
+    N_corr <-  backgroundCorrect(E, method = "normexp")
     
     list(E = E_corr,
          S = S_corr,
@@ -2623,54 +2629,36 @@ shinyServer(function(input, output) {
   })
   
     
-  multi_norm_function = function(data,spot_names,target_names,removed_spots,log_rb,method,proteins,input){
+  multi_norm_function = function(corr_data,spot_names,target_names,removed_spots,log_rb,method,proteins,input){
     
-    norm_list = pre_norm_function(data$E$E,spot_names,target_names,removed_spots,log_rb)
-    E_norm = norm_function(norm_list$m,method,norm_list$spots)
+    E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,removed_spots,log_rb)
+    E_norm = norm_function(E_norm_list$m,method,E_norm_list$spots)
     E_proteins = protein_collapse_function(E_norm,spots(),input)
     E = protein_filter_function(E_proteins,proteins,input)
+    
     E = as.data.frame(E) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$S$E,spot_names,target_names,removed_spots,log_rb)
-    S_norm = norm_function(norm_list$m,method,norm_list$spots)
+    S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,removed_spots,log_rb)
+    S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
     S_proteins = protein_collapse_function(S_norm,spots(),input)
     S = protein_filter_function(S_proteins,proteins,input)
-    #S = as.data.frame(S) %>% column_to_rownames('protein')
+
     S = as.data.frame(S) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$N$E,spot_names,target_names,removed_spots,log_rb)
-    N_norm = norm_function(norm_list$m,method,norm_list$spots)
+    N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,removed_spots,log_rb)
+    N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
     N_proteins = protein_collapse_function(N_norm,spots(),input)
     N = protein_filter_function(N_proteins,proteins,input)
-    #N = as.data.frame(N) %>% column_to_rownames('protein')
+
     N = as.data.frame(N) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$M$E,spot_names,target_names,removed_spots,log_rb)
-    M_norm = norm_function(norm_list$m,method,norm_list$spots)
+    M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,removed_spots,log_rb)
+    M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
     M_proteins = protein_collapse_function(M_norm,spots(),input)
     M = protein_filter_function(M_proteins,proteins,input)
-    #M = as.data.frame(M) %>% column_to_rownames('protein')
+
     M = as.data.frame(M) %>% dplyr::select(-one_of('protein'))
-    #E_norm
-    #E_norm <- normalizeBetweenArrays(data$E, method=method)
-    #E_norm <- as.matrix.EList(E_norm)
-    #rownames(E_norm) <- spots
-    #colnames(E_norm) <- targets
-    # 
-    # S_norm <- normalizeBetweenArrays(data$S,  method=method)
-    # S_norm <- as.matrix.EList(S_norm)
-    # #rownames(S_norm) <- spots
-    # #colnames(S_norm) <- targets
-    # 
-    # M_norm <- normalizeBetweenArrays(data$M, method=method)
-    # M_norm <- as.matrix.EList(M_norm)
-    # #rownames(M_norm) <- spots
-    # #colnames(M_norm) <- targets
-    # 
-    # N_norm <- normalizeBetweenArrays(data$N, method=method)
-    # N_norm <- as.matrix.EList(N_norm)
-    #rownames(N_norm) <-  spots
-    #colnames(N_norm) <- targets
+
     
     list(E = E,
          S = S,
@@ -2678,27 +2666,24 @@ shinyServer(function(input, output) {
          N = N)
   }
   norm = reactive({
-    data = corr()    
-    #spots = paste(E()$genes$ID)
-    #targets = c(targets()$Name)
-    
-    
+    corr_data = corr()    
+
     spot_names = spot_names()
     target_names = target_names()
     removed_spots = removed_spots()
-    log_rb = input$rb_log
+    log_rb = input$log_rb
     proteins = proteins()
     
     
     method = "none"
-    E = multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    E = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     
     method = "quantile"
-    Q = multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    Q = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     method = "cyclicloess"
-    C = multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    C = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     method = "scale"
-    S = multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    S = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     
     
     
@@ -2709,59 +2694,7 @@ shinyServer(function(input, output) {
          S = S)
     
   })
-  # N_norm = reactive({
-  #   data = corr()
-  #   #spots = paste(E()$genes$ID)
-  #   #targets = c(targets()$Name)
-  #   method = "none"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   method = "quantile"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   method = "cyclicloess"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   #multi_norm_function(data,spots,targets,method)
-  # })  
-  # 
-  # Q_norm = reactive({
-  #   data = corr()
-  #   spots = paste(E()$genes$ID)
-  #   targets = c(targets()$Name)
-  #   method = "quantile"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   method = "quantile"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   
-  #   #multi_norm_function(data,spots,targets,method)
-  #   
-  # }) 
-  # 
-  # S_norm = reactive({
-  #   
-  #   data = corr()
-  #   spots = paste(E()$genes$ID)
-  #   targets = c(targets()$Name)
-  #   method = "quantile"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   
-  #   #multi_norm_function(data,spots,targets,method)
-  #   
-  #   
-  # }) 
-  # 
-  # C_norm = reactive({
-  #   
-  #   data = corr()
-  #   spots = paste(E()$genes$ID)
-  #   targets = c(targets()$Name)
-  #   method = "cyclicloess"
-  #   multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method)
-  #   
-  #   #multi_norm_function(data,spots,targets,method)
-  #   
-  #   
-  #  
-  # }) 
-  
+
   multi_fit_function = function(norm){
     
     Rfit <- lmFit(norm$E)
@@ -2795,29 +2728,7 @@ shinyServer(function(input, output) {
     
   })
   
-  # E_fit = reactive({
-  #   
-  #   norm = N_norm()
-  #   multi_fit_function(norm)
-  #   
-  # })
-  # 
-  # S_fit = reactive({
-  #   norm = S_norm()
-  #   multi_fit_function(norm)
-  #   
-  # })
-  # 
-  # Q_fit = reactive({
-  #   norm = Q_norm()
-  #   multi_fit_function(norm)
-  # })
-  # 
-  # C_fit = reactive({
-  #   norm = C_norm()
-  #   multi_fit_function(norm)
-  #   
-  # })
+
   MA_plots = renderPlot({
     df = Rfit()$E$E
     as.tbl(df)  
@@ -2839,7 +2750,7 @@ shinyServer(function(input, output) {
   
   Amean_data = reactive({
     
-    E_Amean = multi_Amean_function(Rfit()$E,"None") 
+    E_Amean = multi_Amean_function(Rfit()$E,"None")  
     S_Amean = multi_Amean_function(Rfit()$S,"Scale")
     Q_Amean = multi_Amean_function(Rfit()$Q,"Quantile")
     C_Amean = multi_Amean_function(Rfit()$C,"Cyclicloess")
@@ -2854,26 +2765,15 @@ shinyServer(function(input, output) {
   })
   
   output$Amean_plot = renderPlot({
-    #fit = E_fit()
-    # 
-    # E_Amean = multi_Amean_function(Rfit()$E,"None") 
-    # S_Amean = multi_Amean_function(Rfit()$S,"Scale")
-    # Q_Amean = multi_Amean_function(Rfit()$Q,"Quantile")
-    # C_Amean = multi_Amean_function(Rfit()$C,"Cyclicloess")
-    # 
-    # Amean = rbind(E_Amean,S_Amean) %>% 
-    #   rbind(Q_Amean) %>% 
-    #   rbind(C_Amean)
-    # 
-    # as.tbl(as.data.frame(Amean))
+
     
     Amean = Amean_data()
 
     
-    ggplot(Amean, aes(x= Correction, y=Amean, fill=Correction))+
+    ggplot(Amean, aes(x= Correction, y=log(Amean), fill=Correction))+
       geom_boxplot()+
       #theme_classic()+
-      theme(axis.text = element_text(size = 12), axis.title = element_blank(), legend.position = "none") + 
+      theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
       facet_grid(Normalisation ~ .)
   },height = multi_plot_height)
   
@@ -2886,7 +2786,7 @@ shinyServer(function(input, output) {
     M <- cbind(Rfit2$F, Sfit2$F, Mfit2$F, Nfit2$F)
     M <- as.data.frame(M)
     colnames(M) = c("Rawdata","Subtraction","Movingminimum","Normexp")
-    M = log2(M)
+    #M = log2(M)
     M_l = M %>% 
       gather('Correction','M')
     M_l$Normalisation = norm
@@ -2894,18 +2794,18 @@ shinyServer(function(input, output) {
   }
   
   M_plot_data = reactive({
-    E_logM_l = multi_M_function(Rfit()$E,"None")
-    S_logM_l = multi_M_function(Rfit()$S,"Scale")
-    Q_logM_l = multi_M_function(Rfit()$Q,"Quantile")
-    C_logM_l = multi_M_function(Rfit()$C,"Cyclicloess")
+    E_M_l = multi_M_function(Rfit()$E,"None")
+    S_M_l = multi_M_function(Rfit()$S,"Scale")
+    Q_M_l = multi_M_function(Rfit()$Q,"Quantile")
+    C_M_l = multi_M_function(Rfit()$C,"Cyclicloess")
     
-    logM_l = E_logM_l %>% 
-      rbind(S_logM_l) %>% 
-      rbind(Q_logM_l) %>% 
-      rbind(C_logM_l)
+    M_l = E_M_l %>% 
+      rbind(S_M_l) %>% 
+      rbind(Q_M_l) %>% 
+      rbind(C_M_l)
     
-    as.tbl(logM_l)
-    logM_l
+    as.tbl(M_l)
+    M_l
   })
   
   
@@ -2921,13 +2821,13 @@ shinyServer(function(input, output) {
     #   rbind(Q_logM_l) %>% 
     #   rbind(C_logM_l)
     # 
-    # as.tbl(logM_l)
-    logM_l = M_plot_data()
+    # as.tbl(logM_l) 
+    M_l =(M_plot_data())
     
-    ggplot(logM_l, aes(x= Correction, y=M, fill=Correction))+
+    ggplot(M_l, aes(x= Correction, y=log(M), fill=Correction))+
       geom_boxplot()+
       #theme_classic()+
-      theme(axis.text = element_text(size = 12), axis.title = element_blank(), legend.position = "none") +
+      theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
       facet_grid(Normalisation ~ .)
   },height = multi_plot_height)
   
@@ -2950,7 +2850,7 @@ output$MA_plot = renderPlot({
   MA = MA_data()
   as.tbl(MA)
   ggplot(MA) + 
-    geom_point(aes(x = Amean, y = M)) + 
+    geom_point(aes(x = log(Amean), y = log(M))) + 
     facet_grid(Normalisation ~ Correction)
 },height = multi_plot_height)
     
@@ -3080,7 +2980,7 @@ output$MA_plot = renderPlot({
   
   output$multi_line_plot = renderPlot({
      
-    names(norm())
+    names(norm()) 
     
     E_df_l = multi_norm_full_function(norm()$E,'None')
     Q_df_l = multi_norm_full_function(norm()$Q,'Quantile')
@@ -3096,7 +2996,7 @@ output$MA_plot = renderPlot({
     unique(df_l$Proteins)
     row_names = c('Cy5 BSA 10ng/ul','Cy5 BSA 15ng/ul','Cy5 BSA 5ng/ul')
     
-    plot_data = df_l %>% 
+    plot_data = df_l# %>% 
       filter(Proteins %in% row_names)
     as.tbl(plot_data) 
     
@@ -3112,47 +3012,54 @@ output$MA_plot = renderPlot({
   
   ### Differential Analysis ####
   
-  eBayes_test = reactive({
+  eBayes_test = reactive({ 
     df = data() %>% column_to_rownames('protein')
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     
     df = df[,selected_cols]
-      #dplyr::select(-protein)
+    #as.tbl(df)  
+    #dplyr::select(-protein)
     
-    colnames(target_conditions()) 
+    #colnames(target_conditions()) 
     
     
-    DS = selected_targets() %>% 
-      filter(Name %in% selected_cols) %>% 
-      pull(Condition)
+    #DS = selected_targets() %>% 
+    #  filter(Name %in% selected_cols) %>% 
+    #  pull(Condition)
 
       #filter(Name %in% selected_cols)
-    DS = factor(DS,levels= unique(DS))
-    DS
+    #DS = factor(DS,levels= unique(DS))
+    #DS
     #colnames(data())
     
-    DS
-    design = model.matrix(~0+DS)
-    colnames(design) = levels(DS)
-    design
-    dim(design)
-    dim(df)
+    #DS
+    #design = model.matrix(~0+DS)
+    #colnames(design) = levels(DS)
+    #design
+    #dim(design)
+    #dim(df)
+    cont_matrix_list = cont_matrix_function(df,targets())
+    design = cont_matrix_list$design
+    cont.matrix = cont_matrix_list$cont.matrix
+    
     fit = lmFit(df,design, weights = as.numeric(arrayw_df()[,selected_cols]))
     fit
     
-    unique(selected_targets()$Condition)
+    #unique(selected_targets()$Condition)
     
-    cont.matrix = makeContrasts(
-      PCR_PositivevsControl = PCR_Positive-Control,
-     levels=design
-    )
     
-    u_DS = unique(DS)
-    u_DS
-    cmd = paste0('cont.matrix = makeContrasts(',u_DS[1],'vs',u_DS[2],' = ',u_DS[1],'-',u_DS[2],',levels=design)')
-    cmd
-    eval(parse(text = cmd))
+    
+    #cont.matrix = makeContrasts(
+    #  PCR_PositivevsControl = PCR_Positive-Control,
+    # levels=design
+    #)
+    
+    #u_DS = unique(DS)
+    #u_DS
+    #cmd = paste0('cont.matrix = makeContrasts(',u_DS[1],'vs',u_DS[2],' = ',u_DS[1],'-',u_DS[2],',levels=design)')
+    #cmd
+    #eval(parse(text = cmd))
     fit2 = contrasts.fit(fit,cont.matrix)
     fit2 = eBayes(fit2)
     fit2
