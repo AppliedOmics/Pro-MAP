@@ -131,6 +131,12 @@ shinyServer(function(input, output) {
       +  as.numeric(okred) #Spot filtering 
     } 
     
+    sd_filter_2 <- function(x){
+      threshold = 2*sd
+      okred <- abs(x[,foreground_column()]) < threshold*abs(x[,background_column()])
+      +  as.numeric(okred) #Spot filtering 
+    } 
+    
     
     CV <- function(x){
       100*(sd(x)/mean(x))
@@ -1605,6 +1611,7 @@ shinyServer(function(input, output) {
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
+      m = neg_corr_function(m,input)
       #m[is.na(m)] = 0
       #m[is.infinite(m)] = 0
       m = m[,selected_targets()$Name]
@@ -1630,12 +1637,26 @@ shinyServer(function(input, output) {
       
     })
     
+    E_filter_before = reactive({
+      E = E()
+      if(!is.null(E()$weights) & input$apply_spot_filtering == T){
+        E_fg = E$E
+        E_fg
+        E_weights = E()$weights
+        E_filter = E_fg * E_weights
+        E_filter[E_filter == 0] = NA
+        E$E = E_filter
+      }
+      E$E
+      E
+    })
+    
     E_corr = reactive({
-        backgroundCorrect(E(), method = input$backgroundCorrect_method, offset = 0)
+        backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method, offset = 0)
     })
     
     output$E_corr_boxplot = renderPlot({
-
+ 
       data = E_corr()$E
       
       input$collapse_boxplots
@@ -1663,6 +1684,7 @@ shinyServer(function(input, output) {
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
+      m = neg_corr_function(m,input)
       m = m[,selected_targets()$Name]
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
@@ -1717,17 +1739,19 @@ shinyServer(function(input, output) {
     
     
     E_filter = reactive({
-      E = E_corr()$E
-      if(!is.null(E_corr()$weights)){
-        E_weights = E_corr()$weights
-        
-        E_filter = E * E_weights
-        E_filter[E_filter == 0] = NA
-      }else{
-        E_filter = E
-      }
       
-      E_filter
+      E_filter_before()$E
+      # E = E_corr()$E
+      # if(!is.null(E_corr()$weights)){
+      #   E_weights = E_corr()$weights
+      #   
+      #   E_filter = E * E_weights
+      #   E_filter[E_filter == 0] = NA
+      # }else{
+      #   E_filter = E
+      # }
+      # 
+      # E_filter
     })
     
     output$E_filter_boxplot = renderPlot({

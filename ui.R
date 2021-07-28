@@ -50,18 +50,23 @@ shinyUI(fluidPage(
         #uiOutput('example_data_text_ui'),
         column(3,uiOutput('select_conditions_column_ui')),
         column(9,uiOutput('condition_select_ui')),
-        column(2,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE)),
-        column(2,radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE))),
+        column(8,
+        column(3,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE)),
+        column(3,radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE))),
         
-        column(4,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
-        column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
-        column(12,
-          column(2,uiOutput('drop_cols_ui')),
-          column(8,uiOutput('drop_rows_ui')),
-          column(2,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T))
+        column(6,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp"),
+               radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
+        #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
+        
+          column(3,uiOutput('drop_cols_ui')),
+          column(9,uiOutput('drop_rows_ui')),
+          column(12,uiOutput('protein_columns_ui'))
+          #column(2,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T))
         ),
-        column(9,uiOutput('protein_columns_ui')),
-        column(3,radioButtons('heatmap_order','Heatmap',c('Cluster','Order'))),
+        #column(9,uiOutput('protein_columns_ui')),
+        column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'),
+               radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T),
+               radioButtons('heatmap_order','Heatmap',c('Cluster','Order'))),
         #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
         column(12,tabsetPanel(
           tabPanel("Instructions",
@@ -170,6 +175,23 @@ shinyUI(fluidPage(
                          ))
                 #column(12,uiOutput('E_corr_Heatmap_ui'))
               ),
+              
+              tabPanel('Spot Filtering',
+                       tabsetPanel(
+                         tabPanel('Plots',
+                                  column(12,plotOutput('E_filter_boxplot')),
+                                  column(12,plotOutput('E_filter_missing_plot')),
+                                  column(12,plotOutput('E_filter_CV_plot'))
+                         ),
+                         tabPanel("MA Plots",
+                                  column(12,plotlyOutput('E_filter_MA_plot'))
+                         ),
+                         tabPanel('Clustering',
+                                  column(12,uiOutput('E_filter_Heatmap_ui'))
+                         ))
+                       
+              ),
+              
               tabPanel('Background Correction',
                        tabsetPanel(
                          tabPanel('Plots',
@@ -185,21 +207,7 @@ shinyUI(fluidPage(
                          ))
               ),
               
-              tabPanel('Spot Filtering',
-                       tabsetPanel(
-                         tabPanel('Plots',
-                           column(12,plotOutput('E_filter_boxplot')),
-                           column(12,plotOutput('E_filter_missing_plot')),
-                           column(12,plotOutput('E_filter_CV_plot'))
-                         ),
-                         tabPanel("MA Plots",
-                           column(12,plotlyOutput('E_filter_MA_plot'))
-                        ),
-                        tabPanel('Clustering',
-                                 column(12,uiOutput('E_filter_Heatmap_ui'))
-                        ))
-                       
-              ),
+      
               
               tabPanel('Normalisation',
                        tabsetPanel(
