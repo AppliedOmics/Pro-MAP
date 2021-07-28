@@ -161,6 +161,9 @@ shinyUI(fluidPage(
                             column(12,plotOutput('E_boxplot')),
                             column(12,plotOutput('R_missing_plot')),
                             column(12,plotOutput('E_CV_plot'))
+                            ),
+                         tabPanel("MA Plots",
+                            column(12,plotlyOutput('R_MA_plot'))
                          ),
                          tabPanel('Clustering',
                             column(12,uiOutput('E_Heatmap_ui'))
@@ -174,6 +177,9 @@ shinyUI(fluidPage(
                            column(12,plotOutput('E_corr_missing_plot')),
                            column(12,plotOutput('E_corr_CV_plot'))
                          ),
+                         tabPanel("MA Plots",
+                           column(12,plotlyOutput('E_corr_MA_plot'))
+                         ),
                          tabPanel('Clustering',
                            column(12,uiOutput('E_corr_Heatmap_ui'))
                          ))
@@ -185,6 +191,9 @@ shinyUI(fluidPage(
                            column(12,plotOutput('E_filter_boxplot')),
                            column(12,plotOutput('E_filter_missing_plot')),
                            column(12,plotOutput('E_filter_CV_plot'))
+                         ),
+                         tabPanel("MA Plots",
+                           column(12,plotlyOutput('E_filter_MA_plot'))
                         ),
                         tabPanel('Clustering',
                                  column(12,uiOutput('E_filter_Heatmap_ui'))
@@ -198,6 +207,9 @@ shinyUI(fluidPage(
                             column(12,plotOutput('E_norm_boxplot')),
                             column(12,plotOutput('E_norm_missing_plot')),
                             column(12,plotOutput('E_norm_CV_plot'))
+                         ),
+                         tabPanel("MA Plots",
+                            column(12,plotlyOutput('E_norm_MA_plot'))
                          ),
                          tabPanel('Clustering',
                             column(12,uiOutput('norm_Heatmap_ui'))
@@ -231,6 +243,9 @@ shinyUI(fluidPage(
                           column(12,plotOutput('data_boxplot')),
                          column(12,plotOutput('data_missing_plot')),
                          column(12,plotOutput('data_CV_plot'))
+                       ),
+                       tabPanel("MA Plots",
+                         column(12,plotlyOutput('data_MA_plot'))
                        ),
                        tabPanel('Clustering',
                         column(12,uiOutput('data_Heatmap_ui'))

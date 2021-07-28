@@ -1427,6 +1427,66 @@ shinyServer(function(input, output) {
       p
     }
     
+    cont_matrix_function = function(df,targets){
+      time = factor(paste(targets$Condition), levels = unique(targets$Condition))
+      time
+      design = model.matrix(~time)
+      colnames(design) = levels(time)
+      
+      conditions = unique(targets$Condition)
+      comparison_list = c()
+      for(i in c(1:length(conditions))){
+        for(j in c(1:length(conditions))){
+          
+          if(j > i){
+            #print(paste(i,j))
+            comparisons = paste0(conditions[i],'vs',conditions[j],' = ',conditions[i],'-',conditions[j])
+            #print(comparisons)
+            comparison_list = c(comparison_list,comparisons)
+          }
+        }
+      }
+      comparison_list
+      design
+      cmd = paste0('cont.matrix = makeContrasts(',paste(comparison_list,collapse=', '),', levels=design)')
+      #print(cmd)
+      eval(parse(text = cmd))
+      cont.matrix
+    }
+    
+    MA_plot_function = function(df,spots){
+        
+        Rfit = lmFit(df)
+        Rfit2 = eBayes(Rfit)
+        Rfit2_df = as.data.frame(Rfit2)
+        as.tbl(Rfit2_df)
+        rownames(Rfit2_df)
+        #Rfit2_df$sig = NA
+        #Rfit2_df$sig[Rfit2_df$p.value < 0.05] = '+'
+        #Rfit2_df$sig[Rfit2_df$p.value >= 0.05] = '-'
+        as.tbl(Rfit2_df)
+        
+        plot_df = Rfit2_df %>% 
+          rownames_to_column('spot') %>% 
+          left_join(spots)
+        
+        as.tbl(plot_df)
+        if(length(unique(plot_df$Category))>1){
+          MA_plot = ggplot(plot_df) + 
+            geom_point(aes(x = log(F), y = log(Amean),col = Category,group = spot))
+        }else{
+          MA_plot = ggplot(plot_df) + 
+            geom_point(aes(x = log(F), y = log(Amean),group = spot))
+        }
+        MA_plot
+    }
+    
+    output$R_MA_plot = renderPlotly({
+      df = E()$E
+      rownames(df) = spot_names()
+      MA_plot_function(df,spots())
+    })
+    
     output$R_missing_plot = renderPlot({
       df = E()$E   
       colnames(df) = target_names()
@@ -1591,7 +1651,11 @@ shinyServer(function(input, output) {
       as.tbl(df)
       missingness_function(df,targets())
     })
-  
+    output$E_corr_MA_plot = renderPlotly({
+      df = E_corr()$E
+      rownames(df) = spot_names()
+      MA_plot_function(df,spots())
+    })
     
     output$E_corr_Heatmap_ui = renderUI({
       df = E_corr()$E   
@@ -1682,6 +1746,12 @@ shinyServer(function(input, output) {
       df = as.data.frame(df)
       
       missingness_function(df,targets())
+    })
+    
+    output$E_filter_MA_plot = renderPlotly({
+      df = E_filter()
+      rownames(df) = spot_names()
+      MA_plot_function(df,spots())
     })
     
     output$E_filter_Heatmap_ui = renderUI({
@@ -1781,7 +1851,7 @@ shinyServer(function(input, output) {
       E_norm
     }
     
-    E_norm = reactive({    
+    E_norm = reactive({     
         norm_list = pre_norm_function(E_filter(),spot_names(),target_names(),removed_spots(),input$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
@@ -1828,6 +1898,12 @@ shinyServer(function(input, output) {
       df = as.data.frame(df)
       
       missingness_function(df,targets())
+    })
+    
+    output$E_norm_MA_plot = renderPlotly({
+      df = E_norm() %>% 
+        column_to_rownames('spot')
+      MA_plot_function(df,spots())
     })
     
     output$norm_Heatmap_ui = renderUI({ 
@@ -2177,6 +2253,16 @@ shinyServer(function(input, output) {
       df = as.data.frame(df)
       
       missingness_function(df,targets())
+    })
+    
+    output$data_MA_plot = renderPlotly({
+      df = data() %>% 
+        column_to_rownames('protein')
+      spots = proteins() %>% 
+        mutate(spot = protein)
+      #duplicated(df$protein)
+      #  rownames_to_column('protein')
+      MA_plot_function(df,spots)
     })
     
     output$data_table = DT::renderDataTable({
