@@ -35,6 +35,9 @@ paper_data_list = list(
 	'PC cohort' = 'www/PC cohort/',
 	'COVID HWC' = 'www/HWC'
 )
+
+
+
 # 
 # if(grepl('srvubushi',node)){
 # 	data_dir = '/mnt/MetaOmics/SharePoint/Antibody\ Arrays\ -\ Documents/Hazel/Data/Raw\ Data/'

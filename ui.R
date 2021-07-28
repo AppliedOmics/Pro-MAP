@@ -156,32 +156,52 @@ shinyUI(fluidPage(
             radioButtons('collapse_boxplots','Collapse Boxplots',c(F,T),inline = T),
             tabsetPanel(
               tabPanel('Raw Data',
-                column(12,plotOutput('E_boxplot')),
-                column(12,plotOutput('R_missing_plot')),
-                column(12,plotOutput('E_CV_plot')),
-                column(12,uiOutput('E_Heatmap_ui'))
+                       tabsetPanel(
+                         tabPanel('Plots',
+                            column(12,plotOutput('E_boxplot')),
+                            column(12,plotOutput('R_missing_plot')),
+                            column(12,plotOutput('E_CV_plot'))
+                         ),
+                         tabPanel('Clustering',
+                            column(12,uiOutput('E_Heatmap_ui'))
+                         ))
                 #column(12,uiOutput('E_corr_Heatmap_ui'))
               ),
               tabPanel('Background Correction',
-                       column(12,plotOutput('E_corr_boxplot')),
-                       column(12,plotOutput('E_corr_missing_plot')),
-                       column(12,plotOutput('E_corr_CV_plot')),
-                       column(12,uiOutput('E_corr_Heatmap_ui'))
+                       tabsetPanel(
+                         tabPanel('Plots',
+                           column(12,plotOutput('E_corr_boxplot')),
+                           column(12,plotOutput('E_corr_missing_plot')),
+                           column(12,plotOutput('E_corr_CV_plot'))
+                         ),
+                         tabPanel('Clustering',
+                           column(12,uiOutput('E_corr_Heatmap_ui'))
+                         ))
               ),
               
               tabPanel('Spot Filtering',
-                       column(12,plotOutput('E_filter_boxplot')),
-                       column(12,plotOutput('E_filter_missing_plot')),
-                       column(12,plotOutput('E_filter_CV_plot')),
-                       column(12,uiOutput('E_filter_Heatmap_ui'))  
+                       tabsetPanel(
+                         tabPanel('Plots',
+                           column(12,plotOutput('E_filter_boxplot')),
+                           column(12,plotOutput('E_filter_missing_plot')),
+                           column(12,plotOutput('E_filter_CV_plot'))
+                        ),
+                        tabPanel('Clustering',
+                                 column(12,uiOutput('E_filter_Heatmap_ui'))
+                        ))
                        
               ),
               
               tabPanel('Normalisation',
-                column(12,plotOutput('E_norm_boxplot')),
-                column(12,plotOutput('E_norm_missing_plot')),
-                column(12,plotOutput('E_norm_CV_plot')),
-                column(12,uiOutput('norm_Heatmap_ui'))
+                       tabsetPanel(
+                         tabPanel('Plots',
+                            column(12,plotOutput('E_norm_boxplot')),
+                            column(12,plotOutput('E_norm_missing_plot')),
+                            column(12,plotOutput('E_norm_CV_plot'))
+                         ),
+                         tabPanel('Clustering',
+                            column(12,uiOutput('norm_Heatmap_ui'))
+                         ))
               ),
               
           
@@ -196,7 +216,8 @@ shinyUI(fluidPage(
                        column(12,plotOutput('arrayw_barplot'))
                        ),
               tabPanel('Final Data',
-                       
+                       tabsetPanel(
+                         tabPanel('Table',
                        #column(6,tags$h2('Data')),
                        column(2,downloadButton('download_data',"Data Table")),
                        column(2,downloadButton('download_ExpSet',"ExpSet")),
@@ -204,11 +225,16 @@ shinyUI(fluidPage(
                        column(12,tags$h4(htmlOutput('data_dim_text'))),
                        
                        
-                       column(12,DT::dataTableOutput('data_table')),
-                        column(12,plotOutput('data_boxplot')),
-                       column(12,plotOutput('data_missing_plot')),
-                       column(12,plotOutput('data_CV_plot')),
+                       column(12,DT::dataTableOutput('data_table'))
+                         ),
+                       tabPanel("Plots",
+                          column(12,plotOutput('data_boxplot')),
+                         column(12,plotOutput('data_missing_plot')),
+                         column(12,plotOutput('data_CV_plot'))
+                       ),
+                       tabPanel('Clustering',
                         column(12,uiOutput('data_Heatmap_ui'))
+                       ))
               ),
               tabPanel('Threshold',
                        uiOutput('threshold_control_col_ui'),

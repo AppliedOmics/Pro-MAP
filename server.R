@@ -1484,6 +1484,42 @@ shinyServer(function(input, output) {
       
     }
     
+    dend_function = function(m,targets){
+      m
+ 
+      
+       dend <- m %>% scale %>% dist %>% 
+         hclust %>% as.dendrogram
+      #%>%
+      #  set("branches_k_color", k=3) %>% set("branches_lwd", 1.2) %>%
+      #  set("labels_colors") %>% set("labels_cex", c(.9,1.2)) %>% 
+      #  set("leaves_pch", 19) %>% set("leaves_col", c("blue", "red"))
+      # plot the dend in usual "base" plotting engine:
+      #plot(dend)
+      library(dendextend)
+      library(ggdendro)
+      ggd1 <- as.ggdend(dend)
+      ggplot(ggd1) 
+      
+      x <- as.matrix(scale(m))
+      dd.row <- as.dendrogram(hclust(dist(t(x))))
+      ddata_x <- dendro_data(dd.row)
+      #as.tbl(ddata_x)
+      
+      ddata_x$labels = ddata_x$labels %>%
+        mutate(Name = label) %>% 
+        left_join(targets)
+      #ddata_x$labels
+      ddata_x$leaf_labels = ddata_x$labels$label
+      
+      #da
+      p2 <- ggplot(segment(ddata_x)) +
+        geom_segment(aes(x=x, y=y, xend=xend, yend=yend))
+      p2 = p2 + geom_text(data=label(ddata_x),
+                     aes(label=label, x=x, y=y-2, colour=ddata_x$labels$Condition, angle = 90))
+      p2
+    }
+    
     log_min_function = function(m,input){
       if(input$min_corr == TRUE){
         m[m < 1] = 1
@@ -1511,12 +1547,25 @@ shinyServer(function(input, output) {
       #m[is.na(m)] = 0
       #m[is.infinite(m)] = 0
       m = m[,selected_targets()$Name]
-      plot_height = 300 + (dim(m)[1]*10)
-      output$E_Heatmap = renderPlot({
-        Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-      },height = plot_height)
+      # plot_height = 300 + (dim(m)[1]*10)
+      # output$E_Heatmap = renderPlot({
+      #   Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
+      # },height = plot_height)
+      # 
+      # plotOutput('E_Heatmap')
       
-      plotOutput('E_Heatmap')
+      if(dim(m)[1] < 200){
+        plot_height = 300 + (dim(m)[1]*10)
+        output$E_Heatmap = renderPlot({
+          Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
+        },height = plot_height)
+        plotOutput('E_Heatmap',height = plot_height)
+      }else{
+        output$E_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+          dend_function(m,target_conditions())
+        })})
+        plotOutput('E_dend') 
+      }
       
     })
     
@@ -1545,7 +1594,7 @@ shinyServer(function(input, output) {
   
     
     output$E_corr_Heatmap_ui = renderUI({
-      df = E_corr()$E 
+      df = E_corr()$E   
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
@@ -1553,12 +1602,19 @@ shinyServer(function(input, output) {
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
-        plot_height = 300 + (dim(m)[1]*10)
-        output$E_corr_Heatmap = renderPlot({
-          Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-        },height = plot_height)
+        if(dim(m)[1] < 200){
+          plot_height = 300 + (dim(m)[1]*10)
+          output$E_corr_Heatmap = renderPlot({
+            Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
+          },height = plot_height)
+          plotOutput('E_corr_Heatmap',height = plot_height)
+        }else{
+          output$E_corr_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+            dend_function(m,target_conditions())
+          })})
+          plotOutput('E_corr_dend') 
+        }
         
-        plotOutput('E_corr_Heatmap')
       }
       
     })
@@ -1638,12 +1694,26 @@ shinyServer(function(input, output) {
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
+      #   plot_height = 300 + (dim(m)[1]*10)
+      #   output$E_corr_Heatmap = renderPlot({
+      #     Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
+      #   },height = plot_height)
+      #   
+      #   plotOutput('E_corr_Heatmap')
+      # }
+      
+      if(dim(m)[1] < 200){
         plot_height = 300 + (dim(m)[1]*10)
-        output$E_corr_Heatmap = renderPlot({
+        output$E_filter_Heatmap = renderPlot({
           Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
         },height = plot_height)
-        
-        plotOutput('E_corr_Heatmap')
+        plotOutput('E_filter_Heatmap',height = plot_height)
+      }else{
+        output$E_filter_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+          dend_function(m,target_conditions())
+        })})
+        plotOutput('E_filter_dend') 
+      }
       }
       
     })
@@ -1742,10 +1812,17 @@ shinyServer(function(input, output) {
 
     })
     
-    output$E_norm_missing_plot = renderPlot({
-      df = E_norm() %>% 
-        column_to_rownames('spot')
+    output$E_norm_missing_plot = renderPlot({ 
+      df = E_norm()
+      if(TRUE %in% duplicated(df$spot)){
+        df = df %>% 
+          dplyr::select(-spot)
+      }else{
+        df = E_norm() %>% 
+          column_to_rownames('spot')
+      }
       
+      #View(df[df$spot %in% df$spot[duplicated(df$spot)],])
       #colnames(df) = target_names()
       #rownames(df) = spot_names()
       df = as.data.frame(df)
@@ -1753,7 +1830,7 @@ shinyServer(function(input, output) {
       missingness_function(df,targets())
     })
     
-    output$norm_Heatmap_ui = renderUI({
+    output$norm_Heatmap_ui = renderUI({ 
       df = E_norm()
       
       m = as.matrix(df %>% 
@@ -1766,12 +1843,25 @@ shinyServer(function(input, output) {
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
       
-        plot_height = 300 + (dim(m)[1]*10)
-          output$norm_Heatmap = renderPlot({
-            Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
-          },height = plot_height)
+        # plot_height = 300 + (dim(m)[1]*10)
+        #   output$norm_Heatmap = renderPlot({
+        #     Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
+        #   },height = plot_height)
+        #   
+        #   plotOutput('norm_Heatmap')
           
-          plotOutput('norm_Heatmap')
+          if(dim(m)[1] < 200){
+            plot_height = 300 + (dim(m)[1]*10)
+            output$E_norm_Heatmap = renderPlot({
+              Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
+            },height = plot_height)
+            plotOutput('E_norm_Heatmap',height = plot_height)
+          }else{
+            output$E_norm_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+              dend_function(m,target_conditions())
+            })})
+            plotOutput('E_norm_dend') 
+          }
       }
     
     })
@@ -2034,12 +2124,25 @@ shinyServer(function(input, output) {
       
       m = m[,select_cols]
       
-      plot_height = 300 + (dim(m)[1]*10)
-      output$data_Heatmap = renderPlot({
-        Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
-      },height = plot_height)
+      # plot_height = 300 + (dim(m)[1]*10)
+      # output$data_Heatmap = renderPlot({
+      #   Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
+      # },height = plot_height)
+      # 
+      # plotOutput('data_Heatmap')
       
-      plotOutput('data_Heatmap')
+      if(dim(m)[1] < 200){
+        plot_height = 300 + (dim(m)[1]*10)
+        output$data_Heatmap = renderPlot({
+          Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
+        },height = plot_height)
+        plotOutput('data_Heatmap',height = plot_height)
+      }else{
+        output$data_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+          dend_function(m,target_conditions())
+        })})
+        plotOutput('data_dend') 
+      }
       
     })
     
@@ -2362,12 +2465,25 @@ shinyServer(function(input, output) {
     m[is.na(m)] = 0
     (select_cols = intersect(selected_targets()$Name,colnames(m)))
     m = m[,select_cols]
-    plot_height = 300 + (dim(m)[1]*10)
-    output$threshold_Heatmap = renderPlot({
-      Heatmap_function(m,samples,features$protein,input$heatmap_order)
-    },height = plot_height)
+    # plot_height = 300 + (dim(m)[1]*10)
+    # output$threshold_Heatmap = renderPlot({
+    #   Heatmap_function(m,samples,features$protein,input$heatmap_order)
+    # },height = plot_height)
+    # 
+    # plotOutput('threshold_Heatmap')
     
-    plotOutput('threshold_Heatmap')
+    if(dim(m)[1] < 200){
+      plot_height = 300 + (dim(m)[1]*10)
+      output$threshold_Heatmap = renderPlot({
+        Heatmap_function(m,samples,features$protein,input$heatmap_order)
+      },height = plot_height)
+      plotOutput('threshold_Heatmap',height = plot_height)
+    }else{
+      output$threshold_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+        dend_function(m,samples)
+      })})
+      plotOutput('threshold_dend') 
+    }
     
   })
 
@@ -2960,11 +3076,24 @@ output$MA_plot = renderPlot({
     #m[is.infinite(m)] = 0
     m = m[,selected_targets()$Name]
     plot_height = 300 + (dim(m)[1]*10)
-    output$eBayes_Heatmap = renderPlot({
-      Heatmap_function(m,target_conditions(),rownames(m))
-    },height = plot_height)
+    # output$eBayes_Heatmap = renderPlot({
+    #   Heatmap_function(m,target_conditions(),rownames(m))
+    # },height = plot_height)
     
-    plotOutput('eBayes_Heatmap')
+    if(dim(m)[1] < 200){
+      plot_height = 300 + (dim(m)[1]*10)
+      output$eBayes_Heatmap = renderPlot({
+        Heatmap_function(m,target_conditions(),rownames(m))
+      },height = plot_height)
+      plotOutput('eBayes_Heatmap',height = plot_height)
+    }else{
+      output$eBayes_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+        dend_function(m,target_conditions())
+      })})
+      plotOutput('eBayes_dend') 
+    }
+    
+    #plotOutput('eBayes_Heatmap')
     
   })
   
