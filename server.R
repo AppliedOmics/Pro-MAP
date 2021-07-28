@@ -84,7 +84,7 @@ shinyServer(function(input, output) {
     eval(parse(text = cmd))
     p + theme(axis.text.x = element_text(angle = 90),
               axis.text = element_text(size = 12),
-              axis.title = element_blank()) 
+              axis.title.x = element_blank()) 
   }
   
   gg_col_function = function(p){
@@ -683,23 +683,33 @@ shinyServer(function(input, output) {
       target_names
     })
     
-    targets_upload = reactive({  
+    targets_upload = reactive({   
       input$reset_targets
       input$dataset
       input$gpr_files
+      target_file_path = NULL
+      
+      file_names = array_file_list()$name
+      (n = length(file_names))
+      df_files = data.frame(FileName = file_names,
+                            Name = tools::file_path_sans_ext(file_names)
+      )
+      dim(df_files)
+      as.tbl(df_files)
+      
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'targets.txt')) & is.null(values$target_file)){
-        df = read.csv(file.path(input$dataset,'targets.txt'),sep ='\t')
+        target_file_path = file.path(input$dataset,'targets.txt')
+        #df = read.csv(file.path(input$dataset,'targets.txt'),sep ='\t')
       }else{
         if(!is.null(values$target_file)){
-          file_names = array_file_list()$name
-          (n = length(file_names))
-          df_files = data.frame(FileName = file_names,
-                                Name = tools::file_path_sans_ext(file_names)
-          )
-          dim(df_files)
-          as.tbl(df_files)
           
-          df_upload = read.csv(values$target_file$datapath,sep ='\t')
+          target_file_path = values$target_file$datapath
+        }
+      }
+        if(!is.null(target_file_path)){
+  
+          
+          df_upload = read.csv(target_file_path,sep ='\t')
           dim(df_upload)
           
           if('FileName' %in% colnames(df_upload)){
@@ -713,18 +723,7 @@ shinyServer(function(input, output) {
           }
           
         }else{
-          
-          file_names = array_file_list()$name
-          
-          n = length(file_names)
-          df_files = data.frame(FileName = file_names,
-                                Name = tools::file_path_sans_ext(file_names)
-          )
-          dim(df_files)
-          as.tbl(df_files)
-          
           df = df_files
-          
         }
         
         if(!'Condition' %in% colnames(df)){
@@ -734,7 +733,7 @@ shinyServer(function(input, output) {
           df$Name = df$File
         }
         #df$Name = as.character(df$Name)
-      }
+   
       df$Name = as.character(df$Name)
       df
     })
@@ -898,23 +897,29 @@ shinyServer(function(input, output) {
       input$reset_spots
       input$dataset
       input$gpr_files
+      spot_file_path = NULL
+      
+      df = E()$genes
+      df$spot = spot_names()
+      
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt')) & is.null(values$spot_file)){
-        df = read.csv(file.path(input$dataset,'spots.txt'),sep ='\t')
+        #df = read.csv(file.path(input$dataset,'spots.txt'),sep ='\t')
+        spot_file_path = file.path(input$dataset,'spots.txt')
       }else{
         if(!is.null(values$spot_file)){
-          df = E()$genes
-          df$spot = spot_names()
-          #upload_df = read.table(input$spot_file$datapath,header = T)
-          upload_df = read.csv(input$spot_file$datapath,sep ='\t')
+          spot_file_path = input$spot_file$datapath
+        }
+      }
+      if(!is.null(spot_file_path)){
+
+          upload_df = read.csv(spot_file_path,sep ='\t')
           
           df = df %>% 
             left_join(upload_df)
-        }else{
-          df = E()$genes
-          df$spot = spot_names()
-          df$Category = character(dim(df)[1])
-          df
-        }
+      }
+      
+      if(!'Category' %in% colnames(df)){
+        df$Category = character(dim(df)[1])
       }
       df
     })
@@ -1024,24 +1029,31 @@ shinyServer(function(input, output) {
       input$dataset
       input$gpr_files
       #if(!is.null(values$data)){
+      
+     
+      df = data.frame(protein = data_full()$protein)
+
+      
+      protein_file_path = NULL
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'proteins.txt')) & is.null(values$protein_file)){
-        df = read.csv(file.path(input$dataset,'proteins.txt'),sep ='\t')
+        #df = read.csv(file.path(input$dataset,'proteins.txt'),sep ='\t')
+        protein_file_path = file.path(input$dataset,'proteins.txt')
       }else{
         if(!is.null(values$protein_file)){
-          df = data_full() 
-          
-          df = data.frame(protein = df$protein)
-          as.tbl(df)
-          #upload_df = read.table(input$protein_file$datapath,header = T)
-          upload_df = read.csv(input$protein_file$datapath,sep ='\t')
+          protein_file_path = input$protein_file$datapath
+        }
+      }
+      if(!is.null(protein_file_path)){
+      
+          upload_df = read.csv(protein_file_path,sep ='\t')
           df = df %>% 
             left_join(upload_df)
-        }else{
-          df = data_full()
-          df = data.frame(protein = df$protein,
-                          Category = character(dim(df)[1]))
-          df
-        }
+      }
+      
+      if(!'Category' %in% colnames(df)){
+     
+        df$Category = character(dim(df)[1])
+
       }
       
       df
@@ -1390,6 +1402,40 @@ shinyServer(function(input, output) {
         ylim(q[1],q[3])
     })
     
+    missingness_function = function(df,targets){
+
+      
+      df[df <= 0] = NA
+      as.tbl(df)
+      
+      df_l = df %>% 
+        rownames_to_column('spot') %>% 
+        gather(Name,value,colnames(df)) %>% 
+        filter(!is.na(value))
+      as.tbl(df_l)
+      
+      df_count = df_l %>% 
+        group_by(Name) %>% 
+          summarise(`Percentage missing` = (dim(df)[1]-n())/dim(df)[1]*100) %>% 
+        ungroup() %>% 
+        left_join(targets)
+      df_count  
+      
+      p = ggplot(df_count) +
+        geom_col(aes(x = Name,y = `Percentage missing`, fill = Condition))
+      p = gg_fill_function(p) 
+      p
+    }
+    
+    output$R_missing_plot = renderPlot({
+      df = E()$E   
+      colnames(df) = target_names()
+      rownames(df) = spot_names()
+      df = as.data.frame(df)
+      
+      missingness_function(df,targets())
+    })
+    
     #---------------------------------Background Correction----------------------------
     
     Heatmap_function = function(m, targets,spots,cluster = 'Cluster'){ 
@@ -1487,6 +1533,15 @@ shinyServer(function(input, output) {
       
       
     })
+    
+    output$E_corr_missing_plot = renderPlot({
+      df = E_corr()$E
+      colnames(df) = target_names()
+      rownames(df) = spot_names()
+      df = as.data.frame(df)
+      as.tbl(df)
+      missingness_function(df,targets())
+    })
   
     
     output$E_corr_Heatmap_ui = renderUI({
@@ -1564,6 +1619,14 @@ shinyServer(function(input, output) {
       
     })
     
+    output$E_filter_missing_plot = renderPlot({
+      df = E_filter()
+      colnames(df) = target_names()
+      rownames(df) = spot_names()
+      df = as.data.frame(df)
+      
+      missingness_function(df,targets())
+    })
     
     output$E_filter_Heatmap_ui = renderUI({
       df = E_filter() 
@@ -1677,6 +1740,17 @@ shinyServer(function(input, output) {
       boxplot_function_1_col_array(data,target_names(),E_norm()$spot,target_conditions(),selected_targets(),FALSE,input)
       
 
+    })
+    
+    output$E_norm_missing_plot = renderPlot({
+      df = E_norm() %>% 
+        column_to_rownames('spot')
+      
+      #colnames(df) = target_names()
+      #rownames(df) = spot_names()
+      df = as.data.frame(df)
+      
+      missingness_function(df,targets())
     })
     
     output$norm_Heatmap_ui = renderUI({
@@ -1989,6 +2063,17 @@ shinyServer(function(input, output) {
       ggplot(CV_df) + 
         geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
         ylim(q[1],q[3])
+    })
+    
+    output$data_missing_plot = renderPlot({
+      df = data() %>% 
+        column_to_rownames('protein')
+      
+      #colnames(df) = target_names()
+      #rownames(df) = spot_names()
+      df = as.data.frame(df)
+      
+      missingness_function(df,targets())
     })
     
     output$data_table = DT::renderDataTable({

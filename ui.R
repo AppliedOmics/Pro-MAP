@@ -36,7 +36,7 @@ shinyUI(fluidPage(
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,'wtflags(0.1)','wtarea(150)','sd_filter'),F,inline = T)),
+        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,'wtflags(0.1)','wtarea(150)','sd_filter'),'sd_filter',inline = T)),
         uiOutput('annotation_columns_ui'),
         #uiOutput('sample_file_upload_ui'),
         selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
@@ -157,18 +157,21 @@ shinyUI(fluidPage(
             tabsetPanel(
               tabPanel('Raw Data',
                 column(12,plotOutput('E_boxplot')),
+                column(12,plotOutput('R_missing_plot')),
                 column(12,plotOutput('E_CV_plot')),
                 column(12,uiOutput('E_Heatmap_ui'))
                 #column(12,uiOutput('E_corr_Heatmap_ui'))
               ),
               tabPanel('Background Correction',
                        column(12,plotOutput('E_corr_boxplot')),
+                       column(12,plotOutput('E_corr_missing_plot')),
                        column(12,plotOutput('E_corr_CV_plot')),
                        column(12,uiOutput('E_corr_Heatmap_ui'))
               ),
               
               tabPanel('Spot Filtering',
                        column(12,plotOutput('E_filter_boxplot')),
+                       column(12,plotOutput('E_filter_missing_plot')),
                        column(12,plotOutput('E_filter_CV_plot')),
                        column(12,uiOutput('E_filter_Heatmap_ui'))  
                        
@@ -176,6 +179,7 @@ shinyUI(fluidPage(
               
               tabPanel('Normalisation',
                 column(12,plotOutput('E_norm_boxplot')),
+                column(12,plotOutput('E_norm_missing_plot')),
                 column(12,plotOutput('E_norm_CV_plot')),
                 column(12,uiOutput('norm_Heatmap_ui'))
               ),
@@ -202,6 +206,7 @@ shinyUI(fluidPage(
                        
                        column(12,DT::dataTableOutput('data_table')),
                         column(12,plotOutput('data_boxplot')),
+                       column(12,plotOutput('data_missing_plot')),
                        column(12,plotOutput('data_CV_plot')),
                         column(12,uiOutput('data_Heatmap_ui'))
               ),
