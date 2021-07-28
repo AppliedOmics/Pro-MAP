@@ -1460,7 +1460,7 @@ shinyServer(function(input, output) {
         Rfit2 = eBayes(Rfit)
         Rfit2_df = as.data.frame(Rfit2)
         as.tbl(Rfit2_df)
-        rownames(Rfit2_df)
+        rownames(Rfit2_df) = rownames(df)
         #Rfit2_df$sig = NA
         #Rfit2_df$sig[Rfit2_df$p.value < 0.05] = '+'
         #Rfit2_df$sig[Rfit2_df$p.value >= 0.05] = '-'
@@ -1482,8 +1482,9 @@ shinyServer(function(input, output) {
     }
     
     output$R_MA_plot = renderPlotly({
-      df = E()$E
+      df = E()$E 
       rownames(df) = spot_names()
+      spots = spots()
       MA_plot_function(df,spots())
     })
     
