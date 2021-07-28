@@ -709,7 +709,7 @@ shinyServer(function(input, output) {
         if(!is.null(target_file_path)){
   
           
-          df_upload = read.csv(target_file_path,sep ='\t')
+          df_upload = read.csv(target_file_path,sep ='\t',stringsAsFactors = F)
           dim(df_upload)
           
           if('FileName' %in% colnames(df_upload)){
@@ -912,7 +912,7 @@ shinyServer(function(input, output) {
       }
       if(!is.null(spot_file_path)){
 
-          upload_df = read.csv(spot_file_path,sep ='\t')
+          upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
           
           df = df %>% 
             left_join(upload_df)
@@ -1045,7 +1045,7 @@ shinyServer(function(input, output) {
       }
       if(!is.null(protein_file_path)){
       
-          upload_df = read.csv(protein_file_path,sep ='\t')
+          upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
           df = df %>% 
             left_join(upload_df)
       }
