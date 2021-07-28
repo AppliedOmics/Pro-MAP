@@ -876,8 +876,16 @@ shinyServer(function(input, output) {
       }else{
         spot_names = paste(E()$genes$ID)
       }
-      duplicated(spot_names)
-      
+      i = 1
+      if(input$remove_spot_duplicates == T){
+        while(TRUE %in% duplicated(spot_names)){
+          print(paste('hit :',i))
+          print(length(spot_names[duplicated(spot_names) == TRUE]))
+          spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
+          i = i + 1
+        }
+        TRUE %in% duplicated(spot_names)
+      }
       spot_names
     })
     
@@ -1382,7 +1390,7 @@ shinyServer(function(input, output) {
     }
 
     E_CV_df = reactive({
-      df = E()$E
+      df = E()$E  
       targets = targets()
       target_names = target_names()
       spot_names = spot_names()
@@ -1857,7 +1865,7 @@ shinyServer(function(input, output) {
       df$spot = spot_names
       
       df_f = df %>% 
-        filter(spot %in% removed_spots)
+        dplyr::filter(spot %in% removed_spots)
       
       df_m = df_f %>% 
         dplyr::select(-spot)
@@ -2602,7 +2610,7 @@ shinyServer(function(input, output) {
   #### Comparing Methods ####
   
     
-  corr = reactive({
+  corr = reactive({ 
     E_corr <-  backgroundCorrect(E(), method = "none")
     S_corr <-  backgroundCorrect(E(), method = "subtract")
     M_corr <-  backgroundCorrect(E(), method = "movingmin")
@@ -2617,27 +2625,27 @@ shinyServer(function(input, output) {
     
   multi_norm_function = function(data,spot_names,target_names,removed_spots,log_rb,method,proteins,input){
     
-    norm_list = pre_norm_function(data$E,spot_names,target_names,removed_spots,log_rb)
+    norm_list = pre_norm_function(data$E$E,spot_names,target_names,removed_spots,log_rb)
     E_norm = norm_function(norm_list$m,method,norm_list$spots)
     E_proteins = protein_collapse_function(E_norm,spots(),input)
     E = protein_filter_function(E_proteins,proteins,input)
     E = as.data.frame(E) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$S,spot_names,target_names,removed_spots,log_rb)
+    norm_list = pre_norm_function(data$S$E,spot_names,target_names,removed_spots,log_rb)
     S_norm = norm_function(norm_list$m,method,norm_list$spots)
     S_proteins = protein_collapse_function(S_norm,spots(),input)
     S = protein_filter_function(S_proteins,proteins,input)
     #S = as.data.frame(S) %>% column_to_rownames('protein')
     S = as.data.frame(S) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$N,spot_names,target_names,removed_spots,log_rb)
+    norm_list = pre_norm_function(data$N$E,spot_names,target_names,removed_spots,log_rb)
     N_norm = norm_function(norm_list$m,method,norm_list$spots)
     N_proteins = protein_collapse_function(N_norm,spots(),input)
     N = protein_filter_function(N_proteins,proteins,input)
     #N = as.data.frame(N) %>% column_to_rownames('protein')
     N = as.data.frame(N) %>% dplyr::select(-one_of('protein'))
     
-    norm_list = pre_norm_function(data$M,spot_names,target_names,removed_spots,log_rb)
+    norm_list = pre_norm_function(data$M$E,spot_names,target_names,removed_spots,log_rb)
     M_norm = norm_function(norm_list$m,method,norm_list$spots)
     M_proteins = protein_collapse_function(M_norm,spots(),input)
     M = protein_filter_function(M_proteins,proteins,input)
@@ -2673,6 +2681,15 @@ shinyServer(function(input, output) {
     data = corr()    
     #spots = paste(E()$genes$ID)
     #targets = c(targets()$Name)
+    
+    
+    spot_names = spot_names()
+    target_names = target_names()
+    removed_spots = removed_spots()
+    log_rb = input$rb_log
+    proteins = proteins()
+    
+    
     method = "none"
     E = multi_norm_function(data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     

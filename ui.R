@@ -92,6 +92,7 @@ shinyUI(fluidPage(
                    #uiOutput('R_spot_control_ui'),
                    #uiOutput('G_spot_control_ui'),
                    uiOutput('both_spot_control_ui'),
+                   radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),inline = T),
                    column(12,DT::dataTableOutput('spot_table'))
                    
           ),
