@@ -1454,7 +1454,7 @@ shinyServer(function(input, output) {
           
           if(j > i){
             #print(paste(i,j))
-            comparisons = paste0(conditions[i],'vs',conditions[j],' = ',conditions[i],'-',conditions[j])
+            comparisons = paste0(conditions[i],'_vs_',conditions[j],' = ',conditions[i],'-',conditions[j])
             #print(comparisons)
             comparison_list = c(comparison_list,comparisons)
           }
@@ -1487,13 +1487,33 @@ shinyServer(function(input, output) {
           left_join(spots)
         
         as.tbl(plot_df)
+        
+        
         if(length(unique(plot_df$Category))>1){
           MA_plot = ggplot(plot_df) + 
-            geom_point(aes(y = log(F), x = log(Amean),col = Category,group = spot))
+            geom_point(aes(y = log(F), x = Amean,col = Category,group = spot))
         }else{
           MA_plot = ggplot(plot_df) + 
-            geom_point(aes(y = log(F), x = log(Amean),group = spot))
+            geom_point(aes(y = log(F), x = Amean,group = spot))
         }
+        
+        # if(input$log_rb == FALSE){
+        #   if(length(unique(plot_df$Category))>1){
+        #     MA_plot = ggplot(plot_df) + 
+        #       geom_point(aes(y = log(F), x = log(Amean),col = Category,group = spot))
+        #   }else{
+        #     MA_plot = ggplot(plot_df) + 
+        #       geom_point(aes(y = log(F), x = log(Amean),group = spot))
+        #   }
+        # }else{
+        #   if(length(unique(plot_df$Category))>1){
+        #     MA_plot = ggplot(plot_df) + 
+        #       geom_point(aes(y = F, x = Amean,col = Category,group = spot))
+        #   }else{
+        #     MA_plot = ggplot(plot_df) + 
+        #       geom_point(aes(y = F, x = Amean,group = spot))
+        #   }
+        # }
         MA_plot
     }
     
@@ -2749,7 +2769,7 @@ shinyServer(function(input, output) {
   }
   
   Amean_data = reactive({
-    
+     
     E_Amean = multi_Amean_function(Rfit()$E,"None")  
     S_Amean = multi_Amean_function(Rfit()$S,"Scale")
     Q_Amean = multi_Amean_function(Rfit()$Q,"Quantile")
@@ -2760,22 +2780,55 @@ shinyServer(function(input, output) {
       rbind(C_Amean)
     
     as.tbl(as.data.frame(Amean))
+    Amean$Correction = factor(Amean$Correction, levels = unique(Amean$Correction))
+    Amean$Normalisation = factor(Amean$Normalisation, levels = unique(Amean$Normalisation))
     Amean
+    #Amean$A
     
   })
   
-  output$Amean_plot = renderPlot({
-
+  
+  output$MA_correction_ui = renderUI({
+    df = Amean_data()
+    selectInput('MA_correction','Background Correction',unique(df$Correction),unique(df$Correction),multiple = T)
+  })
+  
+  output$MA_normalisation_ui = renderUI({
+    df = Amean_data()
+    selectInput('MA_normalisation','Normalisation',unique(df$Normalisation),unique(df$Normalisation),multiple = T)
+  })
+  
+  
+  
+  
+  output$Amean_plot_ui = renderUI({
+      plot_height = single_plot_height * length(input$MA_normalisation)
+      output$Amean_plot = renderPlot({
     
-    Amean = Amean_data()
-
-    
-    ggplot(Amean, aes(x= Correction, y=log(Amean), fill=Correction))+
-      geom_boxplot()+
-      #theme_classic()+
-      theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
-      facet_grid(Normalisation ~ .)
-  },height = multi_plot_height)
+          
+          Amean = Amean_data() %>% 
+            filter(Correction %in% input$MA_correction, 
+                   Normalisation %in% input$MA_normalisation)
+          
+          
+      
+      
+            p = ggplot(Amean, aes(x= Correction, y=Amean, fill=Correction))+
+              geom_boxplot()+
+              #theme_classic()+
+              theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
+              facet_grid(Normalisation ~ .)
+            q = quantile(Amean$Amean,na.rm = T)
+            if(input$MA_quantile == T){
+              p = p + 
+                ylim(q[1],q[3])
+            }
+            p
+          
+        },height = plot_height)
+      
+      plotOutput('Amean_plot',height = plot_height)
+  })
   
   multi_M_function = function(data,norm){
     Rfit2 = data$E
@@ -2805,31 +2858,51 @@ shinyServer(function(input, output) {
       rbind(C_M_l)
     
     as.tbl(M_l)
+    
+    M_l$Correction = factor(M_l$Correction, levels = unique(M_l$Correction))
+    M_l$Normalisation = factor(M_l$Normalisation, levels = unique(M_l$Normalisation))
+    
     M_l
   })
   
   
-  output$M_plot = renderPlot({
+  output$M_plot_ui = renderUI({
+    plot_height = single_plot_height * length(input$MA_normalisation)
+  
+    output$M_plot = renderPlot({
+      
     
-    # E_logM_l = multi_M_function(Rfit()$E,"None")
-    # S_logM_l = multi_M_function(Rfit()$S,"Scale")
-    # Q_logM_l = multi_M_function(Rfit()$Q,"Quantile")
-    # C_logM_l = multi_M_function(Rfit()$C,"Cyclicloess")
-    # 
-    # logM_l = E_logM_l %>% 
-    #   rbind(S_logM_l) %>% 
-    #   rbind(Q_logM_l) %>% 
-    #   rbind(C_logM_l)
-    # 
-    # as.tbl(logM_l) 
-    M_l =(M_plot_data())
-    
-    ggplot(M_l, aes(x= Correction, y=log(M), fill=Correction))+
-      geom_boxplot()+
-      #theme_classic()+
-      theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
-      facet_grid(Normalisation ~ .)
-  },height = multi_plot_height)
+      M_l = M_plot_data()  %>% 
+        filter(Correction %in% input$MA_correction, 
+               Normalisation %in% input$MA_normalisation)
+      if(input$log_rb_M == TRUE){
+        p = ggplot(M_l, aes(x= Correction, y=log(M), fill=Correction))+
+          geom_boxplot()+
+          #theme_classic()+
+          theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
+          facet_grid(Normalisation ~ .)
+        q = quantile(log(M_l$M),na.rm = T)
+        if(input$MA_quantile == T){
+          p = p + 
+            ylim(q[1],q[3])
+        }
+      }else{
+        p = ggplot(M_l, aes(x= Correction, y=M, fill=Correction))+
+          geom_boxplot()+
+          #theme_classic()+
+          theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
+          facet_grid(Normalisation ~ .)
+        q = quantile(M_l$M,na.rm = T)
+        if(input$MA_quantile == T){
+          p = p + 
+            ylim(q[1],q[3])
+        }
+      }
+      p
+    },height = plot_height)
+  
+    plotOutput('M_plot',height = plot_height)
+  })
   
  
 MA_data = reactive({
@@ -2846,13 +2919,28 @@ MA_data = reactive({
   MA
 })
 
-output$MA_plot = renderPlot({
-  MA = MA_data()
-  as.tbl(MA)
-  ggplot(MA) + 
-    geom_point(aes(x = log(Amean), y = log(M))) + 
-    facet_grid(Normalisation ~ Correction)
-},height = multi_plot_height)
+
+  output$MA_plot_ui = renderUI({
+    plot_height = single_plot_height * length(input$MA_normalisation)
+    output$MA_plot = renderPlot({
+      MA = MA_data() %>% 
+        filter(Correction %in% input$MA_correction, 
+               Normalisation %in% input$MA_normalisation)
+      as.tbl(MA)
+      if(input$log_rb_M == TRUE){
+      
+        ggplot(MA) + 
+          geom_point(aes(x = Amean, y = log(M))) + 
+          facet_grid(Normalisation ~ Correction)
+      }else{
+        ggplot(MA) + 
+          geom_point(aes(x = Amean, y = M)) + 
+          facet_grid(Normalisation ~ Correction)
+      }
+    },height = plot_height)
+  
+    plotOutput('MA_plot',height = plot_height)
+  })
     
   
   multi_precision_function = function(data,norm){
@@ -2903,9 +2991,7 @@ output$MA_plot = renderPlot({
     Precision_melt
   }
   
-  precision_plots = reactive({
-
-    
+  precision_data = reactive({
     E_Precision_melt = multi_precision_function(Rfit()$E,"None")
     S_Precision_melt = multi_precision_function(Rfit()$S,"Scale")
     Q_Precision_melt = multi_precision_function(Rfit()$Q,"Quantile")
@@ -2915,6 +3001,19 @@ output$MA_plot = renderPlot({
       rbind(S_Precision_melt) %>% 
       rbind(Q_Precision_melt) %>% 
       rbind(C_Precision_melt)
+    Precision_melt
+    
+    Precision_melt$Background_correction = factor(Precision_melt$Background_correction, levels = unique(Precision_melt$Background_correction))
+    Precision_melt$Normalisation = factor(Precision_melt$Normalisation, levels = unique(Precision_melt$Normalisation))
+    
+    Precision_melt
+  })
+  
+  precision_plots = reactive({
+
+    Precision_melt = precision_data() %>% 
+      filter(Background_correction %in% input$MA_correction, 
+             Normalisation %in% input$MA_normalisation)
     #Precision plots
     p = ggplot(Precision_melt, aes(x=Amean, y=log2(Variance), color=Background_correction)) +
       geom_smooth(method = "loess", se=FALSE)+
@@ -2934,13 +3033,21 @@ output$MA_plot = renderPlot({
     
   })
   
-  output$precision_plot_1 = renderPlot({
-    precision_plots()$p
-  },height = multi_plot_height)
+  output$precision_plot_ui = renderUI({
+    plot_height = single_plot_height * length(input$MA_normalisation)
   
-  output$precision_plot_2 = renderPlot({
-    precision_plots()$p2
-  },height = multi_plot_height)
+      output$precision_plot_1 = renderPlot({
+        precision_plots()$p
+      },height = plot_height)
+      
+      output$precision_plot_2 = renderPlot({
+        precision_plots()$p2
+      },height = plot_height)
+      
+    lst = list(plotOutput('precision_plot_1',height = plot_height),
+               plotOutput('precision_plot_2'),height = plot_height)
+    do.call(tagList,lst)
+  })
   
   
   ### _ Line Graphs ####
@@ -3018,48 +3125,15 @@ output$MA_plot = renderPlot({
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     
     df = df[,selected_cols]
-    #as.tbl(df)  
-    #dplyr::select(-protein)
-    
-    #colnames(target_conditions()) 
-    
-    
-    #DS = selected_targets() %>% 
-    #  filter(Name %in% selected_cols) %>% 
-    #  pull(Condition)
 
-      #filter(Name %in% selected_cols)
-    #DS = factor(DS,levels= unique(DS))
-    #DS
-    #colnames(data())
-    
-    #DS
-    #design = model.matrix(~0+DS)
-    #colnames(design) = levels(DS)
-    #design
-    #dim(design)
-    #dim(df)
-    cont_matrix_list = cont_matrix_function(df,targets())
+    cont_matrix_list = cont_matrix_function(df,selected_targets())
     design = cont_matrix_list$design
     cont.matrix = cont_matrix_list$cont.matrix
     
     fit = lmFit(df,design, weights = as.numeric(arrayw_df()[,selected_cols]))
     fit
-    
-    #unique(selected_targets()$Condition)
-    
-    
-    
-    #cont.matrix = makeContrasts(
-    #  PCR_PositivevsControl = PCR_Positive-Control,
-    # levels=design
-    #)
-    
-    #u_DS = unique(DS)
-    #u_DS
-    #cmd = paste0('cont.matrix = makeContrasts(',u_DS[1],'vs',u_DS[2],' = ',u_DS[1],'-',u_DS[2],',levels=design)')
-    #cmd
-    #eval(parse(text = cmd))
+
+
     fit2 = contrasts.fit(fit,cont.matrix)
     fit2 = eBayes(fit2)
     fit2
@@ -3069,14 +3143,20 @@ output$MA_plot = renderPlot({
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold)
     Sig_Proteins
+    
+    list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd)
     })
   
+  output$cont_matrix_text = renderText({
+    eBayes_test()$cont_matrix
+  })
+  
   output$eBays_table = DT::renderDataTable({
-    eBayes_test()
+    eBayes_test()$df
   })
   
   eBayes_sig_data = reactive({
-    sig_df = eBayes_test() %>%  
+    sig_df = eBayes_test()$df %>%  
       rownames_to_column('protein')
     as.tbl(sig_df)
     df = data()

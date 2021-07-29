@@ -21,6 +21,8 @@ options(DT.options = list(pageLength = 25))
 node = Sys.info()["nodename"]
 data_dir = 'www/'
 
+single_plot_height = 300
+
 multi_plot_height = 600
 if(node == 'WoW.local'){
 	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/Hazel/Data/Raw Data/'
@@ -34,6 +36,7 @@ paper_data_list = list(
 	'GSH cohort' = 'www/GSH Cohort/',
 	'JHB cohort' = 'www/JHB cohort/',
 	'PC cohort' = 'www/PC cohort/',
+	'TC cohort' = 'www/TR cohort/',
 	'COVID HWC' = 'www/HWC'
 )
 

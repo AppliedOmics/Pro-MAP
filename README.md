@@ -5,3 +5,5 @@
 	- add categories separate CV's
 - MA plots
 	- using plotly
+- Significance Testing
+	- generetate contigency matrix for all conditions

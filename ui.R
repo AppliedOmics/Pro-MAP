@@ -269,15 +269,25 @@ shinyUI(fluidPage(
             )
         ),
         tabPanel('All Methods',
+                 column(3,uiOutput('MA_correction_ui')),
+                 column(3,uiOutput('MA_normalisation_ui')),
+                 column(3,radioButtons('log_rb_M','log(M)',c(T,F),inline = T)),
+                 column(3,radioButtons('MA_quantile','Limit axes plots to Quantitles',c(T,F))),
+                column(12,
                  tags$h4('MA plot'),
-                 plotOutput('MA_plot',height = multi_plot_height),
+                 uiOutput('MA_plot_ui'),
+                 #plotOutput('MA_plot',height = multi_plot_height),
                  tags$h4('A mean Plot'),
-                 plotOutput('Amean_plot',height = multi_plot_height),
+                 #plotOutput('Amean_plot',height = multi_plot_height),
+                 uiOutput('Amean_plot_ui'),
                  tags$h4('M plot'),
-                 plotOutput('M_plot',height = multi_plot_height),
+                 uiOutput('M_plot_ui'),
+                 #plotOutput('M_plot',height = multi_plot_height),
                  tags$h4('Precision Plots'),
-                 plotOutput('precision_plot_1',height = multi_plot_height),
-                 plotOutput('precision_plot_2',height = multi_plot_height),
+                 uiOutput('precision_plot_ui')
+                 #plotOutput('precision_plot_1',height = multi_plot_height),
+                 #plotOutput('precision_plot_2',height = multi_plot_height)
+                 )
                  #plotOutput('multi_line_plot',height = multi_plot_height)
                  
                  
@@ -286,6 +296,7 @@ shinyUI(fluidPage(
                  selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH'),
                  tabsetPanel(
                    tabPanel('eBayes',
+                            textOutput('cont_matrix_text'),
                             tabsetPanel(
                               tabPanel('Table',
                                        DT::dataTableOutput('eBays_table')
