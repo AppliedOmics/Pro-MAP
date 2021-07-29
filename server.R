@@ -690,7 +690,7 @@ shinyServer(function(input, output) {
     })
     
     targets_upload = reactive({   
-      input$reset_targets
+      input$reset_targets  
       input$dataset
       input$gpr_files
       target_file_path = NULL
@@ -724,6 +724,7 @@ shinyServer(function(input, output) {
               left_join(df_upload %>% 
                           filter(!duplicated(FileName))) %>%
               filter(FileName %in% file_names)
+            df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
           }else{
             df = df_files
           }
@@ -1105,7 +1106,7 @@ shinyServer(function(input, output) {
     })
     
     output$proteins_table = DT::renderDataTable({
-      proteins()
+      proteins() 
     })
     
     output$download_proteins <- downloadHandler(

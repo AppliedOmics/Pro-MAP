@@ -1,4 +1,4 @@
-Proteins	Category
+protein	Category
 ACVR2B	analyte
 AKT1	analyte
 BAGE2	analyte
