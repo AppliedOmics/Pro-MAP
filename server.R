@@ -274,6 +274,10 @@ shinyServer(function(input, output) {
       paste(test_files()$col_names)
     })
     
+    output$data_columns_text = renderPrint({
+      cat(paste(data_col_names(),collapse =', '))
+    })
+    
     output$test_files_table = DT::renderDataTable({
       df = test_files()$file_df  
       df_g = df %>% group_by(Number.of.Spots,Number.of.Metric.Columns) %>% 
@@ -855,6 +859,27 @@ shinyServer(function(input, output) {
       #}
     })
     
+    output$spot_columns_ui = renderUI({
+      input$dataset 
+      input$gpr_files
+      input$reset_proteins
+      selected = 'Annotation'
+      
+      columns = input$select_annotation
+      
+      if("Name" %in% columns){
+        selected = 'Name'
+      }
+      if("ID" %in% columns){
+        selected = 'ID'
+      }
+      if("Gene_symbol" %in% columns){
+        selected = 'Gene_symbol'
+      }
+      selected
+      selectInput('spot_column','Spot Column',columns,selected)
+    })
+    
     # spot_names = reactive({
     #   if(is.null(input$gpr_files$datapath)){
     #     spot_names = paste(E()$genes$ID)
@@ -872,12 +897,14 @@ shinyServer(function(input, output) {
     spot_names = reactive({
       input$reset_spots
       
-      if(test_files()$type == 'flat'){
-        spot_names = paste(E()$genes$Annotation)
-      }else{
-        spot_names = paste(E()$genes$ID)
-      }
-      i = 1
+      #if(test_files()$type == 'flat'){
+      #  spot_names = paste(E()$genes$Annotation)
+      #}else{
+      #  spot_names = paste(E()$genes$ID)
+      #}
+      
+      spot_names = E()$genes[[input$spot_column]]
+      #i = 1
 
       spot_names
     })
@@ -1478,19 +1505,25 @@ shinyServer(function(input, output) {
     }
     
     MA_plot_function = function(df,spots){
-        
+        if('spot' %in% colnames(df)){
+          spot_col = df$spot
+          df = df %>% dplyr::select(-spot)
+        }else{
+          spot_col = rownames(df)
+        }
+      
         Rfit = lmFit(df)
         Rfit2 = eBayes(Rfit)
         Rfit2_df = as.data.frame(Rfit2)
         as.tbl(Rfit2_df)
-        rownames(Rfit2_df) = rownames(df)
-        #Rfit2_df$sig = NA
-        #Rfit2_df$sig[Rfit2_df$p.value < 0.05] = '+'
-        #Rfit2_df$sig[Rfit2_df$p.value >= 0.05] = '-'
+        dim(Rfit2_df)
+        #rownames(Rfit2_df) = rownames(df)
+        Rfit2_df$spot = spot_col
+      
         as.tbl(Rfit2_df)
         
         plot_df = Rfit2_df %>% 
-          rownames_to_column('spot') %>% 
+          
           left_join(spots)
         
         as.tbl(plot_df)
@@ -1504,28 +1537,12 @@ shinyServer(function(input, output) {
             geom_point(aes(y = log(F), x = Amean,group = spot))
         }
         
-        # if(input$log_rb == FALSE){
-        #   if(length(unique(plot_df$Category))>1){
-        #     MA_plot = ggplot(plot_df) + 
-        #       geom_point(aes(y = log(F), x = log(Amean),col = Category,group = spot))
-        #   }else{
-        #     MA_plot = ggplot(plot_df) + 
-        #       geom_point(aes(y = log(F), x = log(Amean),group = spot))
-        #   }
-        # }else{
-        #   if(length(unique(plot_df$Category))>1){
-        #     MA_plot = ggplot(plot_df) + 
-        #       geom_point(aes(y = F, x = Amean,col = Category,group = spot))
-        #   }else{
-        #     MA_plot = ggplot(plot_df) + 
-        #       geom_point(aes(y = F, x = Amean,group = spot))
-        #   }
-        # }
+   
         MA_plot
     }
     
     output$R_MA_plot = renderPlotly({
-      df = E()$E 
+      df = E()$E  
       rownames(df) = spot_names()
       spots = spots()
       MA_plot_function(df,spots())
@@ -1659,7 +1676,7 @@ shinyServer(function(input, output) {
       # 
       # plotOutput('E_Heatmap')
       
-      if(dim(m)[1] < 200){
+      if(dim(m)[1] < max_heatmap_rows){
         plot_height = 300 + (dim(m)[1]*10)
         output$E_Heatmap = renderPlot({
           Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
@@ -1728,7 +1745,7 @@ shinyServer(function(input, output) {
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
-        if(dim(m)[1] < 200){
+        if(dim(m)[1] < max_heatmap_rows){
           plot_height = 300 + (dim(m)[1]*10)
           output$E_corr_Heatmap = renderPlot({
             Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
@@ -1836,7 +1853,7 @@ shinyServer(function(input, output) {
       #   plotOutput('E_corr_Heatmap')
       # }
       
-      if(dim(m)[1] < 200){
+      if(dim(m)[1] < max_heatmap_rows){
         plot_height = 300 + (dim(m)[1]*10)
         output$E_filter_Heatmap = renderPlot({
           Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
@@ -1972,8 +1989,8 @@ shinyServer(function(input, output) {
     })
     
     output$E_norm_MA_plot = renderPlotly({
-      df = E_norm() %>% 
-        column_to_rownames('spot')
+      df = E_norm()
+      spots = spots()
       MA_plot_function(df,spots())
     })
     
@@ -1997,7 +2014,7 @@ shinyServer(function(input, output) {
         #   
         #   plotOutput('norm_Heatmap')
           
-          if(dim(m)[1] < 200){
+          if(dim(m)[1] < max_heatmap_rows){
             plot_height = 300 + (dim(m)[1]*10)
             output$E_norm_Heatmap = renderPlot({
               Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
@@ -2278,7 +2295,7 @@ shinyServer(function(input, output) {
       # 
       # plotOutput('data_Heatmap')
       
-      if(dim(m)[1] < 200){
+      if(dim(m)[1] < max_heatmap_rows){
         plot_height = 300 + (dim(m)[1]*10)
         output$data_Heatmap = renderPlot({
           Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
@@ -2629,7 +2646,7 @@ shinyServer(function(input, output) {
     # 
     # plotOutput('threshold_Heatmap')
     
-    if(dim(m)[1] < 200){
+    if(dim(m)[1] < max_heatmap_rows){
       plot_height = 300 + (dim(m)[1]*10)
       output$threshold_Heatmap = renderPlot({
         Heatmap_function(m,samples,features$protein,input$heatmap_order)
@@ -3209,7 +3226,7 @@ MA_data = reactive({
     #   Heatmap_function(m,target_conditions(),rownames(m))
     # },height = plot_height)
     
-    if(dim(m)[1] < 200){
+    if(dim(m)[1] < max_heatmap_rows){
       plot_height = 300 + (dim(m)[1]*10)
       output$eBayes_Heatmap = renderPlot({
         Heatmap_function(m,target_conditions(),rownames(m))

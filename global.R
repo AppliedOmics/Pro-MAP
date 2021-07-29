@@ -22,6 +22,7 @@ node = Sys.info()["nodename"]
 data_dir = 'www/'
 
 single_plot_height = 300
+max_heatmap_rows = 1000
 
 multi_plot_height = 600
 if(node == 'WoW.local'){

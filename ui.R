@@ -58,9 +58,7 @@ shinyUI(fluidPage(
                radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
         #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
         
-          column(3,uiOutput('drop_cols_ui')),
-          column(9,uiOutput('drop_rows_ui')),
-          column(12,uiOutput('protein_columns_ui'))
+          
           #column(2,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T))
         ),
         #column(9,uiOutput('protein_columns_ui')),
@@ -74,6 +72,9 @@ shinyUI(fluidPage(
           ),
           tabPanel('File Details',
                    uiOutput('name_column_ui'),
+                   tags$h4('Data Columns'),
+                   tags$h5(htmlOutput('data_columns_text')),
+                   tags$hr(),
                    DT::dataTableOutput('test_files_table')
           ),
           tabPanel('Targets',
@@ -91,6 +92,7 @@ shinyUI(fluidPage(
                    #column(12,uiOutput('gene_control_ui')),
                    #uiOutput('R_spot_control_ui'),
                    #uiOutput('G_spot_control_ui'),
+                   uiOutput('spot_columns_ui'),
                    uiOutput('both_spot_control_ui'),
                    radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
                    column(12,DT::dataTableOutput('spot_table'))
@@ -103,6 +105,9 @@ shinyUI(fluidPage(
                    column(2,downloadButton('download_proteins',"Download")),
                    column(2,actionButton('reset_proteins','Reset')),
                    column(12,uiOutput('protein_control_ui')),
+                   column(3,uiOutput('drop_cols_ui')),
+                   column(9,uiOutput('drop_rows_ui')),
+                   column(12,uiOutput('protein_columns_ui')),
                    column(12,DT::dataTableOutput('proteins_table'))
           ),
         tabPanel('Data Tables',
