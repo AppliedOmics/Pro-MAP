@@ -32,7 +32,7 @@ if(node == 'WoW.local'){
 }
 
 paper_data_list = list(
-	'EUR cohort' = 'www/EUR cohort/',
+	#'EUR cohort' = 'www/EUR cohort/',
 	'GSH cohort' = 'www/GSH Cohort/',
 	'JHB cohort' = 'www/JHB cohort/',
 	'PC cohort' = 'www/PC cohort/',
