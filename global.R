@@ -33,10 +33,11 @@ if(node == 'WoW.local'){
 
 paper_data_list = list(
 	#'EUR cohort' = 'www/EUR cohort/',
+	'TR cohort' = 'www/TR cohort/',
 	'GSH cohort' = 'www/GSH Cohort/',
 	'JHB cohort' = 'www/JHB cohort/',
 	'PC cohort' = 'www/PC cohort/',
-	'TR cohort' = 'www/TR cohort/',
+	#'TR cohort' = 'www/TR cohort/',
 	'COVID HWC' = 'www/HWC'
 )
 
