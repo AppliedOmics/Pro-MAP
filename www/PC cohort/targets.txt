@@ -1,4 +1,4 @@
-Patient number	Name	Age	Gender	n	CY5
+Patient number	Name	Age	Gender	FileName	CY5
 1	GSH015	NA	F	GSH015-211.gpr	PDAC
 2	GSH016	69	F	GSH016-212.gpr	PDAC
 3	GSH004	59	F	GSH004-213.gpr	PDAC
