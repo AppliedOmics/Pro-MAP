@@ -877,15 +877,7 @@ shinyServer(function(input, output) {
         spot_names = paste(E()$genes$ID)
       }
       i = 1
-      if(input$remove_spot_duplicates == T){
-        while(TRUE %in% duplicated(spot_names)){
-          print(paste('hit :',i))
-          print(length(spot_names[duplicated(spot_names) == TRUE]))
-          spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
-          i = i + 1
-        }
-        TRUE %in% duplicated(spot_names)
-      }
+
       spot_names
     })
     
@@ -915,6 +907,20 @@ shinyServer(function(input, output) {
       
       df = E()$genes
       df$spot = spot_names()
+      
+      spot_names = spot_names()
+      if(input$remove_spot_duplicates == T){
+        while(TRUE %in% duplicated(spot_names)){
+          print(paste('hit :',i))
+          print(length(spot_names[duplicated(spot_names) == TRUE]))
+          spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
+          i = i + 1
+        }
+        TRUE %in% duplicated(spot_names)
+        df$unique_spot = spot_names
+      }
+     
+      
       
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt')) & is.null(values$spot_file)){
         #df = read.csv(file.path(input$dataset,'spots.txt'),sep ='\t')
@@ -1908,7 +1914,14 @@ shinyServer(function(input, output) {
       E_norm
     }
     
-    E_norm = reactive({     
+    E_norm = reactive({   
+      
+        data = E_corr()$E
+        spot_names = spot_names()
+        target_names = target_names()
+        removed_spots = removed_spots()
+        log_rb = input$log_rb
+      
         norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),removed_spots(),input$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
