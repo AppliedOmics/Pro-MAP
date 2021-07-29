@@ -7,3 +7,8 @@
 	- using plotly
 - Significance Testing
 	- generetate contigency matrix for all conditions
+	
+	
+#	Bugs to fix
+	
+- Duplicates in Name column of targets file

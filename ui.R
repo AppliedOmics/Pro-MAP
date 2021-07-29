@@ -81,7 +81,7 @@ shinyUI(fluidPage(
                    column(8,uiOutput('target_file_upload_ui')),
                    column(2,downloadButton('download_targets',"Download")),
                    column(2,actionButton('reset_targets','Reset')),  
-                   
+                   column(12,uiOutput('target_upload_error_ui')),
                    column(12,DT::dataTableOutput('target_table'))
           ),
           tabPanel('Spots',
@@ -108,6 +108,7 @@ shinyUI(fluidPage(
                    column(3,uiOutput('drop_cols_ui')),
                    column(9,uiOutput('drop_rows_ui')),
                    column(12,uiOutput('protein_columns_ui')),
+                   column(12,uiOutput('proteins_upload_error_ui')),
                    column(12,DT::dataTableOutput('proteins_table'))
           ),
         tabPanel('Data Tables',

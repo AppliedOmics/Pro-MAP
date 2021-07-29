@@ -446,12 +446,12 @@ shinyServer(function(input, output) {
 
                     (col_names = data_col_names())
                     (col_names = col_names[!col_names %in% c(input$background_column,input$foreground_column)])
-                    annotation=c("Block","Column","Row","ID","Name")
+                    annotation=c("Block","Column","Row","ID","Name",'Gene_symbol')
 
                     if(test_files()$type == 'flat'){
                           annotation = c("Grid","Column","Row","Annotation", "Name")
                       }else{
-                          annotation=c("Block","Column","Row","ID","Name",paste0('B',input$array_colours,' SD'))
+                          annotation=c("Block","Column","Row","ID","Name",'Gene_symbol')
                       }
                     #}
                     selectInput('select_annotation','Annotation Columns',col_names,annotation,multiple = T)
@@ -706,7 +706,8 @@ shinyServer(function(input, output) {
       )
       dim(df_files)
       as.tbl(df_files)
-      
+      error = NULL
+      df_upload = NULL
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'targets.txt')) & is.null(values$target_file)){
         target_file_path = file.path(input$dataset,'targets.txt')
         #df = read.csv(file.path(input$dataset,'targets.txt'),sep ='\t')
@@ -720,16 +721,24 @@ shinyServer(function(input, output) {
   
           
           df_upload = read.csv(target_file_path,sep ='\t',stringsAsFactors = F)
+          
+    
           dim(df_upload)
           
           if('FileName' %in% colnames(df_upload)){
-            df = df_files %>% 
-              dplyr::select(-Name) %>% 
-              left_join(df_upload %>% 
-                          filter(!duplicated(FileName))) %>%
-              filter(FileName %in% file_names)
-            df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
+            if(!TRUE %in% duplicated(df_upload$Name)){
+              df = df_files %>% 
+                dplyr::select(-Name) %>% 
+                left_join(df_upload %>% 
+                            filter(!duplicated(FileName))) %>%
+                filter(FileName %in% file_names)
+              df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
+            }else{
+              error = "There are duplicates in Name column of the uploaded targets file."
+              df = df_files
+            }
           }else{
+            error = 'There is no FileName column in the uploaded targets file.'
             df = df_files
           }
           
@@ -746,10 +755,23 @@ shinyServer(function(input, output) {
         #df$Name = as.character(df$Name)
    
       df$Name = as.character(df$Name)
-      df
+      list(df = df, df_upload = df_upload, error = error)
     })
     
-    targets = reactive(targets_upload())
+    output$target_upload_error_ui = renderUI({
+      if(!is.null(targets_upload()$error)){
+        output$target_upload_error_text = renderPrint(cat(targets_upload()$error))
+        output$target_upload_df = DT::renderDataTable(targets_upload()$df_upload)
+        
+        lst = list(span(tags$h4(htmlOutput('target_upload_error_text')), style="color:red"),
+                   tags$h4('Uploaded Targets Table'),
+                   DT::dataTableOutput('target_upload_df'),
+                   tags$h4('Targets Table'))
+        do.call(tagList,lst)
+      }
+    })
+    
+    targets = reactive(targets_upload()$df)
     # targets = reactive({ 
     #   if(is.null(input$gpr_files$datapath)){
     #     #df = readTargets(file.path(data_dir,'targets.txt'))
@@ -1071,7 +1093,7 @@ shinyServer(function(input, output) {
     #   
     # })
     
-    protein_upload = reactive({
+    protein_upload = reactive({ 
       #req(data_full())
       input$reset_targets
       input$dataset
@@ -1080,8 +1102,8 @@ shinyServer(function(input, output) {
       
      
       df = data.frame(protein = data_full()$protein)
-
-      
+      error = NULL
+      upload_df = NULL
       protein_file_path = NULL
       if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'proteins.txt')) & is.null(values$protein_file)){
         #df = read.csv(file.path(input$dataset,'proteins.txt'),sep ='\t')
@@ -1094,8 +1116,15 @@ shinyServer(function(input, output) {
       if(!is.null(protein_file_path)){
       
           upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
-          df = df %>% 
-            left_join(upload_df)
+          
+          if(!TRUE %in% duplicated(upload_df$Name)){
+            
+            df = df %>% 
+              left_join(upload_df)
+          }else{
+            error = 'There are duplicates in the Name column'
+            df = df
+          }
       }
       
       if(!'Category' %in% colnames(df)){
@@ -1104,13 +1133,13 @@ shinyServer(function(input, output) {
 
       }
       
-      df
+      list(df = df, upload_df = upload_df,error = error)
     })
     
     output$protein_control_ui = renderUI({
       #if(!is.null(values$data)){
       input$reset_proteins
-      df = protein_upload()
+      df = protein_upload()$df
       as.tbl(df)
       proteins = df$protein
       control = df$protein[df$Category == 'control']
@@ -1121,7 +1150,7 @@ shinyServer(function(input, output) {
     proteins = reactive({
       #if(!is.null(protein_upload())){
       #req(input$select_controls)
-      df = protein_upload()
+      df = protein_upload()$df
       df$Category[df$protein == ''] = 'EMPTY'
       df$Category[df$protein == 'EMPTY'] = 'EMPTY'
       if(!is.null(input$select_controls)){
@@ -1131,6 +1160,10 @@ shinyServer(function(input, output) {
       df
       #}
     })
+    
+    
+
+
     
     output$proteins_table = DT::renderDataTable({
       proteins() 
@@ -3151,7 +3184,7 @@ MA_data = reactive({
   ### Differential Analysis ####
   
   eBayes_test = reactive({ 
-    df = data() %>% column_to_rownames('protein')
+    df = data() %>% column_to_rownames('protein') 
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     
@@ -3209,7 +3242,7 @@ MA_data = reactive({
     df = eBayes_sig_data()
   })
   
-  output$eBayes_Heatmap_ui = renderUI({ 
+  output$eBayes_Heatmap_ui = renderUI({  
     df = eBayes_sig_data() %>% 
       column_to_rownames('protein')
     colnames(df)  
@@ -3218,8 +3251,8 @@ MA_data = reactive({
     m
     rownames(df)
     #m = log_min_function(m,input)
-    #m[is.na(m)] = 0
-    #m[is.infinite(m)] = 0
+    m[is.na(m)] = 0
+    m[is.infinite(m)] = 0
     m = m[,selected_targets()$Name]
     plot_height = 300 + (dim(m)[1]*10)
     # output$eBayes_Heatmap = renderPlot({
