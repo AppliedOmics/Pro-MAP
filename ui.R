@@ -29,14 +29,14 @@ shinyUI(fluidPage(
         #uiOutput('array_colours_ui'),
         #uiOutput('array_column_ui'),
         #uiOutput('col_num_ui'),
-        column(12,uiOutput('array_type_ui')),
+        #column(12,uiOutput('array_type_ui')),
         column(6,uiOutput('array_colours_ui')),
         column(6,uiOutput('array_column_ui')),
         #uiOutput('col_num_ui'),
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,'wtflags(0.1)','wtarea(150)','sd_filter'),'sd_filter',inline = T)),
+        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,'2sd Background spot filter' = 'sd_filter'),'sd_filter',inline = T)),
         uiOutput('annotation_columns_ui'),
         #uiOutput('sample_file_upload_ui'),
         selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
@@ -51,11 +51,12 @@ shinyUI(fluidPage(
         column(3,uiOutput('select_conditions_column_ui')),
         column(9,uiOutput('condition_select_ui')),
         column(8,
-        column(3,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE)),
-        column(3,radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE))),
+        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T),
+               radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)),
         
-        column(6,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp"),
-               radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
+        column(8,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp"),
+               column(6,radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
+               column(6,radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None'),inline = T))),
         #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
         
           
@@ -64,7 +65,7 @@ shinyUI(fluidPage(
         #column(9,uiOutput('protein_columns_ui')),
         column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'),
                radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T),
-               radioButtons('heatmap_order','Heatmap',c('Cluster','Order'))),
+               ),
         #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
         column(12,tabsetPanel(
           tabPanel("Instructions",

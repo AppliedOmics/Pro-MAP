@@ -756,7 +756,7 @@ shinyServer(function(input, output) {
    
       df$Name = as.character(df$Name)
       list(df = df, df_upload = df_upload, error = error)
-    })
+    }) 
     
     output$target_upload_error_ui = renderUI({
       if(!is.null(targets_upload()$error)){
@@ -764,9 +764,9 @@ shinyServer(function(input, output) {
         output$target_upload_df = DT::renderDataTable(targets_upload()$df_upload)
         
         lst = list(span(tags$h4(htmlOutput('target_upload_error_text')), style="color:red"),
-                   tags$h4('Uploaded Targets Table'),
+                   tags$h2('Uploaded Targets Table'),
                    DT::dataTableOutput('target_upload_df'),
-                   tags$h4('Targets Table'))
+                   tags$h2('Targets Table'))
         do.call(tagList,lst)
       }
     })

@@ -11,4 +11,31 @@
 	
 #	Bugs to fix
 	
-- Duplicates in Name column of targets file
+
+- HTTPS is slower that HTTP
+	- find out why
+- rest buttons should revert back to generated tables
+- check why control proteins not in MA plots
+- check annotation column assignment for difference file types. 
+- remove array types rb
+- edit spot filtering menu. 
+
+# Additions
+
+- Error messages for all uploaded files
+
+- HeatMap
+	- same function in Data table tab as elsewhere
+	- order by sample order
+	
+- Contingency Matrix
+	- all vs control
+	- manual contingency matrix ??
+	
+- All Methods
+	- add tabs for plots. 
+	
+	# Questions
+	
+	- Rename array colours ?
+	
