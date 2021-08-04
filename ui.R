@@ -7,6 +7,7 @@ shinyUI(fluidPage(
 
     titlePanel("SPOT-Pro Full"),
     #fluidRow(
+        #### sidebarPanel ####
         sidebarPanel(
           fluidRow(
             column(12,
@@ -46,6 +47,7 @@ shinyUI(fluidPage(
   
        
         )))),
+    #### mainPanel ####
     mainPanel(
         #uiOutput('example_data_text_ui'),
         column(3,uiOutput('select_conditions_column_ui')),
@@ -56,7 +58,7 @@ shinyUI(fluidPage(
         
         column(8,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp"),
                column(6,radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
-               column(6,radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None'),inline = T))),
+               column(6,radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T))),
         #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
         
           
@@ -68,16 +70,21 @@ shinyUI(fluidPage(
                ),
         #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
         column(12,tabsetPanel(
+          #### _Instructions ####
           tabPanel("Instructions",
                    uiOutput("readme_markdown_ui")
           ),
+          #### _File Details #####
           tabPanel('File Details',
+                   tags$h4(htmlOutput('test_files_text')),
+                   tags$hr(),
                    uiOutput('name_column_ui'),
                    tags$h4('Data Columns'),
                    tags$h5(htmlOutput('data_columns_text')),
                    tags$hr(),
                    DT::dataTableOutput('test_files_table')
           ),
+          #### _targets ####
           tabPanel('Targets',
                    column(8,uiOutput('target_file_upload_ui')),
                    column(2,downloadButton('download_targets',"Download")),
@@ -85,6 +92,7 @@ shinyUI(fluidPage(
                    column(12,uiOutput('target_upload_error_ui')),
                    column(12,DT::dataTableOutput('target_table'))
           ),
+          #### _spots ####
           tabPanel('Spots',
                    column(8,uiOutput('spot_file_upload_ui'),),
                    
@@ -99,7 +107,7 @@ shinyUI(fluidPage(
                    column(12,DT::dataTableOutput('spot_table'))
                    
           ),
-          
+          #### _proteins ####
           tabPanel('Proteins',
                    column(8,uiOutput('protein_file_upload_ui'),),
                    
@@ -112,6 +120,8 @@ shinyUI(fluidPage(
                    column(12,uiOutput('proteins_upload_error_ui')),
                    column(12,DT::dataTableOutput('proteins_table'))
           ),
+          
+        #### _Data Tables ####
         tabPanel('Data Tables',
                  tabsetPanel(
                    tabPanel('ForeGround',
@@ -135,19 +145,7 @@ shinyUI(fluidPage(
                               )
                             )
                       ),
-                   # tabPanel('Spot Filtering 2sd',
-                   #          textOutput('spot_filtering_threshold_text'),
-                   #          tabsetPanel(selected = 'Plot',
-                   #            tabPanel('Table',
-                   #                     DT::dataTableOutput('spot_filtering_table')
-                   #            ),
-                   #            tabPanel('Plot',
-                   #                     uiOutput('spot_filtering_heatmap_ui')
-                   #            )
-                   #          )
-                   # ),
                    tabPanel('Spot Filtering Elist',
-                            #textOutput('spot_filtering_threshold_text'),
                             tabsetPanel(selected = 'Plot',
                                         tabPanel('Table',
                                                  DT::dataTableOutput('spot_filtering_E_table')
@@ -156,15 +154,9 @@ shinyUI(fluidPage(
                                                  uiOutput('spot_filtering_E_heatmap_ui')
                                         )
                             )
-                   )#,
-                   # tabPanel('Signal to Noise',
-                   #          tabsetPanel(selected = 'Plot',
-                   #                      tabPanel('Table'),
-                   #                      tabPanel('Plot'))
-                   #          
-                   #          )
+                   )
                  )),
-  
+        #### Pipeline ####
         tabPanel('Pre Processing Pipeline',
             radioButtons('collapse_boxplots','Collapse Boxplots',c(F,T),inline = T),
             tabsetPanel(

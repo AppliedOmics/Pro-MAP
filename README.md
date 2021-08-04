@@ -7,26 +7,18 @@
 	- using plotly
 - Significance Testing
 	- generetate contigency matrix for all conditions
+- png for Heatmaps
 	
 	
 #	Bugs to fix
 	
-
-- HTTPS is slower that HTTP
-	- find out why
-- rest buttons should revert back to generated tables
 - check why control proteins not in MA plots
 - check annotation column assignment for difference file types. 
-- remove array types rb
-- edit spot filtering menu. 
+
 
 # Additions
 
 - Error messages for all uploaded files
-
-- HeatMap
-	- same function in Data table tab as elsewhere
-	- order by sample order
 	
 - Contingency Matrix
 	- all vs control
@@ -36,6 +28,5 @@
 	- add tabs for plots. 
 	
 	# Questions
-	
-	- Rename array colours ?
+
 	

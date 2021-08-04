@@ -9,7 +9,7 @@
 
 library(shiny)
 
-# Define server logic required to draw a histogram
+
 shinyServer(function(input, output) {
   
 
@@ -149,7 +149,7 @@ shinyServer(function(input, output) {
         }
     })
     
-    #### Inputs #####
+  #### Inputs Options #####
     ##### _Select Datasets #####
     
     output$select_datasets_ui = renderUI({
@@ -172,15 +172,16 @@ shinyServer(function(input, output) {
           file_path_list = input$gpr_files$datapath
         }
       }else{
+        values$target_file = 'dataset'
+        values$spot_file = 'dataset'
+        values$protein_file = 'dataset'
         getwd()
         (path = input$dataset)
         file_list = list.files(path)
         file_list = file_list[!file_list %in% c('targets.txt','spots.txt','proteins.txt')]
         file_list
-        #gpr_files = grep('.gpr',file_list,value = T)
         file_path_list = file.path(path,file_list)
-        #gpr_files_path_list
-        #file_path_list
+     
       }
       file_path_list
       list(name = file_list,path = file_path_list)
@@ -191,7 +192,6 @@ shinyServer(function(input, output) {
       
       # Create a Progress object
       progress <- shiny::Progress$new()
-      # Make sure it closes when we exit this reactive, even if there's an error
       on.exit(progress$close())
       progress$set(message = "Testing file", value = 0)
       
@@ -283,8 +283,18 @@ shinyServer(function(input, output) {
       df_g = df %>% group_by(Number.of.Spots,Number.of.Metric.Columns) %>% 
         summarise(FileNames = paste(File_name,collapse = ' ,')) %>% 
         ungroup()
-      
       df_g
+    })
+    
+    output$test_files_text = renderPrint({
+      df = test_files()$file_df 
+      as.tbl(df)
+      
+      cat(dim(df)[1],'Files with',
+      paste(unique(df$Number.of.Spots),collapse=', '),
+      'spots and ',
+      paste(unique(df$Number.of.Metric.Columns),collapse =', '),'columns')
+      
     })
     
     output$test_file_text = renderText({ 
@@ -299,59 +309,12 @@ shinyServer(function(input, output) {
       }
     })
     
-    
-    ###_Column Selections ####
-    
-    # data_col_names = reactive({
-    #   if(!is.null(input$gpr_files$datapath)){
-    #     file_path = input$gpr_files$datapath[1]
-    #   }else{
-    #     path = data_dir
-    #     file_list = list.files(path)
-    #     gpr_files = grep('.gpr',file_list,value = T)
-    #     gpr_files_path_list = file.path(path,gpr_files)
-    #     gpr_files_path_list
-    #     file_path = gpr_files_path_list[1]
-    #   }
-    #   
-    #     #if(grepl('.txt',input$gpr_files$datapath[1])){
-    #     if(input$array_type == 'Genepix'){
-    #         print('txt')
-    #         df = read.table(file_path,sep ='\t',stringsAsFactors = F)
-    #         (col_names = paste(unlist(df[1,])))
-    #     }else{
-    #       
-    #         file_1 = read_table(file_path)
-    #         file_1
-    #         i = max(grep("Block",file_1[[1]]))
-    #         df = read.csv(file_path,skip = i,sep ='\t',header = F, stringsAsFactors = F)
-    #         as.tbl(df)
-    #         col_names = paste(df[1,])
-    #         #df[[1]][1]
-    #         #col_names = df[[1]][grep('"Block"\t"Column"',df[[1]])]
-    #         #col_names = paste(unlist(strsplit(col_names,'\t')))
-    #         #col_names = gsub('\"','',col_names)
-    #      
-    #     }
-    # 
-    #     col_names
-    # })
-    
-    output$array_type_ui = renderUI({
-      #if(!is.null(input$gpr_files$datapath)){
-      selected = 'Mapix'
-        if(TRUE %in% grepl('txt',input$gpr_files$datapath)){
-          selected = "Genepix"
-        }else{
-          selected = 'Mapix'
-        }
-        radioButtons('array_type','Array',c('Mapix','Genepix'),selected,inline = T)
-      #}
-    })
-    
+     
+
+  
+    #### _Columns Selection ####
     
     output$array_colours_ui = renderUI({
-      #if(!is.null(input$gpr_files$datapath)){
         col_names = data_col_names() 
         colour_list = c()
         colour_list_test = c('532','635')
@@ -361,13 +324,10 @@ shinyServer(function(input, output) {
           }
         }
         colour_list
-        #colour_list = c('532','635')
-        selectInput('array_colours', 'Array Colours',colour_list,colour_list[1],multiple = F)
-      #}
+        selectInput('array_colours', 'Array Chanel',colour_list,colour_list[1],multiple = F)
     })
     
     output$array_column_ui = renderUI({ 
-      #if(!is.null(input$gpr_files$datapath)){
       if(test_files()$type != 'flat'){
           colour_list = c('Median','Mean')
           selected = 'Median'
@@ -376,7 +336,7 @@ shinyServer(function(input, output) {
           selected = '(med) [med]'
         }
         selectInput('array_column', 'Array Column',colour_list,selected)
-      #}
+
     })
     
     output$foreground_column_ui = renderUI({
@@ -386,7 +346,6 @@ shinyServer(function(input, output) {
             (selected = paste0('F',input$array_colours,' ',input$array_column))
 
             if(test_files()$type == 'flat'){
-              #if(grepl('.txt',input$gpr_files$datapath[1])){
                 f_col = paste0('Raw intensity ',input$array_column,' {',input$array_colours,'}')
                 if(f_col %in% col_names){
                   selected = f_col
@@ -401,24 +360,18 @@ shinyServer(function(input, output) {
                   (selected = grep('F',grep('Median',col_names,value = T),value = T))
                 }
               }
-            #}
-            #if(selected = 'error'){
-              selectInput('foreground_column', 'Foreground',col_names,selected)
-            #}
-        #}
 
-      #selectInput('foreground_column', 'Foreground',col_names,selected)
+              selectInput('foreground_column', 'Foreground',col_names,selected)
+     
     })
 
     output$background_column_ui = renderUI({
-        #if(!is.null(input$gpr_files$datapath)){
             col_names = data_col_names()
             col_names
             selected = paste0('B',input$array_colours,' ',input$array_column)
 
             if(test_files()$type == 'flat'){
 
-              #if(grepl('.txt',input$gpr_files$datapath[1])){
                 (f_col = paste0('Background ',input$array_column,' {',input$array_colours,'}'))
                 if(f_col %in% col_names){
                   selected = f_col
@@ -434,13 +387,12 @@ shinyServer(function(input, output) {
                 }
               }
 
-            #}
+
             selectInput('background_column', 'Background',col_names,selected)
-        #}
+
     })
 
     output$annotation_columns_ui = renderUI({
-        #if(!is.null(input$gpr_files$datapath)){
             if(!is.null(input$background_column)){
                 if(!is.null(input$foreground_column)){
 
@@ -453,68 +405,23 @@ shinyServer(function(input, output) {
                       }else{
                           annotation=c("Block","Column","Row","ID","Name",'Gene_symbol')
                       }
-                    #}
                     selectInput('select_annotation','Annotation Columns',col_names,annotation,multiple = T)
                 }
             }
-        #}
+
     })
     
-    # output$foreground_column_ui = renderUI({ 
-    #   if(!is.null(test_files())){
-    #     col_names = data_col_names() 
-    #     col_names
-    #     test_files()$type
-    # 
-    #     
-    #     if(test_files()$type == 'flat'){
-    #       selected = paste0("Raw intensity ",input$array_column,' {',input$array_colours,'}')
-    #     }else{
-    #       (selected = grep('F',grep('Median',col_names,value = T),value = T)[1])
-    #     }
-    #     selectInput('foreground_column', 'Foreground',col_names,selected)
-    #   }
-    # })
-    # 
-    # output$background_column_ui = renderUI({
-    #   if(!is.null(test_files())){
-    #     col_names = data_col_names() 
-    #     col_names
-    #     test_files()$type
-    #     
-    #     
-    #     if(test_files()$type == 'flat'){
-    #       selected = "Background (med) [med] {635}"
-    #     }else{
-    #       (selected = grep('B',grep('Median',col_names,value = T),value = T)[1])
-    #     }
-    #     selectInput('background_column', 'Background',col_names,selected)
-    #   }
-    #   
-    # })
-    # 
-    # output$annotation_columns_ui = renderUI({
-    #   if(!is.null(input$background_column)){
-    #     if(!is.null(input$foreground_column)){
-    #       
-    #       (col_names = data_col_names())
-    #       (col_names = col_names[!col_names %in% c(input$background_column,input$foreground_column)])
-    #       if(test_files()$type == 'flat'){
-    #         annotation = c("Grid","Column","Row","Annotation", "Name")
-    #       }else{
-    #         annotation=c("Block","Column","Row","ID","Name")
-    #       }
-    #       selectInput('select_annotation','Annotation Columns',col_names,annotation,multiple = T)
-    #     }
-    #   }
-    #   
-    # })
-
-    
-    #### E ####
-     
     foreground_column = reactive(input$foreground_column)
     background_column = reactive(input$background_column)
+    
+    
+    
+  #---------------------------Read in data and filter spots----------------------------------------------------
+    
+    
+    #### _EListRaw ####
+     
+
     
     observeEvent(input$gpr_files$datapath,{
       values$spot_file = NULL 
@@ -528,22 +435,6 @@ shinyServer(function(input, output) {
 
     
     E = reactive({   
-        #req(input$gpr_files)
-        #upload = list()
-        # if(!is.null(input$gpr_files$datapath)){
-        #   file_path_list = input$gpr_files$datapath
-        #   #values$spot_file = NULL 
-        #   #values$proteins_file = NULL
-        #   #values$target_file = NULL
-        # }else{
-        #   path = data_dir
-        #   file_list = list.files(path)
-        #   gpr_files = grep('.gpr',file_list,value = T)
-        #   gpr_files_path_list = file.path(path,gpr_files)
-        #   gpr_files_path_list
-        #   file_path_list = gpr_files_path_list
-        # }
-      
       file_path_list = array_file_list()$path  
       file_path_list
           if(input$spot_filtering == 'wtflags(0.1)'){
@@ -569,116 +460,32 @@ shinyServer(function(input, output) {
                                columns=list(E=input$foreground_column, Eb=input$background_column),
                                annotation=c(input$select_annotation))
           }
-        # }else{
-        #     
-        #     
-        #         path = data_dir
-        #         file_list = list.files(path)
-        #         gpr_files = grep('.gpr',file_list,value = T)
-        #         gpr_files_path_list = file.path(path,gpr_files)
-        #         gpr_files_path_list
-        #   
-        #         
-        #     
-        #         if(input$spot_filtering == TRUE){
-        #         
-        #             E <- read.maimages(gpr_files_path_list,
-        #                                columns=list(E="F635 Median", Eb="B635 Median"),
-        #                                annotation=c("Block", "Column", "Row", "ID"),
-        #                                             wt.fun=myfun())
-        #         }else{
-        #           E <- read.maimages(gpr_files_path_list,
-        #                              columns=list(E="F532 Median", Eb="B532 Median"),
-        #                              annotation=c("Block", "Column", "Row", "ID"))
-        #         }
-        # 
-        #             E
-        #     
-        #   
-        # }
+
         E
     
     })
     
 
-    
-    #---------------------------Read in data and filter spots----------------------------------------------------
-    
-    #first make a targets file (.txt) with the following colunms
-    #Name, filename, and Disease state (include any other extra information if necessary)
 
-    # output$protein_file_upload_ui = renderUI({
-    #     if(!is.null(input$gpr_files$datapath)){
-    #         fileInput(
-    #             inputId = "protein_file", 
-    #             label = "Upload Protein File", 
-    #             #multiple = TRUE,
-    #             accept = c(".txt")
-    #         )
-    #     }
-    # })
-    # 
-    # 
-    # 
-    # observeEvent(input$reset_spots,{
-    #   values$spot_file = NULL
-    # })
-    # observeEvent(input$reset_proteins,{
-    #   values$proteins_file = NULL
-    # })
-    # 
-    # 
-    # 
-    # observeEvent(input$spot_file,{
-    #   values$spot_file = input$spot_file
-    # })
-    # 
-    # observeEvent(input$protein_file,{
-    #   values$protein_file = input$protein_file
-    # })
+    #### _targets #####
     
-    #### _targets ####
+    #values$target_file is a reactive value, that serves as a global variabe, which can be affected by different reactive elements
     
-    # observeEvent(input$reset_targets,{
-    #   values$target_file = NULL
-    # })
-    # 
-    # observeEvent(input$target_file,{
-    #   values$target_file = input$target_file
-    # })
-    # 
-    # output$target_file_upload_ui = renderUI({
-    #   if(!is.null(input$gpr_files$datapath)){
-    #     fileInput(
-    #       inputId = "target_file", 
-    #       label = "Upload Targets File", 
-    #       #multiple = TRUE,
-    #       accept = c(".txt")
-    #     )
-    #   }
-    # })
-    # 
-    # target_names = reactive({
-    #   #basename(colnames(E()$E))
-    #   #as.tbl(targets())
-    #   
-    #   target_names = targets()$Name
-    #   target_names
-    # })
-    
-    observeEvent(c(input$dataset,
-                   input$reset_target,
+    # inputs that reste values$target file
+    observeEvent(c(input$reset_targets,
                    input$gpr_files),{
-                     values$target_file = NULL
+                   values$target_file = NULL
                    })
     
+    
+    # assigns input$target file to values$target file
     observeEvent(input$target_file,{
       values$target_file = input$target_file
     })
     
     output$target_file_upload_ui = renderUI({
       input$dataset
-      input$reset_target
+      input$reset_targets
       input$gpr_files
       
       fileInput(
@@ -693,8 +500,10 @@ shinyServer(function(input, output) {
       target_names
     })
     
+    
+    # reactive object that decided which targets file to upload. 
     targets_upload = reactive({   
-      input$reset_targets  
+      input$reset_targets    
       input$dataset
       input$gpr_files
       target_file_path = NULL
@@ -708,23 +517,16 @@ shinyServer(function(input, output) {
       as.tbl(df_files)
       error = NULL
       df_upload = NULL
-      if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'targets.txt')) & is.null(values$target_file)){
-        target_file_path = file.path(input$dataset,'targets.txt')
-        #df = read.csv(file.path(input$dataset,'targets.txt'),sep ='\t')
+      if(is.null(values$target_file)){
+        df = df_files
+        
       }else{
-        if(!is.null(values$target_file)){
-          
+        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'targets.txt')) & values$target_file == 'dataset'){
+          target_file_path = file.path(input$dataset,'targets.txt')
+        }else{
           target_file_path = values$target_file$datapath
         }
-      }
-        if(!is.null(target_file_path)){
-  
-          
           df_upload = read.csv(target_file_path,sep ='\t',stringsAsFactors = F)
-          
-    
-          dim(df_upload)
-          
           if('FileName' %in% colnames(df_upload)){
             if(!TRUE %in% duplicated(df_upload$Name)){
               df = df_files %>% 
@@ -733,6 +535,13 @@ shinyServer(function(input, output) {
                             filter(!duplicated(FileName))) %>%
                 filter(FileName %in% file_names)
               df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
+              
+              if(length(intersect(df_files$FileName,df_upload$FileName)) == 0){
+                
+                error = "There is no intersect between the uploaded target file and the array files"
+                df = df_files
+              }
+              
             }else{
               error = "There are duplicates in Name column of the uploaded targets file."
               df = df_files
@@ -741,10 +550,7 @@ shinyServer(function(input, output) {
             error = 'There is no FileName column in the uploaded targets file.'
             df = df_files
           }
-          
-        }else{
-          df = df_files
-        }
+      }
         
         if(!'Condition' %in% colnames(df)){
           df$Condition = 'Condition'
@@ -752,7 +558,7 @@ shinyServer(function(input, output) {
         if(!'Name' %in% colnames(df)){
           df$Name = df$File
         }
-        #df$Name = as.character(df$Name)
+
    
       df$Name = as.character(df$Name)
       list(df = df, df_upload = df_upload, error = error)
@@ -772,64 +578,6 @@ shinyServer(function(input, output) {
     })
     
     targets = reactive(targets_upload()$df)
-    # targets = reactive({ 
-    #   if(is.null(input$gpr_files$datapath)){
-    #     #df = readTargets(file.path(data_dir,'targets.txt'))
-    #     df = read.csv(file.path(data_dir,'targets.txt'),sep = '\t')
-    #   }else{
-    #     if(!is.null(values$target_file)){
-    #       file_names = input$gpr_files$name
-    #       (n = length(file_names))
-    #       df_files = data.frame(FileName = file_names,
-    #                             Name = tools::file_path_sans_ext(file_names)
-    #       )
-    #       dim(df_files)
-    #       as.tbl(df_files)
-    #       #df = readTargets(values$target_file$datapath,sep ='\t',row.names = FALSE)
-    #       df_upload = read.csv(values$target_file$datapath,sep ='\t')
-    #       dim(df_upload)
-    #       duplicated(df_upload$FileName)
-    #       df = df_files %>% 
-    #         dplyr::select(-Name) %>% 
-    #         left_join(df_upload %>% 
-    #                     filter(!duplicated(FileName)))
-    #       as.tbl(df)
-    #       
-    #       df = df %>% filter(FileName %in% input$gpr_files$name)
-    #       dim(df)
-    #       #df
-    #       #df = read_table2(values$target_file$datapath)
-    #       str(df)
-    #     }else{
-    #       #file_names = basename(E()$targets$FileName)
-    #       file_names = input$gpr_files$name
-    #       n = length(file_names)
-    #       df_files = data.frame(FileName = file_names,
-    #                             Name = tools::file_path_sans_ext(file_names)
-    #       )
-    #       dim(df_files)
-    #       as.tbl(df_files)
-    #       
-    #       df = df_files
-    #       
-    #       #df$Group = 'Group'
-    #       #df$Condition = 'Condition'
-    #       
-    #       
-    #     }
-    #   }
-    #   if(!'Group' %in% colnames(df)){
-    #     df$Group = 'Group'
-    #   }
-    #   if(!'Condition' %in% colnames(df)){
-    #     df$Condition = 'Condition'
-    #   }
-    #   if(!'Name' %in% colnames(df)){
-    #     df$Name = df$File
-    #   }
-    #   df$Name = as.character(df$Name)
-    #   df
-    # })
     
     output$select_conditions_column_ui = renderUI({
       selectInput('select_conditions_column','Select Condition Column',colnames(targets()),colnames(targets()))
@@ -871,14 +619,11 @@ shinyServer(function(input, output) {
     })
     
     output$spot_file_upload_ui = renderUI({
-      #if(!is.null(input$gpr_files$datapath)){
         fileInput(
           inputId = "spot_file", 
           label = "Upload Spots File", 
-          #multiple = TRUE,
           accept = c(".txt")
         )
-      #}
     })
     
     output$spot_columns_ui = renderUI({
@@ -902,52 +647,16 @@ shinyServer(function(input, output) {
       selectInput('spot_column','Spot Column',columns,selected)
     })
     
-    # spot_names = reactive({
-    #   if(is.null(input$gpr_files$datapath)){
-    #     spot_names = paste(E()$genes$ID)
-    #   }else{
-    #     #colnames(df) <- c(targets()$Name)
-    #     if(grepl('.txt',input$gpr_files$datapath[1])){
-    #       spot_names = paste(E()$genes$Annotation)
-    #     }else{
-    #       spot_names = paste(E()$genes$ID)
-    #     }
-    #   }
-    #   spot_names
-    # })
+
     
     spot_names = reactive({
       input$reset_spots
-      
-      #if(test_files()$type == 'flat'){
-      #  spot_names = paste(E()$genes$Annotation)
-      #}else{
-      #  spot_names = paste(E()$genes$ID)
-      #}
-      
+
       spot_names = E()$genes[[input$spot_column]]
-      #i = 1
 
       spot_names
     })
     
-    
-    
-    # spot_upload = reactive({
-    #   if(is.null(input$gpr_files$datapath)){
-    #     df = read.table(file.path(data_dir,'spots.txt'),header = T)
-    #   }else{
-    #     if(!is.null(values$spot_file)){
-    #       df = read.table(input$spot_file$datapath,header = T)
-    #     }else{
-    #       df = E()$genes
-    #       df$spot = spot_names()
-    #       df$Category = character(dim(df)[1])
-    #       df
-    #     }
-    #   }
-    #   df
-    # })
     
     spot_upload = reactive({  
       input$reset_spots
@@ -969,23 +678,20 @@ shinyServer(function(input, output) {
         TRUE %in% duplicated(spot_names)
         df$unique_spot = spot_names
       }
-     
-      
-      
-      if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt')) & is.null(values$spot_file)){
-        #df = read.csv(file.path(input$dataset,'spots.txt'),sep ='\t')
-        spot_file_path = file.path(input$dataset,'spots.txt')
-      }else{
-        if(!is.null(values$spot_file)){
-          spot_file_path = input$spot_file$datapath
-        }
-      }
-      if(!is.null(spot_file_path)){
 
-          upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
+      if(!is.null(values$spot_file)){
+        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt'))){
+          spot_file_path = file.path(input$dataset,'spots.txt')
+        }
+        if(!is.null(input$spot_file$datapath)){
+            spot_file_path = input$spot_file$datapath
+        }
+        if(!is.null(spot_file_path)){
           
+          upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
           df = df %>% 
             left_join(upload_df)
+        }
       }
       
       if(!'Category' %in% colnames(df)){
@@ -1033,7 +739,6 @@ shinyServer(function(input, output) {
     #### _proteins ####
     
     output$protein_file_upload_ui = renderUI({
-      input$dataset
       input$reset_proteins
       input$gpr_files
       fileInput(
@@ -1068,63 +773,36 @@ shinyServer(function(input, output) {
       values$protein_file = input$protein_file
     })
     
-    # protein_upload = reactive({
-    #   
-    #   
-    #   if(is.null(input$gpr_files$datapath)){
-    #     df = read.table(file.path(data_dir,'proteins.txt'),header = T)
-    #   }else{
-    #     if(!is.null(values$protein_file)){
-    #       df = read.table(input$protein_file$datapath,header = T)
-    #     }else{
-    #       # df = E()$genes
-    #       # df$spot = spot_names()
-    #       # df$Category = character(dim(df)[1])
-    #       # df
-    #       
-    #       df = data_full()
-    #       
-    #       df = data.frame(protein = df$protein,
-    #                       Category = character(dim(df)[1]))
-    #       df
-    #     }
-    #   }
-    #   df
-    #   
-    # })
     
     protein_upload = reactive({ 
-      #req(data_full())
+
       input$reset_targets
       input$dataset
       input$gpr_files
-      #if(!is.null(values$data)){
-      
+
      
       df = data.frame(protein = data_full()$protein)
       error = NULL
       upload_df = NULL
       protein_file_path = NULL
-      if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'proteins.txt')) & is.null(values$protein_file)){
-        #df = read.csv(file.path(input$dataset,'proteins.txt'),sep ='\t')
-        protein_file_path = file.path(input$dataset,'proteins.txt')
-      }else{
-        if(!is.null(values$protein_file)){
-          protein_file_path = input$protein_file$datapath
-        }
-      }
-      if(!is.null(protein_file_path)){
       
-          upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
-          
-          if(!TRUE %in% duplicated(upload_df$Name)){
-            
-            df = df %>% 
-              left_join(upload_df)
-          }else{
-            error = 'There are duplicates in the Name column'
-            df = df
-          }
+      if(!is.null(values$protein_file)){
+        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'proteins.txt'))){
+          protein_file_path = file.path(input$dataset,'proteins.txt')
+        }
+        if(!is.null(input$protein_file$datapath)){
+            protein_file_path = input$protein_file$datapath
+        }
+        if(!is.null(protein_file_path)){
+            upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
+            if(!TRUE %in% duplicated(upload_df$Name)){
+              df = df %>% 
+                left_join(upload_df)
+            }else{
+              error = 'There are duplicates in the Name column'
+              df = df
+            }
+        }
       }
       
       if(!'Category' %in% colnames(df)){
@@ -1177,7 +855,7 @@ shinyServer(function(input, output) {
     )
     
     
-    #### Data #####
+    #### Data Table Heatmaps#####
     
     output$foreground_table = DT::renderDataTable({
       df = as.data.frame(E()$E)  
@@ -1189,38 +867,17 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     }) 
-    
-    fbs_heatmap_function = function(m,spots){
-      col_fun = colorRamp2(c(0,max(as.numeric(m),na.rm = T)), c("white","red"))
+    output$foreground_heatmap_ui = renderUI({ 
       
-      Heatmap(m,
-              col = col_fun,
-              row_labels = spots,
-              row_names_side = "left",
-              column_names_side = "top",
-              cluster_columns = FALSE,
-              cluster_rows = FALSE)
-    }
-    
-    output$foreground_heatmap_ui = renderUI({
-      #input$ 
-      m = E()$E  
-      
-
-      colnames(m)
-      colnames(m) = target_names()
-      m = m[,selected_targets()$Name]
-
+      m = E()$E
       plot_height = 300+(dim(m)[1]*10)
-      output$foreground_heatmap = renderPlot({
-        #fbs_heatmap_function(m,spot_names())
-        Heatmap_function(m,selected_targets(),spot_names(),input$heatmap_order)
-    
-      },height = plot_height)
       
-      plotOutput('foreground_heatmap',height = plot_height)
+      plot_height = data_heatmap_Server('foreground',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      
+      do.call(tagList,data_heatmap_UI('foreground',plot_height))
+      
     })
-    
+  
     output$background_table = DT::renderDataTable({
       df = as.data.frame(E()$Eb)
       colnames(df) = target_names()
@@ -1230,58 +887,17 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     })
-    
-    output$background_heatmap_ui = renderUI({
+    output$background_heatmap_ui = renderUI({ 
+      
       m = E()$Eb
-      col_fun = colorRamp2(c(0,max(as.numeric(m))), c("white", "red"))
-      
-      colnames(m)
-      colnames(m) = target_names()
-      m = m[,selected_targets()$Name]
-      
       plot_height = 300+(dim(m)[1]*10)
-      output$background_heatmap = renderPlot({
-        fbs_heatmap_function(m,spot_names())
-    
-      },height = plot_height)
       
-      plotOutput('background_heatmap',height = plot_height)
-    })
-    
-    spot_filtering_threshold = reactive({
-      (threshold = 2*sd(E()$Eb))
-      df = E()$Eb %>% 
-        as.data.frame
-      as.tbl(df)
-      df_l = df %>% 
-        as.tibble %>% 
-        rownames_to_column('spot') %>% 
-        
-        gather(key,value,colnames(df))
-      as.tbl(df_l)
-    })
-    
-    output$spot_filtering_threshold_text = renderText({
-      paste('Spot filtering threshold = ',spot_filtering_threshold())
-    })
-     
-    spot_filtering = reactive({
-      threshold = spot_filtering_threshold()
+      plot_height = data_heatmap_Server('background',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       
-      df = as.data.frame(abs(E()$E) < threshold*abs(E()$Eb))
-      as.tbl(as.data.frame(df))
-      dim(df) 
-      #df = E()$weights %>%  
-      #  as.data.frame
-      colnames(df) = target_names()
-      df$spot = spot_names()
-      as.tbl(as.data.frame(df))
-      df = df %>% 
-        dplyr::select(spot,everything())
-      df
+      do.call(tagList,data_heatmap_UI('background',plot_height))
       
     })
-    
+
     spot_filtering_E = reactive({
       df = E()$weights %>%  
         as.data.frame
@@ -1292,101 +908,33 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     })
-    
-    output$spot_filtering_table = DT::renderDataTable({
-      # myfun <- function(x, threshold = 2*sd){
-      #   okred <- abs(x[,"F635 Median"]) < threshold*abs(x[,"B635Median"])
-      #   +  as.numeric(okred) #Spot filtering 
-      # }
-      
-     df = spot_filtering()
-    })
-    output$spot_filtering_heatmap_ui = renderUI({  
-
-      
-      
-      m = spot_filtering() %>% 
-        dplyr::select(-spot) %>% 
-        as.matrix()
-      
-
-      m[m == TRUE] = 'TRUE'
-      m[m != TRUE] = 'FALSE'
- 
-      colnames(m)
-      colnames(m) = target_names()
-      m = m[,selected_targets()$Name]
-    plot_height = 300+(dim(m)[1]*10)
-    output$spot_filtering_heatmap = renderPlot({
-      
-      Heatmap(m,
-              name = 'spot',
-
-              row_labels = spot_names(),
-              row_names_side = "left",
-              column_names_side = "top",
-              cluster_columns = FALSE,
-              cluster_rows = FALSE)
-    },height = plot_height)
-    
-    plotOutput('spot_filtering_heatmap',height = plot_height)
-    })
-    
-    
     output$spot_filtering_E_table = DT::renderDataTable({
-      # myfun <- function(x, threshold = 2*sd){
-      #   okred <- abs(x[,"F635 Median"]) < threshold*abs(x[,"B635Median"])
-      #   +  as.numeric(okred) #Spot filtering 
-      # }
-      
       df = spot_filtering_E()
     })
     output$spot_filtering_E_heatmap_ui = renderUI({ 
       
-      
-      
-      m = spot_filtering_E() %>% 
-        dplyr::select(-spot) %>% 
-        as.matrix()
-      
-      
-      #m[m == TRUE] = 'TRUE'
-      #m[m != TRUE] = 'FALSE'
-      
-      colnames(m)
-      colnames(m) = target_names()
-      m = m[,selected_targets()$Name]
-      plot_height = 300+(dim(m)[1]*10)
-      output$spot_filtering_E_heatmap = renderPlot({
+    
+    
+      if('weights' %in% names(E())){
+        m = spot_filtering_E() %>% 
+          dplyr::select(-spot) %>% 
+          as.matrix()
         
-        Heatmap(m,
-                name = 'spot',
-                
-                row_labels = spot_names(),
-                row_names_side = "left",
-                column_names_side = "top",
-                cluster_columns = FALSE,
-                cluster_rows = FALSE)
-      },height = plot_height)
-      
-      plotOutput('spot_filtering_E_heatmap',height = plot_height)
+        if(length(unique(as.numeric(m))) >1){
+        
+          
+          plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+          
+          do.call(tagList,data_heatmap_UI('spot_filtering',plot_height))
+        }else{
+          tags$h4('No spots were filtered')
+        }
+      }else{
+        tags$h4('No spot weighting applied')
+      }
+  
     })
     
-    signal2noise = reactive({
-      fg = E()$E
-      bg = E()$Eb
-      View(bg)
-      dim(bg)[2]
-      bg_sd = bg %>% 
-        as.data.frame %>% 
-        mutate_all(as.numeric) %>% 
-        rowwise() %>% 
-        mutate(row_sd = mean(.,na.rm = T))
-      View(bg_df)
-      bg_sd$row_sd
-      
-      sd(bg[2,])
-    })
     
     #----------------------------Visualization of Raw data---------------------------------------------
     
@@ -1592,87 +1140,6 @@ shinyServer(function(input, output) {
     
     #---------------------------------Background Correction----------------------------
     
-    Heatmap_function = function(m, targets,spots,cluster = 'Cluster'){ 
-      
-      plot_min = min(as.numeric(m),na.rm = T)
-      if(plot_min < 0){
-        col_fun = colorRamp2(c(plot_min,0,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c('blue',"white",'orange',"red"))
-        
-      }else{
-        col_fun = colorRamp2(c(plot_min,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c("white",'orange',"red"))
-      }
-      
-      targets = targets %>% 
-        filter(Name %in% colnames(m))
-      
-      ha_annotation = targets$Condition
-      names(ha_annotation) = targets$Name
-      (condition_col = brewer.pal(n = length(unique(targets$Condition)), name = input$r_col)[1:length(unique(targets$Condition))])
-      (names(condition_col) = unique(targets$Condition))
-      column_ha = HeatmapAnnotation(Condition = ha_annotation, col = list(Condition = condition_col))
-      
-      sample_order = targets %>% 
-        arrange(Condition)
-      
-      
-      if(cluster == 'Cluster'){
-        Heatmap(m,
-                col = col_fun,
-                row_labels = spots,
-                column_dend_height = unit(4, "cm"), 
-                row_dend_width = unit(4, "cm"),
-                column_names_side = "top",
-                top_annotation = column_ha
-        )
-      }else{
-        Heatmap(m,
-                col = col_fun,
-                row_labels = spots,
-                row_names_side = "left",
-                column_names_side = "top",
-                cluster_columns = FALSE,
-                cluster_rows = FALSE,
-                top_annotation = column_ha,
-                column_order = sample_order$Name)
-      }
-      
-    }
-    
-    dend_function = function(m,targets){
-      m
- 
-      
-       dend <- m %>% scale %>% dist %>% 
-         hclust %>% as.dendrogram
-      #%>%
-      #  set("branches_k_color", k=3) %>% set("branches_lwd", 1.2) %>%
-      #  set("labels_colors") %>% set("labels_cex", c(.9,1.2)) %>% 
-      #  set("leaves_pch", 19) %>% set("leaves_col", c("blue", "red"))
-      # plot the dend in usual "base" plotting engine:
-      #plot(dend)
-      library(dendextend)
-      library(ggdendro)
-      ggd1 <- as.ggdend(dend)
-      ggplot(ggd1) 
-      
-      x <- as.matrix(scale(m))
-      dd.row <- as.dendrogram(hclust(dist(t(x))))
-      ddata_x <- dendro_data(dd.row)
-      #as.tbl(ddata_x)
-      
-      ddata_x$labels = ddata_x$labels %>%
-        mutate(Name = label) %>% 
-        left_join(targets)
-      #ddata_x$labels
-      ddata_x$leaf_labels = ddata_x$labels$label
-      
-      #da
-      p2 <- ggplot(segment(ddata_x)) +
-        geom_segment(aes(x=x, y=y, xend=xend, yend=yend))
-      p2 = p2 + geom_text(data=label(ddata_x),
-                     aes(label=label, x=x, y=y-2, colour=ddata_x$labels$Condition, angle = 90))
-      p2
-    }
     
     log_min_function = function(m,input){
       if(input$min_corr == TRUE){
@@ -1694,33 +1161,16 @@ shinyServer(function(input, output) {
     }
     
     output$E_Heatmap_ui = renderUI({ 
-      df = E()$E 
+      df = E()$E    
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
-      #m[is.na(m)] = 0
-      #m[is.infinite(m)] = 0
-      m = m[,selected_targets()$Name]
-      # plot_height = 300 + (dim(m)[1]*10)
-      # output$E_Heatmap = renderPlot({
-      #   Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-      # },height = plot_height)
-      # 
-      # plotOutput('E_Heatmap')
       
-      if(dim(m)[1] < max_heatmap_rows){
-        plot_height = 300 + (dim(m)[1]*10)
-        output$E_Heatmap = renderPlot({
-          Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-        },height = plot_height)
-        plotOutput('E_Heatmap',height = plot_height)
-      }else{
-        output$E_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-          dend_function(m,target_conditions())
-        })})
-        plotOutput('E_dend') 
-      }
+      plot_height = data_heatmap_Server('Raw',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      
+      do.call(tagList,data_heatmap_UI('Raw',plot_height))
+      
       
     })
     
@@ -1775,23 +1225,31 @@ shinyServer(function(input, output) {
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       m = m[,selected_targets()$Name]
+      
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
-        if(dim(m)[1] < max_heatmap_rows){
-          plot_height = 300 + (dim(m)[1]*10)
-          output$E_corr_Heatmap = renderPlot({
-            Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-          },height = plot_height)
-          plotOutput('E_corr_Heatmap',height = plot_height)
-        }else{
-          output$E_corr_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-            dend_function(m,target_conditions())
-          })})
-          plotOutput('E_corr_dend') 
-        }
+      
+        plot_height = data_heatmap_Server('Correction',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
         
+        do.call(tagList,data_heatmap_UI('Correction',plot_height))
       }
+      
+
+      #   if(dim(m)[1] < max_heatmap_rows){
+      #     plot_height = 300 + (dim(m)[1]*10)
+      #     output$E_corr_Heatmap = renderPlot({
+      #       Heatmap_function(m,target_conditions(),spot_names(),input$r_col,input$heatmap_order)
+      #     },height = plot_height)
+      #     plotOutput('E_corr_Heatmap',height = plot_height)
+      #   }else{
+      #     output$E_corr_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+      #       dend_function(m,target_conditions())
+      #     })})
+      #     plotOutput('E_corr_dend') 
+      #   }
+      #   
+      # }
       
     })
     
@@ -1830,17 +1288,7 @@ shinyServer(function(input, output) {
     E_filter = reactive({
       
       E_filter_before()$E
-      # E = E_corr()$E
-      # if(!is.null(E_corr()$weights)){
-      #   E_weights = E_corr()$weights
-      #   
-      #   E_filter = E * E_weights
-      #   E_filter[E_filter == 0] = NA
-      # }else{
-      #   E_filter = E
-      # }
-      # 
-      # E_filter
+
     })
     
     output$E_filter_boxplot = renderPlot({
@@ -1878,27 +1326,11 @@ shinyServer(function(input, output) {
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
-      #   plot_height = 300 + (dim(m)[1]*10)
-      #   output$E_corr_Heatmap = renderPlot({
-      #     Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-      #   },height = plot_height)
-      #   
-      #   plotOutput('E_corr_Heatmap')
-      # }
-      
-      if(dim(m)[1] < max_heatmap_rows){
-        plot_height = 300 + (dim(m)[1]*10)
-        output$E_filter_Heatmap = renderPlot({
-          Heatmap_function(m,target_conditions(),spot_names(),input$heatmap_order)
-        },height = plot_height)
-        plotOutput('E_filter_Heatmap',height = plot_height)
-      }else{
-        output$E_filter_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-          dend_function(m,target_conditions())
-        })})
-        plotOutput('E_filter_dend') 
+        plot_height = data_heatmap_Server('Raw_filter',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+        
+        do.call(tagList,data_heatmap_UI('Raw_filter',plot_height))
       }
-      }
+        
       
     })
     
@@ -1933,12 +1365,7 @@ shinyServer(function(input, output) {
     })
     #---------------------------------Normalization------------------------------------
     
-    # E_df = reactive({
-    #     E_norm = data.frame(log2(E()$E))
-    #     rownames(E_norm) <- spot_names() #ID represents column name of protein IDs/names 
-    #     colnames(E_norm) <- target_names()
-    #     E_norm
-    # })
+
     pre_norm_function = function(data,spot_names,target_names,removed_spots,log_rb){
       df = as.data.frame(data)
       dim(df)
@@ -1988,12 +1415,6 @@ shinyServer(function(input, output) {
     #----------------------------Visualization of Normalized data---------------------------------------------
     
     output$E_norm_boxplot = renderPlot({
-        # boxplot(data.frame(log2(E_norm())), 
-        #         main = "Normalised Rawdata",
-        #         ylab="Expression Intensity",
-        #         col = "white",
-        #         font =12,
-        #         frame = FALSE) 
       data = E_norm() %>% 
         dplyr::select(-spot)
       
@@ -2012,10 +1433,7 @@ shinyServer(function(input, output) {
         df = E_norm() %>% 
           column_to_rownames('spot')
       }
-      
-      #View(df[df$spot %in% df$spot[duplicated(df$spot)],])
-      #colnames(df) = target_names()
-      #rownames(df) = spot_names()
+
       df = as.data.frame(df)
       
       missingness_function(df,targets())
@@ -2039,27 +1457,11 @@ shinyServer(function(input, output) {
       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
       }else{
-      
-        # plot_height = 300 + (dim(m)[1]*10)
-        #   output$norm_Heatmap = renderPlot({
-        #     Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
-        #   },height = plot_height)
-        #   
-        #   plotOutput('norm_Heatmap')
-          
-          if(dim(m)[1] < max_heatmap_rows){
-            plot_height = 300 + (dim(m)[1]*10)
-            output$E_norm_Heatmap = renderPlot({
-              Heatmap_function(m,target_conditions(),df$spot,input$heatmap_order)
-            },height = plot_height)
-            plotOutput('E_norm_Heatmap',height = plot_height)
-          }else{
-            output$E_norm_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-              dend_function(m,target_conditions())
-            })})
-            plotOutput('E_norm_dend') 
-          }
+        plot_height = data_heatmap_Server('normalisation',m,target_conditions(),selected_targets(),df$spot,input$r_col,input$heatmap_order)
+        
+        do.call(tagList,data_heatmap_UI('normalisation',plot_height))
       }
+
     
     })
     
@@ -2321,6 +1723,10 @@ shinyServer(function(input, output) {
       
       m = m[,select_cols]
       
+      plot_height = data_heatmap_Server('data',m,target_conditions(),selected_targets(),df$protein,input$r_col,input$heatmap_order)
+      
+      do.call(tagList,data_heatmap_UI('data',plot_height))
+      
       # plot_height = 300 + (dim(m)[1]*10)
       # output$data_Heatmap = renderPlot({
       #   Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
@@ -2328,18 +1734,18 @@ shinyServer(function(input, output) {
       # 
       # plotOutput('data_Heatmap')
       
-      if(dim(m)[1] < max_heatmap_rows){
-        plot_height = 300 + (dim(m)[1]*10)
-        output$data_Heatmap = renderPlot({
-          Heatmap_function(m,target_conditions(),df$protein,input$heatmap_order)
-        },height = plot_height)
-        plotOutput('data_Heatmap',height = plot_height)
-      }else{
-        output$data_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-          dend_function(m,target_conditions())
-        })})
-        plotOutput('data_dend') 
-      }
+      # if(dim(m)[1] < max_heatmap_rows){
+      #   plot_height = 300 + (dim(m)[1]*10)
+      #   output$data_Heatmap = renderPlot({
+      #     Heatmap_function(m,target_conditions(),df$protein,input$r_col,input$heatmap_order)
+      #   },height = plot_height)
+      #   plotOutput('data_Heatmap',height = plot_height)
+      # }else{
+      #   output$data_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+      #     dend_function(m,target_conditions())
+      #   })})
+      #   plotOutput('data_dend') 
+      # }
       
     })
     
@@ -2672,6 +2078,10 @@ shinyServer(function(input, output) {
     m[is.na(m)] = 0
     (select_cols = intersect(selected_targets()$Name,colnames(m)))
     m = m[,select_cols]
+    
+    plot_height = data_heatmap_Server('threshold',m,target_conditions(),selected_targets(),df$protein,input$r_col,input$heatmap_order)
+    
+    do.call(tagList,data_heatmap_UI('threshold',plot_height))
     # plot_height = 300 + (dim(m)[1]*10)
     # output$threshold_Heatmap = renderPlot({
     #   Heatmap_function(m,samples,features$protein,input$heatmap_order)
@@ -2679,18 +2089,18 @@ shinyServer(function(input, output) {
     # 
     # plotOutput('threshold_Heatmap')
     
-    if(dim(m)[1] < max_heatmap_rows){
-      plot_height = 300 + (dim(m)[1]*10)
-      output$threshold_Heatmap = renderPlot({
-        Heatmap_function(m,samples,features$protein,input$heatmap_order)
-      },height = plot_height)
-      plotOutput('threshold_Heatmap',height = plot_height)
-    }else{
-      output$threshold_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-        dend_function(m,samples)
-      })})
-      plotOutput('threshold_dend') 
-    }
+    # if(dim(m)[1] < max_heatmap_rows){
+    #   plot_height = 300 + (dim(m)[1]*10)
+    #   output$threshold_Heatmap = renderPlot({
+    #     Heatmap_function(m,samples,features$protein,input$r_col,input$heatmap_order)
+    #   },height = plot_height)
+    #   plotOutput('threshold_Heatmap',height = plot_height)
+    # }else{
+    #   output$threshold_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+    #     dend_function(m,samples)
+    #   })})
+    #   plotOutput('threshold_dend') 
+    # }
     
   })
 
@@ -3243,7 +2653,7 @@ MA_data = reactive({
   })
   
   output$eBayes_Heatmap_ui = renderUI({  
-    df = eBayes_sig_data() %>% 
+    df = eBayes_sig_data() %>%  
       column_to_rownames('protein')
     colnames(df)  
     #colnames(df) = target_names()
@@ -3259,19 +2669,23 @@ MA_data = reactive({
     #   Heatmap_function(m,target_conditions(),rownames(m))
     # },height = plot_height)
     
+    #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+    
+    #do.call(tagList,data_heatmap_UI('eBayes',plot_height))
+
     if(dim(m)[1] < max_heatmap_rows){
       plot_height = 300 + (dim(m)[1]*10)
       output$eBayes_Heatmap = renderPlot({
-        Heatmap_function(m,target_conditions(),rownames(m))
+        Heatmap_function(m,target_conditions(),rownames(m),input$r_col,input$heatmap_order)
       },height = plot_height)
       plotOutput('eBayes_Heatmap',height = plot_height)
     }else{
       output$eBayes_dend = renderPlot({withProgress(message = 'generating dendrogram',{
         dend_function(m,target_conditions())
       })})
-      plotOutput('eBayes_dend') 
+      plotOutput('eBayes_dend')
     }
-    
+
     #plotOutput('eBayes_Heatmap')
     
   })

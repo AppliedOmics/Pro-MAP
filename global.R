@@ -15,6 +15,8 @@ library(OptimalCutpoints)
 library(magrittr)
 library(tibble)
 library(foreach) 
+
+source('shiny_functions.R')
 #library(naniar)
 
 options(DT.options = list(pageLength = 25))
