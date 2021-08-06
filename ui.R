@@ -37,7 +37,7 @@ shinyUI(fluidPage(
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,'2sd Background spot filter' = 'sd_filter'),'sd_filter',inline = T)),
+        column(12,radioButtons('spot_filtering','Spot Filtering',c(T,F),inline = T)),
         uiOutput('annotation_columns_ui'),
         #uiOutput('sample_file_upload_ui'),
         selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
@@ -127,7 +127,8 @@ shinyUI(fluidPage(
                    tabPanel('ForeGround',
                             tabsetPanel(selected = 'Plot',
                               tabPanel('Table',
-                                  DT::dataTableOutput('foreground_table')
+                                  uiOutput('foreground_table_ui'),
+                                  #DT::dataTableOutput('foreground_table')
                               ),
                               tabPanel('Plot',
                                        uiOutput('foreground_heatmap_ui')
@@ -138,7 +139,7 @@ shinyUI(fluidPage(
                    tabPanel('BackGround',
                             tabsetPanel(selected = 'Plot',
                               tabPanel('Table',
-                                       DT::dataTableOutput('background_table')
+                                       uiOutput('background_table_ui')
                               ),
                               tabPanel('Plot',
                                        uiOutput('background_heatmap_ui')
@@ -148,7 +149,7 @@ shinyUI(fluidPage(
                    tabPanel('Spot Filtering Elist',
                             tabsetPanel(selected = 'Plot',
                                         tabPanel('Table',
-                                                 DT::dataTableOutput('spot_filtering_E_table')
+                                                 uiOutput('spot_filtering_table_ui')
                                         ),
                                         tabPanel('Plot',
                                                  uiOutput('spot_filtering_E_heatmap_ui')
@@ -160,68 +161,81 @@ shinyUI(fluidPage(
         tabPanel('Pre Processing Pipeline',
             radioButtons('collapse_boxplots','Collapse Boxplots',c(F,T),inline = T),
             tabsetPanel(
+              #### Raw ####
               tabPanel('Raw Data',
-                       tabsetPanel(
-                         tabPanel('Plots',
-                            column(12,plotOutput('E_boxplot')),
-                            column(12,plotOutput('R_missing_plot')),
-                            column(12,plotOutput('E_CV_plot'))
-                            ),
-                         tabPanel("MA Plots",
-                            column(12,plotlyOutput('R_MA_plot'))
-                         ),
-                         tabPanel('Clustering',
-                            column(12,uiOutput('E_Heatmap_ui'))
-                         ))
-                #column(12,uiOutput('E_corr_Heatmap_ui'))
-              ),
-              
-              tabPanel('Spot Filtering',
-                       tabsetPanel(
-                         tabPanel('Plots',
-                                  column(12,plotOutput('E_filter_boxplot')),
-                                  column(12,plotOutput('E_filter_missing_plot')),
-                                  column(12,plotOutput('E_filter_CV_plot'))
-                         ),
-                         tabPanel("MA Plots",
-                                  column(12,plotlyOutput('E_filter_MA_plot'))
-                         ),
-                         tabPanel('Clustering',
-                                  column(12,uiOutput('E_filter_Heatmap_ui'))
-                         ))
+                       uiOutput('Raw_tabs_ui')
+                       #tabsetPanel(
+                         #do.call(resultlistUI('RAW'))
+                        # tabPanel('Test',
                        
-              ),
+                       
+                       
+                                  # do.call(
+                                  #   tabsetPanel,
+                                  #   append(
+                                  #     list(
+                                  #       #id = "tabs",
+                                  #       #tabPanel(
+                                  #       #  title = "Tab 1",
+                                  #       #  "Some text here"
+                                  #       #)
+                                  #     ),
+                                  #     resultlistUI(id = "RAW")
+                                  #   )
+                                  # )
+                         #)
+                                  
+                        #          )
+                         # tabPanel('Plots',
+                         #          uiOutput('RAW_boxplot_ui'),
+                         #          uiOutput('RAW_CV_plot_ui'),
+                         #          uiOutput('RAW_missing_plot_ui')
+                         #    ),
+                         # tabPanel("MA Plots",
+                         #    uiOutput('RAW_MA_plot_ui'),
+                         #                                   ),
+                         # tabPanel('Clustering',
+                         #    column(12,uiOutput('RAW_Heatmap_ui'))
+                         # )
+                         
+                         
+                       ),
+              tabPanel('RAW filter',
+                       uiOutput('Raw_filter_tabs_ui')),
               
               tabPanel('Background Correction',
-                       tabsetPanel(
-                         tabPanel('Plots',
-                           column(12,plotOutput('E_corr_boxplot')),
-                           column(12,plotOutput('E_corr_missing_plot')),
-                           column(12,plotOutput('E_corr_CV_plot'))
-                         ),
-                         tabPanel("MA Plots",
-                           column(12,plotlyOutput('E_corr_MA_plot'))
-                         ),
-                         tabPanel('Clustering',
-                           column(12,uiOutput('E_corr_Heatmap_ui'))
-                         ))
+                       uiOutput('Raw_corr_tabs_ui'),
+                       # tabsetPanel(
+                       #   tabPanel('Plots',
+                       #     column(12,plotOutput('E_corr_boxplot')),
+                       #     column(12,plotOutput('E_corr_missing_plot')),
+                       #     column(12,plotOutput('E_corr_CV_plot'))
+                       #   ),
+                       #   tabPanel("MA Plots",
+                       #     column(12,plotlyOutput('E_corr_MA_plot'))
+                       #   ),
+                       #   tabPanel('Clustering',
+                       #     column(12,uiOutput('E_corr_Heatmap_ui'))
+                       #   ))
               ),
               
       
               
               tabPanel('Normalisation',
-                       tabsetPanel(
-                         tabPanel('Plots',
-                            column(12,plotOutput('E_norm_boxplot')),
-                            column(12,plotOutput('E_norm_missing_plot')),
-                            column(12,plotOutput('E_norm_CV_plot'))
-                         ),
-                         tabPanel("MA Plots",
-                            column(12,plotlyOutput('E_norm_MA_plot'))
-                         ),
-                         tabPanel('Clustering',
-                            column(12,uiOutput('norm_Heatmap_ui'))
-                         ))
+                       uiOutput('Raw_norm_tabs_ui')
+                       
+                       # tabsetPanel(
+                       #   tabPanel('Plots',
+                       #      column(12,plotOutput('E_norm_boxplot')),
+                       #      column(12,plotOutput('E_norm_missing_plot')),
+                       #      column(12,plotOutput('E_norm_CV_plot'))
+                       #   ),
+                       #   tabPanel("MA Plots",
+                       #      column(12,plotlyOutput('E_norm_MA_plot'))
+                       #   ),
+                       #   tabPanel('Clustering',
+                       #      column(12,uiOutput('norm_Heatmap_ui'))
+                       #   ))
               ),
               
           

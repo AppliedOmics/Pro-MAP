@@ -12,7 +12,61 @@ library(shiny)
 
 shinyServer(function(input, output) {
   
+#### Functions ####
+  
+  values = reactiveValues(
+    target_file = NULL,
+    spot_file = NULL,
+    protein_file = NULL
+  )
+  
+  gg_theme_function = function(p){
+    cmd = paste0('p = p + ',input$gg_theme,'()')
+    cmd
+    eval(parse(text = cmd))
+    p + theme(axis.text.x = element_text(angle = 90),
+              axis.text = element_text(size = 12),
+              axis.title.x = element_blank()) 
+  }
+  
+  gg_col_function = function(p){
+    
+    p = gg_theme_function(p)
+    if(input$gg_grey){
+      p = p + scale_colour_grey()
+    }else{
+      p = p + 
+        #theme_classic() + 
+        scale_colour_brewer(palette = input$r_col)
+    }
+    p
+  }
+  
+  gg_fill_function = function(p){
+    
+    p = gg_theme_function(p)
+    if(input$gg_grey){
+      p = p + scale_fill_grey()
+    }else{
+      p = p + 
+        #theme_classic() + 
+        scale_fill_brewer(palette = input$r_col)
+    }
+    p
+  }
 
+  
+  
+  CV <- function(x){
+    100*(sd(x)/mean(x))
+  }
+  
+  sd_filter <- function(x){
+    threshold = 2*sd(abs(x[,background_column()]))
+    okred <- abs(x[,foreground_column()]) < threshold*abs(x[,background_column()])
+    +  as.numeric(okred) #Spot filtering 
+  } 
+  
   
   #### Debugging and updating #####
   hideTab('main','All Methods')
@@ -70,84 +124,7 @@ shinyServer(function(input, output) {
     includeMarkdown("README.md")
   })
   
-  #### Functions #####
-  
-  values = reactiveValues(
-    target_file = NULL,
-    spot_file = NULL,
-    protein_file = NULL
-  )
-  
-  gg_theme_function = function(p){
-    cmd = paste0('p = p + ',input$gg_theme,'()')
-    cmd
-    eval(parse(text = cmd))
-    p + theme(axis.text.x = element_text(angle = 90),
-              axis.text = element_text(size = 12),
-              axis.title.x = element_blank()) 
-  }
-  
-  gg_col_function = function(p){
-    
-     p = gg_theme_function(p)
-    if(input$gg_grey){
-      p = p + scale_colour_grey()
-    }else{
-      p = p + 
-        #theme_classic() + 
-        scale_colour_brewer(palette = input$r_col)
-    }
-    p
-  }
-  
-  gg_fill_function = function(p){
-    
-    p = gg_theme_function(p)
-    if(input$gg_grey){
-      p = p + scale_fill_grey()
-    }else{
-      p = p + 
-        #theme_classic() + 
-        scale_fill_brewer(palette = input$r_col)
-    }
-    p
-  }
-    
 
-    
-    myfun <- function(x, threshold = 2*sd){
-        okred <- abs(x[,"F635 Median"]) < threshold*abs(x[,"B635Median"])
-        +  as.numeric(okred) #Spot filtering 
-    }
-    
-    myfun_2 <- function(x, threshold, foreground_column, background_column){
-      okred <- abs(x[,foreground_column]) < threshold*abs(x[,background_column])
-      +  as.numeric(okred) #Spot filtering 
-    }
-    
-    sd_filter <- function(x){
-      threshold = 2*sd(abs(x[,background_column()]))
-      okred <- abs(x[,foreground_column()]) < threshold*abs(x[,background_column()])
-      +  as.numeric(okred) #Spot filtering 
-    } 
-    
-    sd_filter_2 <- function(x){
-      threshold = 2*sd
-      okred <- abs(x[,foreground_column()]) < threshold*abs(x[,background_column()])
-      +  as.numeric(okred) #Spot filtering 
-    } 
-    
-    
-    CV <- function(x){
-      100*(sd(x)/mean(x))
-    }
-
-    output$example_data_text_ui = renderUI({
-        if(is.null(input$gpr_files$datapath)){
-            span(tags$h4('Example data automatically uploaded at start.'), style="color:red")
-            
-        }
-    })
     
   #### Inputs Options #####
     ##### _Select Datasets #####
@@ -437,19 +414,19 @@ shinyServer(function(input, output) {
     E = reactive({   
       file_path_list = array_file_list()$path  
       file_path_list
-          if(input$spot_filtering == 'wtflags(0.1)'){
-            E <- read.maimages(file_path_list,
-                               columns=list(E=input$foreground_column, Eb=input$background_column),
-                               annotation=c(input$select_annotation), 
-                               wt.fun=wtflags(0.1))
-          }
-          if(input$spot_filtering == 'wtarea(150)'){
-            E <- read.maimages(file_path_list,
-                               columns=list(E=input$foreground_column, Eb=input$background_column),
-                               annotation=c(input$select_annotation), 
-                               wt.fun=wtarea(150))
-          }
-          if(input$spot_filtering == 'sd_filter'){
+          # if(input$spot_filtering == 'wtflags(0.1)'){
+          #   E <- read.maimages(file_path_list,
+          #                      columns=list(E=input$foreground_column, Eb=input$background_column),
+          #                      annotation=c(input$select_annotation), 
+          #                      wt.fun=wtflags(0.1))
+          # }
+          # if(input$spot_filtering == 'wtarea(150)'){
+          #   E <- read.maimages(file_path_list,
+          #                      columns=list(E=input$foreground_column, Eb=input$background_column),
+          #                      annotation=c(input$select_annotation), 
+          #                      wt.fun=wtarea(150))
+          # }
+          if(input$spot_filtering == TRUE){
             E <- read.maimages(file_path_list,
                                columns=list(E=input$foreground_column, Eb=input$background_column),
                                annotation=c(input$select_annotation), 
@@ -855,9 +832,115 @@ shinyServer(function(input, output) {
     )
     
     
-    #### Data Table Heatmaps#####
+    #### Data Table Heatmaps #####
     
-    output$foreground_table = DT::renderDataTable({
+    array_HeatMap_function <- function(m,target_names,selected_targets,spot_names,pallete,cluster) {
+    
+          colnames(m) = target_names$Name
+          m = m[,selected_targets$Name]
+          
+          plot_height = 300+(dim(m)[1]*10)
+          plot_width = 600 + (dim(m)[2]*5) 
+          if(cluster == 'dend'){
+            plot_height = 300
+            ht = dend_function(m,target_names)
+          }else{
+            plot_height = 300+(dim(m)[1]*10)
+            ht = Heatmap_function(m,selected_targets,spot_names,pallete,cluster)
+          }
+     list(p = ht,plot_height = plot_height, plot_width = plot_width)  
+    }
+    
+    Heatmap_function = function(m, targets,spots,pallete,cluster = 'Cluster'){ 
+      
+      plot_min = min(as.numeric(m),na.rm = T)
+      if(plot_min < 0){
+        col_fun = colorRamp2(c(plot_min,0,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c('blue',"white",'orange',"red"))
+        
+      }else{
+        col_fun = colorRamp2(c(plot_min,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c("white",'orange',"red"))
+      }
+      
+      targets = targets %>% 
+        filter(Name %in% colnames(m))
+      
+      ha_annotation = targets$Condition
+      names(ha_annotation) = targets$Name
+      (condition_col = brewer.pal(n = length(unique(targets$Condition)), name = pallete)[1:length(unique(targets$Condition))])
+      (names(condition_col) = unique(targets$Condition))
+      column_ha = HeatmapAnnotation(Condition = ha_annotation, col = list(Condition = condition_col))
+      
+      sample_order = targets %>% 
+        arrange(Condition)
+      
+      
+      if(cluster == 'Cluster'){
+        ht = Heatmap(m,
+                     col = col_fun,
+                     row_labels = spots,
+                     column_dend_height = unit(4, "cm"), 
+                     row_dend_width = unit(4, "cm"),
+                     column_names_side = "top",
+                     top_annotation = column_ha
+        )
+      }
+      if(cluster == 'Order'){
+        ht = Heatmap(m,
+                     col = col_fun,
+                     row_labels = spots,
+                     row_names_side = "left",
+                     column_names_side = "top",
+                     cluster_columns = FALSE,
+                     cluster_rows = FALSE,
+                     top_annotation = column_ha,
+                     column_order = sample_order$Name)
+      }
+      if(cluster == 'None'){
+        ht = Heatmap(m,
+                     col = col_fun,
+                     row_labels = spots,
+                     row_names_side = "left",
+                     column_names_side = "top",
+                     cluster_columns = FALSE,
+                     cluster_rows = FALSE,
+                     top_annotation = column_ha)
+      }
+      ht
+      
+    }
+    
+    dend_function = function(m,targets){
+      m
+      
+      
+      dend <- m %>% scale %>% dist %>% 
+        hclust %>% as.dendrogram
+      
+      library(dendextend)
+      library(ggdendro)
+      ggd1 <- as.ggdend(dend)
+      ggplot(ggd1) 
+      
+      x <- as.matrix(scale(m))
+      dd.row <- as.dendrogram(hclust(dist(t(x))))
+      ddata_x <- dendro_data(dd.row)
+      
+      
+      ddata_x$labels = ddata_x$labels %>%
+        mutate(Name = label) %>% 
+        left_join(targets)
+      
+      ddata_x$leaf_labels = ddata_x$labels$label
+      
+      p2 <- ggplot(segment(ddata_x)) +
+        geom_segment(aes(x=x, y=y, xend=xend, yend=yend))
+      p2 = p2 + geom_text(data=label(ddata_x),
+                          aes(label=label, x=x, y=y-2, colour=ddata_x$labels$Condition, angle = 90))
+      p2
+    }
+    
+    
+    foreground_table = reactive({
       df = as.data.frame(E()$E)  
       dim(df)
       colnames(df) = target_names()
@@ -867,18 +950,25 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     }) 
+    
+    output$foreground_table_ui = renderUI({
+      df = foreground_table()
+      id = 'foreground'
+      name = 'table'
+      table_Server(id,name,df)
+      table_UI(id,name)
+    })
+    
     output$foreground_heatmap_ui = renderUI({ 
-      
-      m = E()$E
-      plot_height = 300+(dim(m)[1]*10)
-      
-      plot_height = data_heatmap_Server('foreground',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-      
-      do.call(tagList,data_heatmap_UI('foreground',plot_height))
-      
+      m = E()$E 
+      id = 'foreground'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
     })
   
-    output$background_table = DT::renderDataTable({
+    background_table = reactive({
       df = as.data.frame(E()$Eb)
       colnames(df) = target_names()
       df$spot = spot_names()
@@ -887,15 +977,24 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     })
+    
+    output$background_table_ui = renderUI({
+      df = background_table()
+      id = 'background'
+      name = 'table'
+      table_Server(id,name,df)
+      table_UI(id,name)
+    })
+    
     output$background_heatmap_ui = renderUI({ 
       
-      m = E()$Eb
-      plot_height = 300+(dim(m)[1]*10)
-      
-      plot_height = data_heatmap_Server('background',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-      
-      do.call(tagList,data_heatmap_UI('background',plot_height))
-      
+      m = E()$Eb 
+      id = 'backhground'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
+
     })
 
     spot_filtering_E = reactive({
@@ -908,9 +1007,18 @@ shinyServer(function(input, output) {
         dplyr::select(spot,everything())
       df
     })
-    output$spot_filtering_E_table = DT::renderDataTable({
+    #output$spot_filtering_E_table = DT::renderDataTable({
+    #  df = spot_filtering_E()
+    #})
+    
+    output$spot_filtering_table_ui = renderUI({
       df = spot_filtering_E()
+      id = 'spot_filtering'
+      name = 'table'
+      table_Server(id,name,df)
+      table_UI(id,name)
     })
+    
     output$spot_filtering_E_heatmap_ui = renderUI({ 
       
     
@@ -922,15 +1030,20 @@ shinyServer(function(input, output) {
         
         if(length(unique(as.numeric(m))) >1){
         
+          id = 'spot_filtering'
+          name = 'Hcluster'
+          ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+          ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+          do.call(tagList,plot_UI(id,name))
           
-          plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+          #plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
           
-          do.call(tagList,data_heatmap_UI('spot_filtering',plot_height))
+          #do.call(tagList,data_heatmap_UI('spot_filtering',plot_height))
         }else{
           tags$h4('No spots were filtered')
         }
       }else{
-        tags$h4('No spot weighting applied')
+        tags$h4('No spot filtering was applied to the array data')
       }
   
     })
@@ -976,84 +1089,165 @@ shinyServer(function(input, output) {
       
       p 
     }
+
     
-    
-    output$E_boxplot = renderPlot({ 
-      input$collapse_boxplots
-      boxplot_function_1_col_array(E()$E,target_names(),spot_names(),target_conditions(),selected_targets(),input$log_rb,input)
-    })
+    array_boxplot_function = function(data,target_names,spot_names,targets,selected_targets,
+                                      log_rb,input){
+      df = data.frame(data)
+      #if(log_rb == TRUE){
+      #  df = log2(df)
+      #}
+      colnames(df) <- target_names
+      df$Proteins = spot_names
+      as.tbl(df)   
+      
+      
+      df_l = df %>% 
+        gather(Name,`Expression Intensity`,c(target_names)) %>% 
+        left_join(targets) %>% 
+        filter(Name %in% selected_targets$Name)
+      as.tbl(df_l)
+      p = ggplot(df_l)
+      if(input$collapse_boxplots == F){
+        
+        if(length(unique(df_l$Condition)) > 1){
+          p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, col = Condition))
+          
+        }else{
+          p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`))
+          
+        }
+      }else{
+        p = p + geom_boxplot(aes(x = Condition,y = `Expression Intensity`, col = Condition))
+        
+      }
+      if(log_rb == FALSE){
+        p = p + scale_y_continuous(trans='log2')
+      }
+      p = gg_col_function(p)
+      if(length(unique(df_l$Group)) > 1){
+        p = p + facet_grid(Group ~ .)
+      }
+      
+      p 
+    }
     
     CV_df_function  = function(df,targets){
-  
- 
       
       df_l = df %>% 
         gather(Name,value,-spot) %>% 
-        left_join(targets())
+        left_join(targets)
       
       as.tbl(df_l)
       
       df_cv = df_l %>% 
         filter(!is.na(value)) %>% 
         group_by(spot,Condition) %>% 
-          summarise(mean = mean(value,na.rm = T),
-                    sd = sd(value,na.rm = T)) %>% 
+        summarise(mean = mean(value,na.rm = T),
+                  sd = sd(value,na.rm = T)) %>% 
         ungroup() %>% 
         mutate(CV = sd/mean*100)
       
       df_cv
     }
-
-    E_CV_df = reactive({
-      df = E()$E  
-      targets = targets()
-      target_names = target_names()
-      spot_names = spot_names()
-      
-      colnames(df) = target_names()
-      rownames(df) = spot_names()
-      df = df %>% 
-        as.data.frame %>% 
-        rownames_to_column('spot')
-      
-      CV_df = CV_df_function(df,targets)
-      CV_df
-    })
     
-    output$E_CV_plot = renderPlot({
-      CV_df = E_CV_df() %>%  
-        left_join(spots())
-      as.tbl(CV_df)
-      unique(CV_df$Category)
+    CV_plot_function = function(data,targets,spots){
+      CV_df = data %>%  
+        left_join(spots)
       q = quantile(CV_df$CV,na.rm = T)
-      ggplot(CV_df) + 
-        geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
-        ylim(q[1],q[3])
-    })
+      
+      if(length(unique(CV_df$Category)) == 1){
+        p = ggplot(CV_df) + 
+          geom_boxplot(aes(y = CV,x = Condition)) + 
+          ylim(q[1],q[3])
+        
+      }else{
+        p = ggplot(CV_df) + 
+          geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
+          ylim(q[1],q[3])
+      }
+      
+      p
+    }
     
     missingness_function = function(df,targets){
-
+      
       
       df[df <= 0] = NA
       as.tbl(df)
       
       df_l = df %>% 
-        rownames_to_column('spot') %>% 
-        gather(Name,value,colnames(df)) %>% 
+        #rownames_to_column('spot') %>% 
+        gather(Name,value,-spot) %>% 
         filter(!is.na(value))
       as.tbl(df_l)
       
       df_count = df_l %>% 
         group_by(Name) %>% 
-          summarise(`Percentage missing` = (dim(df)[1]-n())/dim(df)[1]*100) %>% 
+        summarise(`Percentage missing` = (dim(df)[1]-n())/dim(df)[1]*100) %>% 
         ungroup() %>% 
         left_join(targets)
       df_count  
       
       p = ggplot(df_count) +
         geom_col(aes(x = Name,y = `Percentage missing`, fill = Condition))
-      p = gg_fill_function(p) 
       p
+    }
+    
+    MA_plot_function = function(df,spots){
+      if('spot' %in% colnames(df)){
+        spot_col = df$spot
+        df = df %>% dplyr::select(-spot)
+      }else{
+        spot_col = rownames(df)
+      }
+      
+      Rfit = lmFit(df)
+      Rfit2 = eBayes(Rfit)
+      Rfit2_df = as.data.frame(Rfit2)
+      as.tbl(Rfit2_df)
+      dim(Rfit2_df)
+      #rownames(Rfit2_df) = rownames(df)
+      Rfit2_df$spot = spot_col
+      
+      as.tbl(Rfit2_df)
+      
+      plot_df = Rfit2_df %>% 
+        
+        left_join(spots)
+      
+      as.tbl(plot_df)
+      
+      
+      if(length(unique(plot_df$Category))>1){
+        MA_plot = ggplot(plot_df) + 
+          geom_point(aes(y = log(F), x = Amean,col = Category,group = spot))
+      }else{
+        MA_plot = ggplot(plot_df) + 
+          geom_point(aes(y = log(F), x = Amean,group = spot))
+      }
+      
+      
+      MA_plot
+    }
+    
+    log_min_function = function(m,input){
+      if(input$min_corr == TRUE){
+        m[m < 1] = 1
+      }
+      if(input$log_rb == TRUE){
+        m = log2(m)
+      }
+      m
+    }
+    
+    neg_corr_function = function(m,input){
+      if(input$min_corr == TRUE){
+        m[is.na(m)] = 0
+        m[is.infinite(m)] = 0 
+        m[m < 0] = 0
+      }
+      m
     }
     
     cont_matrix_function = function(df,targets){
@@ -1085,94 +1279,105 @@ shinyServer(function(input, output) {
       return(result)
     }
     
-    MA_plot_function = function(df,spots){
-        if('spot' %in% colnames(df)){
-          spot_col = df$spot
-          df = df %>% dplyr::select(-spot)
-        }else{
-          spot_col = rownames(df)
-        }
+    #### __RAW DATA ####
+     
+    output[['RAW-boxplot_ui']] = renderUI({   
       
-        Rfit = lmFit(df)
-        Rfit2 = eBayes(Rfit)
-        Rfit2_df = as.data.frame(Rfit2)
-        as.tbl(Rfit2_df)
-        dim(Rfit2_df)
-        #rownames(Rfit2_df) = rownames(df)
-        Rfit2_df$spot = spot_col
+      data = E()$E
+      log_rb = FALSE
+      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+
+      id = 'RAW'
+      name = 'boxplot'
       
-        as.tbl(Rfit2_df)
-        
-        plot_df = Rfit2_df %>% 
-          
-          left_join(spots)
-        
-        as.tbl(plot_df)
-        
-        
-        if(length(unique(plot_df$Category))>1){
-          MA_plot = ggplot(plot_df) + 
-            geom_point(aes(y = log(F), x = Amean,col = Category,group = spot))
-        }else{
-          MA_plot = ggplot(plot_df) + 
-            geom_point(aes(y = log(F), x = Amean,group = spot))
-        }
-        
-   
-        MA_plot
-    }
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot'))
+    })
     
-    output$R_MA_plot = renderPlotly({
+    RAW_df = reactive({
       df = E()$E  
-      rownames(df) = spot_names()
-      spots = spots()
-      MA_plot_function(df,spots())
-    })
-    
-    output$R_missing_plot = renderPlot({
-      df = E()$E   
       colnames(df) = target_names()
-      rownames(df) = spot_names()
-      df = as.data.frame(df)
-      
-      missingness_function(df,targets())
+      df = df %>% 
+        as.data.frame()
+      df$spot = spot_names()
+      df
+      #CV_df = CV_df_function(df,targets())
+      #CV_df
     })
     
-    #---------------------------------Background Correction----------------------------
+    output[['RAW-CV_plot_ui']] = renderUI({  
+      df = RAW_df()
+      data = CV_df_function(df,targets()) 
+      
+      p = CV_plot_function(data,targets(),spots())
+      p = gg_fill_function(p)
+      
+      id = 'RAW'
+      name = 'CV'
+      title = "RAW data CV's across arrays for all probes"
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,title))
+      
+    })
     
     
-    log_min_function = function(m,input){
-      if(input$min_corr == TRUE){
-        m[m < 1] = 1
-      }
-      if(input$log_rb == TRUE){
-        m = log2(m)
-      }
-      m
-    }
+    output[['RAW-MA_plot_ui']] = renderUI({
+      
+      #df = E()$E  
+      #rownames(df) = spot_names()
+      #spots = spots()
+      
+      df = RAW_df()
+      p = MA_plot_function(df,spots())
+      #p = gg_col_function(p)
+      
+      id = 'RAW'
+      name = 'MA'
+      title = NULL
+      plotly_Server(id,name,p)
+      do.call(tagList,plotly_UI(id,name,title))
+      
+    })
     
-    neg_corr_function = function(m,input){
-      if(input$min_corr == TRUE){
-        m[is.na(m)] = 0
-        m[is.infinite(m)] = 0 
-        m[m < 0] = 0
-      }
-      m
-    }
     
-    output$E_Heatmap_ui = renderUI({ 
-      df = E()$E    
+    output[['RAW-missing_plot_ui']] = renderUI({  
+      #df = E()$E     
+      #colnames(df) = target_names()
+      #rownames(df) = spot_names()
+      #df = as.data.frame(df)
+      
+      df = RAW_df()
+      p = missingness_function(df,targets())
+      p = gg_fill_function(p)
+      
+      plot_Server('RAW','missingness',p)
+      do.call(tagList,plot_UI('RAW','missingness','Percentage of missing values per array'))
+      #print(reactiveValuesToList(output))
+      #names(outputOptions(output))
+    })
+    
+    output[['RAW-Heatmap_ui']] = renderUI({ 
+      df = E()$E     
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       
-      plot_height = data_heatmap_Server('Raw',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-      
-      do.call(tagList,data_heatmap_UI('Raw',plot_height))
-      
+      id = 'RAW'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list$p
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
       
     })
+    
+    output$Raw_tabs_ui = renderUI({ 
+      do.call(tagList,PlotTabs_UI(id = "RAW"))
+    })
+    
+    
+    #----------------------------------SPOT FILTERING----------------------------------------
     
     E_filter_before = reactive({
       E = E()
@@ -1188,181 +1393,354 @@ shinyServer(function(input, output) {
       E
     })
     
+    E_filter = reactive({
+      
+      E_filter_before()$E
+      
+    })
+    
+    output[['RAW_filter-boxplot_ui']] = renderUI({   
+      
+      data = E_filter()
+      log_rb = FALSE
+      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+      
+      id = 'RAW_filter'
+      name = 'boxplot'
+      
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot'))
+    })
+    
+    E_filter_df = reactive({
+      df = E_filter() 
+      colnames(df) = target_names()
+      df = df %>% 
+        as.data.frame
+      df$spot = spot_names()
+      df
+    })
+    
+    output[['RAW_filter-CV_plot_ui']] = renderUI({     
+      df = E_filter_df() 
+      data = CV_df_function(df,targets())
+      p = CV_plot_function(data,targets(),spots())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_filter'
+      name = 'CV'
+      title = "RAW data CV's across arrays for all probes"
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,title))
+      
+    })
+    
+    output[['RAW_filter-MA_plot_ui']] = renderUI({
+      
+      df = E_filter_df()  
+      p = MA_plot_function(df,spots())
+
+      id = 'RAW_filter'
+      name = 'MA'
+      title = NULL
+      plotly_Server(id,name,p)
+      do.call(tagList,plotly_UI(id,name,title))
+      
+    })
+    
+    
+    output[['RAW_filter-missing_plot_ui']] = renderUI({   
+      df = E_filter_df()
+      p = missingness_function(df,targets())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_filter'
+      name = 'missingness' 
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Percentage of missing values per array'))
+    })
+    
+    output[['RAW_filter-Heatmap_ui']] = renderUI({ 
+      df = E_filter()     
+      colnames(df) = target_names()
+      m = as.matrix(df)
+      m = log_min_function(m,input)
+      m = neg_corr_function(m,input)
+      
+      id = 'RAW_filter'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list$p
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
+      
+    })
+    
+    output$Raw_filter_tabs_ui = renderUI({ 
+      do.call(tagList,PlotTabs_UI(id = "RAW_filter"))
+    })
+    
+    
+    #---------------------------------Background Correction----------------------------
+    
+    
+
+    
     E_corr = reactive({
         #backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method, offset = 0)
       backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method)
       
     })
     
-    output$E_corr_boxplot = renderPlot({
- 
-      data = E_corr()$E
+    output[['RAW_corr-boxplot_ui']] = renderUI({   
       
-      input$collapse_boxplots
-      boxplot_function_1_col_array(data,target_names(),spot_names(),target_conditions(),selected_targets(),input$log_rb,input)
+      data = E_corr()$E   
+      log_rb = FALSE
+      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
       
+      id = 'RAW_corr'
+      name = 'boxplot'
       
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Background Corrected Expression Intensity Boxplot'))
     })
     
-    output$E_corr_missing_plot = renderPlot({
+    E_corr_df = reactive({
       df = E_corr()$E
       colnames(df) = target_names()
-      rownames(df) = spot_names()
-      df = as.data.frame(df)
-      as.tbl(df)
-      missingness_function(df,targets())
-    })
-    output$E_corr_MA_plot = renderPlotly({
-      df = E_corr()$E
-      rownames(df) = spot_names()
-      MA_plot_function(df,spots())
+      df = df %>% 
+        as.data.frame
+      df$spot = spot_names()
+      df
     })
     
-    output$E_corr_Heatmap_ui = renderUI({
-      df = E_corr()$E   
+    output[['RAW_corr-CV_plot_ui']] = renderUI({     
+      df = E_corr_df() 
+      data = CV_df_function(df,targets())
+      p = CV_plot_function(data,targets(),spots())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_corr'
+      name = 'CV'
+      title = "Background Corrected CV's across arrays for all probes"
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,title))
+      
+    })
+    
+    output[['RAW_corr-MA_plot_ui']] = renderUI({
+      
+      df = E_corr_df()  
+      p = MA_plot_function(df,spots())
+      
+      id = 'RAW_corr'
+      name = 'MA'
+      title = NULL
+      plotly_Server(id,name,p)
+      do.call(tagList,plotly_UI(id,name,title))
+      
+    })
+    
+    
+    output[['RAW_corr-missing_plot_ui']] = renderUI({   
+      df = E_corr_df()
+      p = missingness_function(df,targets())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_corr'
+      name = 'missingness' 
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Percentage of missing values per array'))
+    })
+    
+    output[['RAW_corr-Heatmap_ui']] = renderUI({ 
+      df = E_corr()$E     
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
-      m = m[,selected_targets()$Name]
       
-      if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
-        span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
-      }else{
-      
-        plot_height = data_heatmap_Server('Correction',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-        
-        do.call(tagList,data_heatmap_UI('Correction',plot_height))
-      }
-      
-
-      #   if(dim(m)[1] < max_heatmap_rows){
-      #     plot_height = 300 + (dim(m)[1]*10)
-      #     output$E_corr_Heatmap = renderPlot({
-      #       Heatmap_function(m,target_conditions(),spot_names(),input$r_col,input$heatmap_order)
-      #     },height = plot_height)
-      #     plotOutput('E_corr_Heatmap',height = plot_height)
-      #   }else{
-      #     output$E_corr_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-      #       dend_function(m,target_conditions())
-      #     })})
-      #     plotOutput('E_corr_dend') 
-      #   }
-      #   
-      # }
+      id = 'RAW_corr'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list$p
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
       
     })
     
-    E_corr_CV_df = reactive({
-      df = E_corr()$E
-      targets = targets()
-      target_names = target_names()
-      spot_names = spot_names()
-      
-      colnames(df) = target_names()
-      rownames(df) = spot_names()
-      
-      
-      df = df %>% 
-        as.data.frame %>% 
-        rownames_to_column('spot')
-      
-      CV_df = CV_df_function(df,targets)
-      CV_df
+    output$Raw_corr_tabs_ui = renderUI({ 
+      do.call(tagList,PlotTabs_UI(id = "RAW_corr"))
     })
     
-    output$E_corr_CV_plot = renderPlot({
-      CV_df = E_corr_CV_df() %>%  
-        left_join(spots())
-      as.tbl(CV_df)
-      unique(CV_df$Category)
-      q = quantile(CV_df$CV,na.rm = T)
-      ggplot(CV_df) + 
-        geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
-        ylim(q[1],q[3])
-    })
+    
+    # output$E_corr_boxplot = renderPlot({
+    # 
+    #   data = E_corr()$E
+    #   
+    #   input$collapse_boxplots
+    #   boxplot_function_1_col_array(data,target_names(),spot_names(),target_conditions(),selected_targets(),input$log_rb,input)
+    #   
+    #   
+    # })
+    # 
+    # output$E_corr_missing_plot = renderPlot({
+    #   df = E_corr()$E
+    #   colnames(df) = target_names()
+    #   rownames(df) = spot_names()
+    #   df = as.data.frame(df)
+    #   as.tbl(df)
+    #   missingness_function(df,targets())
+    # })
+    # output$E_corr_MA_plot = renderPlotly({
+    #   df = E_corr()$E
+    #   rownames(df) = spot_names()
+    #   MA_plot_function(df,spots())
+    # })
+    # 
+    # output$E_corr_Heatmap_ui = renderUI({
+    #   df = E_corr()$E   
+    #   colnames(df) = target_names()
+    #   m = as.matrix(df)
+    #   m = log_min_function(m,input)
+    #   m = neg_corr_function(m,input)
+    #   m = m[,selected_targets()$Name]
+    #   
+    #   if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
+    #     span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
+    #   }else{
+    #   
+    #     plot_height = data_heatmap_Server('Correction',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+    #     
+    #     do.call(tagList,data_heatmap_UI('Correction',plot_height))
+    #   }
+    #   
+    # 
+    #   #   if(dim(m)[1] < max_heatmap_rows){
+    #   #     plot_height = 300 + (dim(m)[1]*10)
+    #   #     output$E_corr_Heatmap = renderPlot({
+    #   #       Heatmap_function(m,target_conditions(),spot_names(),input$r_col,input$heatmap_order)
+    #   #     },height = plot_height)
+    #   #     plotOutput('E_corr_Heatmap',height = plot_height)
+    #   #   }else{
+    #   #     output$E_corr_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+    #   #       dend_function(m,target_conditions())
+    #   #     })})
+    #   #     plotOutput('E_corr_dend') 
+    #   #   }
+    #   #   
+    #   # }
+    #   
+    # })
+    # 
+    # E_corr_CV_df = reactive({
+    #   df = E_corr()$E 
+    #   targets = targets()
+    #   target_names = target_names()
+    #   spot_names = spot_names()
+    #   
+    #   colnames(df) = target_names()
+    #   rownames(df) = spot_names()
+    #   
+    #   
+    #   df = df %>% 
+    #     as.data.frame %>% 
+    #     rownames_to_column('spot')
+    #   
+    #   CV_df = CV_df_function(df,targets)
+    #   CV_df
+    # })
+    # 
+    # output$E_corr_CV_plot = renderPlot({
+    #   CV_df = E_corr_CV_df() %>%  
+    #     left_join(spots())
+    #   as.tbl(CV_df)
+    #   unique(CV_df$Category)
+    #   q = quantile(CV_df$CV,na.rm = T)
+    #   ggplot(CV_df) + 
+    #     geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
+    #     ylim(q[1],q[3])
+    # })
     
     #----------------------------------Spot Filtering ----------------------------------
     
     
-    E_filter = reactive({
-      
-      E_filter_before()$E
-
-    })
-    
-    output$E_filter_boxplot = renderPlot({
-      
-      data = E_filter()
-      
-      input$collapse_boxplots
-      boxplot_function_1_col_array(data,target_names(),spot_names(),target_conditions(),selected_targets(),input$log_rb,input)
-      
-      
-    })
-    
-    output$E_filter_missing_plot = renderPlot({
-      df = E_filter()
-      colnames(df) = target_names()
-      rownames(df) = spot_names()
-      df = as.data.frame(df)
-      
-      missingness_function(df,targets())
-    })
-    
-    output$E_filter_MA_plot = renderPlotly({
-      df = E_filter()
-      rownames(df) = spot_names()
-      MA_plot_function(df,spots())
-    })
-    
-    output$E_filter_Heatmap_ui = renderUI({
-      df = E_filter() 
-      colnames(df) = target_names()
-      m = as.matrix(df)
-      m = log_min_function(m,input)
-      m = neg_corr_function(m,input)
-      m = m[,selected_targets()$Name]
-      if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
-        span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
-      }else{
-        plot_height = data_heatmap_Server('Raw_filter',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-        
-        do.call(tagList,data_heatmap_UI('Raw_filter',plot_height))
-      }
-        
-      
-    })
-    
-    
-    E_filter_CV_df = reactive({
-      df = E_filter() 
-      targets = targets()
-      target_names = target_names()
-      spot_names = spot_names()
-      
-      colnames(df) = target_names()
-      rownames(df) = spot_names()
-      
-      
-      df = df %>% 
-        as.data.frame %>% 
-        rownames_to_column('spot')
-      
-      CV_df = CV_df_function(df,targets)
-      CV_df
-    })
-    
-    output$E_filter_CV_plot = renderPlot({
-      CV_df = E_filter_CV_df() %>%  
-        left_join(spots())
-      as.tbl(CV_df)
-      unique(CV_df$Category)
-      q = quantile(CV_df$CV,na.rm = T)
-      ggplot(CV_df) + 
-        geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
-        ylim(q[1],q[3])
-    })
+# 
+#     
+#     
+#     output$E_filter_boxplot = renderPlot({
+#       
+#       data = E_filter()
+#       
+#       input$collapse_boxplots
+#       boxplot_function_1_col_array(data,target_names(),spot_names(),target_conditions(),selected_targets(),input$log_rb,input)
+#       
+#       
+#     })
+#     
+#     output$E_filter_missing_plot = renderPlot({
+#       df = E_filter()
+#       colnames(df) = target_names()
+#       rownames(df) = spot_names()
+#       df = as.data.frame(df)
+#       
+#       missingness_function(df,targets())
+#     })
+#     
+#     output$E_filter_MA_plot = renderPlotly({
+#       df = E_filter()
+#       rownames(df) = spot_names()
+#       MA_plot_function(df,spots())
+#     })
+#     
+#     output$E_filter_Heatmap_ui = renderUI({
+#       df = E_filter() 
+#       colnames(df) = target_names()
+#       m = as.matrix(df)
+#       m = log_min_function(m,input)
+#       m = neg_corr_function(m,input)
+#       m = m[,selected_targets()$Name]
+#       if(TRUE %in% is.na(m) | TRUE %in% is.infinite(m)){
+#         span(tags$h5("Negative values cannot be log2 transformed, NA's produced"), style="color:red")
+#       }else{
+#         plot_height = data_heatmap_Server('Raw_filter',m,target_conditions(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+#         
+#         do.call(tagList,data_heatmap_UI('Raw_filter',plot_height))
+#       }
+#         
+#       
+#     })
+#     
+#     E_filter_df = reactive({
+#       df = E_filter() 
+#       colnames(df) = target_names()
+#       df = df %>% 
+#         as.data.frame
+#       df$spot = spot_names()
+#       df
+#     })
+#     
+#     E_filter_CV_df = reactive({
+#       df = E_filter() 
+#       colnames(df) = target_names()
+#       df = df %>% 
+#         as.data.frame
+#       df$spot = spot_names()
+#       
+#       CV_df = CV_df_function(df,targets)
+#       CV_df
+#     })
+#     
+#     output$E_filter_CV_plot = renderPlot({
+#       CV_df = E_filter_CV_df() %>%  
+#         left_join(spots())
+#       as.tbl(CV_df)
+#       unique(CV_df$Category)
+#       q = quantile(CV_df$CV,na.rm = T)
+#       ggplot(CV_df) + 
+#         geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
+#         ylim(q[1],q[3])
+#     })
     #---------------------------------Normalization------------------------------------
     
 
@@ -1413,6 +1791,95 @@ shinyServer(function(input, output) {
     })
     
     #----------------------------Visualization of Normalized data---------------------------------------------
+    
+    
+    output[['RAW_norm-boxplot_ui']] = renderUI({   
+       
+      data = E_norm() %>% 
+        dplyr::select(-spot)
+      log_rb = input$log_rb
+      #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+      p = array_boxplot_function(data,target_names(),E_norm()$spot,target_conditions(),selected_targets(),log_rb,input)
+      
+      
+      id = 'RAW_norm'
+      name = 'boxplot'
+      
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Background Corrected & Normalised Expression Intensity Boxplot'))
+    })
+    
+    #E_norm_df = reactive({
+    #  df = E_norm()
+      #colnames(df) = target_names()
+    #  df = df %>% 
+    #    as.data.frame
+      #df$spot = spot_names()
+    #  df
+    #})
+    
+    output[['RAW_norm-CV_plot_ui']] = renderUI({     
+      df = E_norm() 
+      data = CV_df_function(df,targets())
+      p = CV_plot_function(data,targets(),spots())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_norm'
+      name = 'CV'
+      title = "Background Corrected & Normalised CV's across arrays for all probes"
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,title))
+      
+    })
+    
+    output[['RAW_norm-MA_plot_ui']] = renderUI({
+      
+      df = E_norm()  
+      p = MA_plot_function(df,spots())
+      
+      id = 'RAW_norm'
+      name = 'MA'
+      title = NULL
+      plotly_Server(id,name,p)
+      do.call(tagList,plotly_UI(id,name,title))
+      
+    })
+    
+    
+    output[['RAW_norm-missing_plot_ui']] = renderUI({   
+      df = E_norm()
+      p = missingness_function(df,targets())
+      p = gg_fill_function(p)
+      
+      id = 'RAW_norm'
+      name = 'missingness' 
+      plot_Server(id,name,p)
+      do.call(tagList,plot_UI(id,name,'Percentage of missing values per array'))
+    })
+    
+    output[['RAW_norm-Heatmap_ui']] = renderUI({ 
+      df = E_norm() %>% 
+        dplyr::select(-spot)
+      colnames(df) = target_names()
+      m = as.matrix(df)
+      m = log_min_function(m,input)
+      m = neg_corr_function(m,input)
+      
+      id = 'RAW_norm'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),E_norm()$spot,input$r_col,input$heatmap_order)
+      ht_list$p
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      do.call(tagList,plot_UI(id,name))
+      
+    })
+    
+    output$Raw_norm_tabs_ui = renderUI({ 
+      do.call(tagList,PlotTabs_UI(id = "RAW_norm"))
+    })
+    
+    
+    
     
     output$E_norm_boxplot = renderPlot({
       data = E_norm() %>% 
@@ -2653,7 +3120,7 @@ MA_data = reactive({
   })
   
   output$eBayes_Heatmap_ui = renderUI({  
-    df = eBayes_sig_data() %>%  
+    df = eBayes_sig_data() %>%   
       column_to_rownames('protein')
     colnames(df)  
     #colnames(df) = target_names()
@@ -2664,27 +3131,30 @@ MA_data = reactive({
     m[is.na(m)] = 0
     m[is.infinite(m)] = 0
     m = m[,selected_targets()$Name]
-    plot_height = 300 + (dim(m)[1]*10)
+    #plot_height = 300 + (dim(m)[1]*10)
     # output$eBayes_Heatmap = renderPlot({
     #   Heatmap_function(m,target_conditions(),rownames(m))
     # },height = plot_height)
-    
-    #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
-    
-    #do.call(tagList,data_heatmap_UI('eBayes',plot_height))
-
-    if(dim(m)[1] < max_heatmap_rows){
-      plot_height = 300 + (dim(m)[1]*10)
-      output$eBayes_Heatmap = renderPlot({
-        Heatmap_function(m,target_conditions(),rownames(m),input$r_col,input$heatmap_order)
-      },height = plot_height)
-      plotOutput('eBayes_Heatmap',height = plot_height)
+    if(dim(m)[1] == 0){
+      tags$h4('No significant proteins')
     }else{
-      output$eBayes_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-        dend_function(m,target_conditions())
-      })})
-      plotOutput('eBayes_dend')
+      plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+      
+      do.call(tagList,data_heatmap_UI('eBayes',plot_height))
     }
+ 
+    # if(dim(m)[1] < max_heatmap_rows){
+    #   plot_height = 300 + (dim(m)[1]*10)
+    #   output$eBayes_Heatmap = renderPlot({
+    #     Heatmap_function(m,target_conditions(),rownames(m),input$r_col,input$heatmap_order)
+    #   },height = plot_height)
+    #   plotOutput('eBayes_Heatmap',height = plot_height)
+    # }else{
+    #   output$eBayes_dend = renderPlot({withProgress(message = 'generating dendrogram',{
+    #     dend_function(m,target_conditions())
+    #   })})
+    #   plotOutput('eBayes_dend')
+    # }
 
     #plotOutput('eBayes_Heatmap')
     

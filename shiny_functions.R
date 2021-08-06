@@ -22,141 +22,143 @@ counterServer <- function(id) {
 	)
 }
 
+#### Functions #####
 
-data_heatmap_UI = function(id,plot_height){
+
+#### PLOT and SERVER UI ####
+
+plot_UI = function(id,name,title = NULL){
 	ns <- NS(id)
 	list(
-				column(11),
-				column(1,downloadButton(ns('downloadData'), 'png')),
-				column(12,plotOutput(ns('heatmap'),height = plot_height))
+		column(11,tags$h4(title)),
+		column(1,downloadButton(ns(paste0(name,'_downloadPlot')), 'png')),
+		column(12,plotOutput(ns(name)))
 	)
 }
 
-data_heatmap_Server <- function(id,m,target_names,selected_targets,spot_names,pallete,cluster) {
+plot_Server <- function(id,name,p) { 
 	moduleServer(
 		id,
 		function(input, output, session) {
-				#ns <- NS(id)
-				#m = E()$E  
-				print(id)
-				print(dim(m))
-
-				colnames(m)
-				colnames(m) = target_names$Name
-				m = m[,selected_targets$Name]
-
-				plot_height = 300+(dim(m)[1]*10)
-				if(cluster == 'dend'){
-					plot_height = 300
-					ht = dend_function(m,target_names)
-				}else{
-					plot_height = 300+(dim(m)[1]*10)
-					ht = Heatmap_function(m,selected_targets,spot_names,pallete,cluster)
+			
+			output[[name]] = renderPlot({
+				p
+			})
+			
+			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+				filename = function() { paste0(id,'_',name,'.png') },
+				content = function(file) {
+					ggsave(file,p, width = 9, height = 6)
 				}
-				#print(ht)
-				
-				output$heatmap = renderPlot({
-					print(ht)
-				},height = plot_height)
-				
-				output$downloadData <- downloadHandler(
-					filename = function() {paste0(id,'_Hcluster.png')},
-					content = function(file) {
-						png(file, height = plot_height)
-						print(ht)
-						dev.off()
-					}
-				)
-			return(plot_height)
+			)
 		}
 	)
 }
 
-Heatmap_function = function(m, targets,spots,pallete,cluster = 'Cluster'){ 
-	
-	plot_min = min(as.numeric(m),na.rm = T)
-	if(plot_min < 0){
-		col_fun = colorRamp2(c(plot_min,0,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c('blue',"white",'orange',"red"))
-		
-	}else{
-		col_fun = colorRamp2(c(plot_min,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c("white",'orange',"red"))
-	}
-	
-	targets = targets %>% 
-		filter(Name %in% colnames(m))
-	
-	ha_annotation = targets$Condition
-	names(ha_annotation) = targets$Name
-	(condition_col = brewer.pal(n = length(unique(targets$Condition)), name = pallete)[1:length(unique(targets$Condition))])
-	(names(condition_col) = unique(targets$Condition))
-	column_ha = HeatmapAnnotation(Condition = ha_annotation, col = list(Condition = condition_col))
-	
-	sample_order = targets %>% 
-		arrange(Condition)
-	
-	
-	if(cluster == 'Cluster'){
-		ht = Heatmap(m,
-								 col = col_fun,
-								 row_labels = spots,
-								 column_dend_height = unit(4, "cm"), 
-								 row_dend_width = unit(4, "cm"),
-								 column_names_side = "top",
-								 top_annotation = column_ha
-		)
-	}
-	if(cluster == 'Order'){
-		ht = Heatmap(m,
-								 col = col_fun,
-								 row_labels = spots,
-								 row_names_side = "left",
-								 column_names_side = "top",
-								 cluster_columns = FALSE,
-								 cluster_rows = FALSE,
-								 top_annotation = column_ha,
-								 column_order = sample_order$Name)
-	}
-	if(cluster == 'None'){
-		ht = Heatmap(m,
-								 col = col_fun,
-								 row_labels = spots,
-								 row_names_side = "left",
-								 column_names_side = "top",
-								 cluster_columns = FALSE,
-								 cluster_rows = FALSE,
-								 top_annotation = column_ha)
-	}
-	ht
-	
+ht_plot_Server <- function(id,name,p,plot_height,plot_width) { 
+	moduleServer(
+		id,
+		function(input, output, session) {
+			
+			output[[name]] = renderPlot({
+				p
+			},height = plot_height)
+			
+			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+				filename = function() { paste0(id,'_',name,'.png') },
+				content = function(file) {
+					png(file, height = plot_height, width = plot_width)
+					print(p)
+					dev.off()
+				}
+			)
+		}
+	)
 }
 
-dend_function = function(m,targets){
-	m
-	
-	
-	dend <- m %>% scale %>% dist %>% 
-		hclust %>% as.dendrogram
-	
-	library(dendextend)
-	library(ggdendro)
-	ggd1 <- as.ggdend(dend)
-	ggplot(ggd1) 
-	
-	x <- as.matrix(scale(m))
-	dd.row <- as.dendrogram(hclust(dist(t(x))))
-	ddata_x <- dendro_data(dd.row)
-	
-	
-	ddata_x$labels = ddata_x$labels %>%
-		mutate(Name = label) %>% 
-		left_join(targets)
-	
-	ddata_x$leaf_labels = ddata_x$labels$label
-	
-	p2 <- ggplot(segment(ddata_x)) +
-		geom_segment(aes(x=x, y=y, xend=xend, yend=yend))
-	p2 = p2 + geom_text(data=label(ddata_x),
-											aes(label=label, x=x, y=y-2, colour=ddata_x$labels$Condition, angle = 90))
-	p2
+plotly_UI = function(id,name,title = NULL){
+	ns <- NS(id)
+	list(
+		column(11,tags$h4(title)),
+		column(1,downloadButton(ns(paste0(name,'_downloadPlot')), 'png')),
+		column(12,plotlyOutput(ns(name)))
+	)
 }
+
+plotly_Server <- function(id,name,p) { 
+	moduleServer(
+		id,
+		function(input, output, session) {
+			
+			output[[name]] = renderPlotly({
+				p
+			})
+			
+			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+				filename = function() { paste0(id,'_',name,'.png') },
+				content = function(file) {
+					ggsave(file,p, width = 9, height = 6)
+				}
+			)
+		}
+	)
+}
+
+
+table_UI = function(id,name){
+	ns <- NS(id)
+	list(
+		column(11),
+		column(1,downloadButton(ns(paste0(name,'_downloadData')), 'csv')),
+		column(12,DT::dataTableOutput(ns(name)))
+	)
+}
+
+table_Server <- function(id,name,df) { 
+	moduleServer(
+		id,
+		function(input, output, session) {
+			
+			output[[name]] = DT::renderDataTable({
+				df
+			})
+			
+			output[[paste0(name,'_downloadData')]] <- downloadHandler(
+				filename = function() {
+					paste0(id,'_',name,'.csv')
+				},
+				content = function(file) {
+					write.csv(df, file, row.names = FALSE)
+				}
+			)
+		}
+	)
+}
+
+
+### Plot Tabs ####
+
+PlotTabs_UI <- function(id) {
+	ns <- NS(id)
+	list(
+		tabsetPanel(
+			tabPanel('Plots',
+							 uiOutput(ns('boxplot_ui')),
+							 uiOutput(ns('CV_plot_ui')),
+							 uiOutput(ns('missing_plot_ui'))
+			),
+			tabPanel("MA Plots",
+							 uiOutput(ns('MA_plot_ui')),
+			),
+			tabPanel('Clustering',
+							 column(12,uiOutput(ns('Heatmap_ui')))
+			))
+	)
+}
+
+
+
+
+
+
 

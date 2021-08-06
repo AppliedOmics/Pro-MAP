@@ -27,6 +27,8 @@
 - All Methods
 	- add tabs for plots. 
 	
+- Batch Normalise
+	
 	# Questions
 
 	
