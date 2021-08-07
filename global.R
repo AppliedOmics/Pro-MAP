@@ -16,6 +16,8 @@ library(magrittr)
 library(tibble)
 library(foreach) 
 
+library(shinydashboard)
+
 source('shiny_functions.R')
 #library(naniar)
 

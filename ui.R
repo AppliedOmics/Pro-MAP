@@ -43,9 +43,13 @@ shinyUI(fluidPage(
         selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
                                                'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
         radioButtons('gg_grey','Grey Scale',c(FALSE,TRUE),inline = T),
-        selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2')
-  
-       
+        selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2'),
+        radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
+        radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
+        radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
+        radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T),
+        radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
+        
         )))),
     #### mainPanel ####
     mainPanel(
@@ -53,29 +57,29 @@ shinyUI(fluidPage(
         column(3,uiOutput('select_conditions_column_ui')),
         column(9,uiOutput('condition_select_ui')),
         column(8,
-        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T),
-               radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)),
+        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)
+               ),
         
-        column(8,selectInput('backgroundCorrect_method','Background Correct Method',c("none", "subtract", "movingmin","normexp"),"normexp"),
-               column(6,radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)),
-               column(6,radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T))),
+        column(8,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")
+               
+               ),
         #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
         
           
           #column(2,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T))
         ),
         #column(9,uiOutput('protein_columns_ui')),
-        column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'),
-               radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T),
+        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')
+               #radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T),
                ),
         #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
-        column(12,tabsetPanel(
+        column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
-          tabPanel("Instructions",
+          tabPanel('Instructions',
                    uiOutput("readme_markdown_ui")
           ),
           #### _File Details #####
-          tabPanel('File Details',
+          tabPanel(title = tags$h5('File Details'), value = 'files',
                    tags$h4(htmlOutput('test_files_text')),
                    tags$hr(),
                    uiOutput('name_column_ui'),
@@ -85,7 +89,7 @@ shinyUI(fluidPage(
                    DT::dataTableOutput('test_files_table')
           ),
           #### _targets ####
-          tabPanel('Targets',
+          tabPanel(title = uiOutput('target_label'),value = 'targets',
                    column(8,uiOutput('target_file_upload_ui')),
                    column(2,downloadButton('download_targets',"Download")),
                    column(2,actionButton('reset_targets','Reset')),  
@@ -93,7 +97,7 @@ shinyUI(fluidPage(
                    column(12,DT::dataTableOutput('target_table'))
           ),
           #### _spots ####
-          tabPanel('Spots',
+          tabPanel(title = uiOutput('probe_label'),value = 'probes',
                    column(8,uiOutput('spot_file_upload_ui'),),
                    
                    column(2,downloadButton('download_spots',"Download")),
@@ -107,8 +111,65 @@ shinyUI(fluidPage(
                    column(12,DT::dataTableOutput('spot_table'))
                    
           ),
+          
+          
+          #### _Data Tables ####
+          tabPanel(title = tags$h5('Data Tables'),value = 'data',
+                   tabsetPanel(
+                     tabPanel('ForeGround',
+                              tabsetPanel(selected = 'Plot',
+                                          tabPanel('Table',
+                                                   uiOutput('foreground_table_ui'),
+                                                   #DT::dataTableOutput('foreground_table')
+                                          ),
+                                          tabPanel('Plot',
+                                                   tabsetPanel(
+                                                     tabPanel('Heatmap',
+                                                              uiOutput('foreground_heatmap_ui')
+                                                     ),
+                                                     tabPanel('CV',
+                                                              uiOutput('foreground_triplicate_cv_plot_ui')
+                                                     )
+                                                   )
+                                                   
+                                          )
+                              )
+                              
+                              
+                     ),
+                     tabPanel('BackGround',
+                              tabsetPanel(selected = 'Plot',
+                                          tabPanel('Table',
+                                                   uiOutput('background_table_ui')
+                                          ),
+                                          tabPanel('Plot',
+                                                   tabsetPanel(
+                                                     tabPanel("HeatMap",
+                                                              uiOutput('background_heatmap_ui')
+                                                     ),
+                                                     tabPanel('CV',
+                                                              uiOutput('background_triplicate_cv_plot_ui')
+                                                     )
+                                                   )
+                                                   
+                                          )
+                              )
+                     ),
+                     tabPanel('Spot Filtering Elist',
+                              tabsetPanel(selected = 'Plot',
+                                          tabPanel('Table',
+                                                   uiOutput('spot_filtering_table_ui')
+                                          ),
+                                          tabPanel('Plot',
+                                                   uiOutput('spot_filtering_E_heatmap_ui')
+                                          )
+                              )
+                     )
+                   )),
+          
+          
           #### _proteins ####
-          tabPanel('Proteins',
+          tabPanel(title = uiOutput('protein_label'),value = 'proteins',
                    column(8,uiOutput('protein_file_upload_ui'),),
                    
                    column(2,downloadButton('download_proteins',"Download")),
@@ -121,167 +182,55 @@ shinyUI(fluidPage(
                    column(12,DT::dataTableOutput('proteins_table'))
           ),
           
-        #### _Data Tables ####
-        tabPanel('Data Tables',
-                 tabsetPanel(
-                   tabPanel('ForeGround',
-                            tabsetPanel(selected = 'Plot',
-                              tabPanel('Table',
-                                  uiOutput('foreground_table_ui'),
-                                  #DT::dataTableOutput('foreground_table')
-                              ),
-                              tabPanel('Plot',
-                                       uiOutput('foreground_heatmap_ui')
-                              )
-                            )
-                      
-                      ),
-                   tabPanel('BackGround',
-                            tabsetPanel(selected = 'Plot',
-                              tabPanel('Table',
-                                       uiOutput('background_table_ui')
-                              ),
-                              tabPanel('Plot',
-                                       uiOutput('background_heatmap_ui')
-                              )
-                            )
-                      ),
-                   tabPanel('Spot Filtering Elist',
-                            tabsetPanel(selected = 'Plot',
-                                        tabPanel('Table',
-                                                 uiOutput('spot_filtering_table_ui')
-                                        ),
-                                        tabPanel('Plot',
-                                                 uiOutput('spot_filtering_E_heatmap_ui')
-                                        )
-                            )
-                   )
-                 )),
+
         #### Pipeline ####
-        tabPanel('Pre Processing Pipeline',
-            radioButtons('collapse_boxplots','Collapse Boxplots',c(F,T),inline = T),
+        tabPanel(title = tags$h5('Pre Processing Pipeline'),value = 'pipeline',
             tabsetPanel(
-              #### Raw ####
+        
               tabPanel('Raw Data',
                        uiOutput('Raw_tabs_ui')
-                       #tabsetPanel(
-                         #do.call(resultlistUI('RAW'))
-                        # tabPanel('Test',
-                       
-                       
-                       
-                                  # do.call(
-                                  #   tabsetPanel,
-                                  #   append(
-                                  #     list(
-                                  #       #id = "tabs",
-                                  #       #tabPanel(
-                                  #       #  title = "Tab 1",
-                                  #       #  "Some text here"
-                                  #       #)
-                                  #     ),
-                                  #     resultlistUI(id = "RAW")
-                                  #   )
-                                  # )
-                         #)
-                                  
-                        #          )
-                         # tabPanel('Plots',
-                         #          uiOutput('RAW_boxplot_ui'),
-                         #          uiOutput('RAW_CV_plot_ui'),
-                         #          uiOutput('RAW_missing_plot_ui')
-                         #    ),
-                         # tabPanel("MA Plots",
-                         #    uiOutput('RAW_MA_plot_ui'),
-                         #                                   ),
-                         # tabPanel('Clustering',
-                         #    column(12,uiOutput('RAW_Heatmap_ui'))
-                         # )
-                         
-                         
                        ),
-              tabPanel('RAW filter',
+              
+              tabPanel('Spot Filtering',
                        uiOutput('Raw_filter_tabs_ui')),
               
               tabPanel('Background Correction',
                        uiOutput('Raw_corr_tabs_ui'),
-                       # tabsetPanel(
-                       #   tabPanel('Plots',
-                       #     column(12,plotOutput('E_corr_boxplot')),
-                       #     column(12,plotOutput('E_corr_missing_plot')),
-                       #     column(12,plotOutput('E_corr_CV_plot'))
-                       #   ),
-                       #   tabPanel("MA Plots",
-                       #     column(12,plotlyOutput('E_corr_MA_plot'))
-                       #   ),
-                       #   tabPanel('Clustering',
-                       #     column(12,uiOutput('E_corr_Heatmap_ui'))
-                       #   ))
               ),
-              
-      
-              
+  
               tabPanel('Normalisation',
                        uiOutput('Raw_norm_tabs_ui')
-                       
-                       # tabsetPanel(
-                       #   tabPanel('Plots',
-                       #      column(12,plotOutput('E_norm_boxplot')),
-                       #      column(12,plotOutput('E_norm_missing_plot')),
-                       #      column(12,plotOutput('E_norm_CV_plot'))
-                       #   ),
-                       #   tabPanel("MA Plots",
-                       #      column(12,plotlyOutput('E_norm_MA_plot'))
-                       #   ),
-                       #   tabPanel('Clustering',
-                       #      column(12,uiOutput('norm_Heatmap_ui'))
-                       #   ))
               ),
-              
-          
-              
-             
               tabPanel('Array Weights',
-                       #column(4,tags$h2('Array Weights')),
-                       column(2,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
-                       column(8),
+                      
+                       column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
+                       column(1),
+                       column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
+                       column(1),
                        column(2,downloadButton('download_arrayw',"Download")),
                        column(12,DT::dataTableOutput('arrayw_table')),
-                       column(12,plotOutput('arrayw_barplot'))
+                       
+                       column(12,uiOutput('arrayw_barplot_ui'))
+                     
                        ),
               tabPanel('Final Data',
-                       tabsetPanel(
-                         tabPanel('Table',
-                       #column(6,tags$h2('Data')),
-                       column(2,downloadButton('download_data',"Data Table")),
-                       column(2,downloadButton('download_ExpSet',"ExpSet")),
-                       column(2,downloadButton('download_MSnSet',"MSnSet")),
-                       column(12,tags$h4(htmlOutput('data_dim_text'))),
+                       uiOutput('Data_tabs_ui')
                        
-                       
-                       column(12,DT::dataTableOutput('data_table'))
-                         ),
-                       tabPanel("Plots",
-                          column(12,plotOutput('data_boxplot')),
-                         column(12,plotOutput('data_missing_plot')),
-                         column(12,plotOutput('data_CV_plot'))
-                       ),
-                       tabPanel("MA Plots",
-                         column(12,plotlyOutput('data_MA_plot'))
-                       ),
-                       tabPanel('Clustering',
-                        column(12,uiOutput('data_Heatmap_ui'))
-                       ))
+    
               ),
-              tabPanel('Threshold',
+              tabPanel('Optimal Cutpoints',
+                       tags$h5('Calculates optimal cutpoints, as a minimum value set for specificity'),
                        uiOutput('threshold_control_col_ui'),
+                     
                        uiOutput('threshold_ui'),
+                       #tags$h6('3'),
                        uiOutput('threshold_output_ui'),
+                       #tags$h6('4'),
                        uiOutput('threshold_Heatmap_ui')
                        )
             )
         ),
-        tabPanel('All Methods',
+        tabPanel(title = tags$h5('All Methods'),value = 'all',
                  column(3,uiOutput('MA_correction_ui')),
                  column(3,uiOutput('MA_normalisation_ui')),
                  column(3,radioButtons('log_rb_M','log(M)',c(T,F),inline = T)),
@@ -305,7 +254,7 @@ shinyUI(fluidPage(
                  
                  
         ),
-        tabPanel('Significance Testing',
+        tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
                  selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH'),
                  tabsetPanel(
                    tabPanel('eBayes',

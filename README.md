@@ -7,7 +7,7 @@
 	- using plotly
 - Significance Testing
 	- generetate contigency matrix for all conditions
-- png for Heatmaps
+- most plots are now downloadable
 	
 	
 #	Bugs to fix
