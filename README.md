@@ -7,12 +7,13 @@
 	- using plotly
 - Significance Testing
 	- generetate contigency matrix for all conditions
-- most plots are now downloadable
+- plots are now downloadable as png
+- CV of triplicates for foreground and background 
+
 	
 	
 #	Bugs to fix
 	
-- check why control proteins not in MA plots
 - check annotation column assignment for difference file types. 
 
 
