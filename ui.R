@@ -51,6 +51,7 @@ shinyUI(fluidPage(
                                                  'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
           radioButtons('gg_grey','Grey Scale',c(FALSE,TRUE),inline = T),
           selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2'),
+          radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T),
           radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
           radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
           radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
@@ -101,25 +102,27 @@ shinyUI(fluidPage(
           ),
           #### _targets ####
           tabPanel(title = uiOutput('target_label'),value = 'targets',
-                   column(8,uiOutput('target_file_upload_ui')),
+                   column(9,uiOutput('target_file_upload_ui')),
                    column(2,downloadButton('download_targets',"Download")),
-                   column(2,actionButton('reset_targets','Reset')),  
+                   column(1,actionButton('reset_targets','Reset')),  
                    column(12,uiOutput('target_upload_error_ui')),
                    column(12,DT::dataTableOutput('target_table'))
           ),
           #### _spots ####
           tabPanel(title = uiOutput('probe_label'),value = 'probes',
-                   column(8,uiOutput('spot_file_upload_ui'),),
-                   
+                   column(4,uiOutput('spot_file_upload_ui'),),
+                   column(5,uiOutput('spot_columns_ui')),
                    column(2,downloadButton('download_spots',"Download")),
-                   column(2,actionButton('reset_spots','Reset')), 
+                   column(1,actionButton('reset_spots','Reset')), 
                    #column(12,uiOutput('gene_control_ui')),
                    #uiOutput('R_spot_control_ui'),
                    #uiOutput('G_spot_control_ui'),
-                   uiOutput('spot_columns_ui'),
-                   uiOutput('both_spot_control_ui'),
+                   #uiOutput('spot_columns_ui'),
+                   column(12,
+                   uiOutput('spot_control_ui'),
+                   uiOutput('spot_remove_ui'),
                    radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
-                   column(12,DT::dataTableOutput('spot_table'))
+                   DT::dataTableOutput('spot_table'))
                    
           ),
           
@@ -181,10 +184,10 @@ shinyUI(fluidPage(
           
           #### _proteins ####
           tabPanel(title = uiOutput('protein_label'),value = 'proteins',
-                   column(8,uiOutput('protein_file_upload_ui'),),
+                   column(9,uiOutput('protein_file_upload_ui'),),
                    
                    column(2,downloadButton('download_proteins',"Download")),
-                   column(2,actionButton('reset_proteins','Reset')),
+                   column(1,actionButton('reset_proteins','Reset')),
                    column(12,uiOutput('protein_control_ui')),
                    column(3,uiOutput('drop_cols_ui')),
                    column(9,uiOutput('drop_rows_ui')),

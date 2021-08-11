@@ -29,7 +29,7 @@ header_UI = function(app_version){
 	#print(app_version)
 	#browser()
 	if(app_version == 'full'){
-		titlePanel("SPOT-Pro Full")
+		titlePanel("SCaMP Pro")
 	}else{
 		tagList(
 			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
@@ -64,23 +64,24 @@ spots_tab_UI = function(){
 
 #### PLOT and SERVER UI ####
 
-plot_UI = function(id,name,title = NULL){
+
+plot_UI = function(id,name,title = NULL,plot_height = 400){
 	ns <- NS(id)
 	list(
 		column(11,tags$h4(title)),
 		column(1,downloadButton(ns(paste0(name,'_downloadPlot')), 'png')),
-		column(12,plotOutput(ns(name)))
+		column(12,plotOutput(ns(name),height = plot_height))
 	)
 }
 
-plot_Server <- function(id,name,p) { 
+plot_Server <- function(id,name,p,plot_height = 400) { 
 	moduleServer(
 		id,
 		function(input, output, session) {
 			
 			output[[name]] = renderPlot({
 				p
-			})
+			},height = plot_height)
 			
 			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
 				filename = function() { paste0(id,'_',name,'.png') },

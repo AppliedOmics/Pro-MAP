@@ -189,6 +189,7 @@ shinyServer(function(session, input, output) {
       hideTab('main','pipeline')
       hideTab('main','all')
       hideTab('main','sig')
+      showTab('main','targets')
       # Create a Progress object
       progress <- shiny::Progress$new()
       on.exit(progress$close())
@@ -275,7 +276,6 @@ shinyServer(function(session, input, output) {
       }
       #file_error
       
-      
       #if(length(file_error_list) == 0){
       #  hideTab('main','targets')
       #}
@@ -325,6 +325,8 @@ shinyServer(function(session, input, output) {
       if(length(test_files()$file_error) > 0){
         if('cols' %in% names(test_files()$file_error)){
           #updateTabItems(session,"main", "File Details")
+          hideTab('main','targets')
+          
           span(tags$h4(test_files()$file_error$cols), style="color:red")
         }
       }
@@ -773,7 +775,7 @@ shinyServer(function(session, input, output) {
       df
     })
     
-    output$both_spot_control_ui = renderUI({
+    output$spot_remove_ui = renderUI({
       input$reset_spots
       input$dataset
       input$gpr_files
@@ -781,19 +783,32 @@ shinyServer(function(session, input, output) {
       as.tbl(df)
       proteins = df$spot
       control = df$spot[df$Category == 'remove' | df$spot == 'EMPTY']
-      selectInput('select_remove','Spots to Remove',proteins,control,multiple = T, width = 1200)
+      selectInput('select_remove','Probes to Remove before Normalisation',proteins,control,multiple = T, width = 1200)
+    })
+    
+    output$spot_control_ui = renderUI({
+      input$reset_spots
+      input$dataset
+      input$gpr_files
+      df = spot_upload()
+      as.tbl(df)
+      proteins = df$spot
+      control = df$spot[df$Category == 'control']
+      selectInput('select_control_spot','Control Probes (labelled by not removed)',proteins,control,multiple = T, width = 1200)
     })
     
     spots = reactive({
       df = spot_upload()
-      df$Category[df$spot %in% input$select_remove] = 'remove'
-      df$Category[df$Category == 'remove' & !df$spot %in% input$select_remove] = ''
+      df$Category = 'analyte probe'
+      df$Category[df$spot %in% input$select_remove] = 'removed probe'
+      df$Category[df$spot %in% input$select_control_spot] = 'control probe'
+      #df$Category[df$Category == 'remove' & !df$spot %in% input$select_remove] = ''
       df
     })
     
     removed_spots = reactive({
       spots() %>% 
-        filter(!Category %in% c('remove')) %>% 
+        filter(!Category %in% c('removed probe')) %>% 
         pull(spot)
     })
     
@@ -951,6 +966,21 @@ shinyServer(function(session, input, output) {
           colnames(m) = target_names$Name
           m = m[,selected_targets$Name]
           
+          remove = c()
+          if(FALSE %in% is.finite(m)){
+            m[!is.finite(m)] = 0
+            remove = c(remove,'infinite')
+            
+          }
+          if(TRUE %in% is.infinite(m)){
+            m[is.na(m)] = 0
+            remove = c(remove,'na')
+          }
+          
+          title = ''
+          if(length(remove) > 0){
+            title = paste('replaced ',paste(remove,collapse = ' and '), "values with zero's")
+          }
           plot_height = 300+(dim(m)[1]*10)
           plot_width = 600 + (dim(m)[2]*5) 
           if(cluster == 'dend'){
@@ -960,7 +990,7 @@ shinyServer(function(session, input, output) {
             plot_height = 300+(dim(m)[1]*10)
             ht = Heatmap_function(m,selected_targets,spot_names,pallete,cluster)
           }
-     list(p = ht,plot_height = plot_height, plot_width = plot_width)  
+     list(p = ht,plot_height = plot_height, plot_width = plot_width, warning = title)  
     }
     
     Heatmap_function = function(m, targets,spots,pallete,cluster = 'Cluster'){ 
@@ -1077,7 +1107,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
     })
     
     triplicate_CV_function = function(df){
@@ -1211,7 +1241,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
 
     })
     
@@ -1271,7 +1301,7 @@ shinyServer(function(session, input, output) {
           name = 'Hcluster'
           ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
           ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-          do.call(tagList,plot_UI(id,name))
+          do.call(tagList,plot_UI(id,name,ht_list$warning))
           
           #plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
           
@@ -1310,7 +1340,7 @@ shinyServer(function(session, input, output) {
       p = ggplot(df_l)
       if(input$collapse_boxplots == F){
         
-        if(length(unique(df_l$Condition)) > 1){
+        if(length(unique(df_l$Condition)) > 1 ){
           p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, col = Condition))
           
         }else{
@@ -1330,6 +1360,63 @@ shinyServer(function(session, input, output) {
       }
       
       p 
+    }
+    
+    array_boxplot_function_2 = function(data,target_names,spot_names,
+                                        targets,selected_targets,
+                                        spots,
+                                        log_rb,input){
+      df = data.frame(data)
+      #if(log_rb == TRUE){
+      #  df = log2(df)
+      #}
+      colnames(df) <- target_names
+      df$spot = spot_names
+      as.tbl(df)   
+      
+      
+      if("Name" %in% colnames(spots)){
+        spots = spots %>% 
+          dplyr::select(-Name)
+      }
+      
+      df_l = df %>% 
+        gather(Name,`Expression Intensity`,c(target_names)) %>% 
+        left_join(targets) %>% 
+        left_join(spots) %>% 
+        filter(Name %in% selected_targets$Name) 
+      as.tbl(df_l)
+      p = ggplot(df_l)
+      if(input$collapse_boxplots == F){
+        #p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, fill = Condition, col = Category))
+        
+        if(length(unique(df_l$Condition)) > 1 ){
+          p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, col = Condition))
+          
+        }else{
+          p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`))
+          
+        }
+      }else{
+        p = p + geom_boxplot(aes(x = Condition,y = `Expression Intensity`, col = Condition))
+        
+      }
+      if(log_rb == FALSE){
+        p = p + scale_y_continuous(trans='log2')
+      }
+      p = gg_col_function(p)
+      #if(length(unique(df_l$Group)) > 1){
+      #  p = p + facet_grid(Group ~ .)
+      #  p = p + facet_grid(Category ~ ., scales = 'free')
+      #}
+      plot_height = 400
+      if(input$sep_categories == TRUE){
+        if(length(unique(df_l$Category)) > 1){
+          p = p + facet_grid(Category ~ ., scales = 'free')
+          plot_height = 300 * length(unique(df_l$Category))
+        }
+      }
+      list(p = p, plot_height = plot_height)
     }
     
     CV_df_function  = function(df,targets){
@@ -1483,15 +1570,19 @@ shinyServer(function(session, input, output) {
      
     output[['RAW-boxplot_ui']] = renderUI({   
       
-      data = E()$E
+      data = E()$E  
       log_rb = FALSE
-      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
-
+      result_list = array_boxplot_function_2(data,
+                                   target_names(),spot_names(),
+                                   target_conditions(),selected_targets(),
+                                   spots(),
+                                   log_rb,input)
+      p
       id = 'RAW'
       name = 'boxplot'
       
-      plot_Server(id,name,p)
-      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot'))
+      plot_Server(id,name,result_list$p, result_list$plot_height)
+      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot',result_list$plot_height))
     })
     
     RAW_df = reactive({
@@ -1549,18 +1640,21 @@ shinyServer(function(session, input, output) {
     })
     
     output[['RAW-Heatmap_ui']] = renderUI({ 
-      df = E()$E     
+      df = E()$E      
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
-      m = neg_corr_function(m,input)
+      m = neg_corr_function(m,input) 
       
       id = 'RAW'
       name = 'Hcluster'
+      
+
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width) 
+      #title = paste('removed ',paste(ht_list$removed,collapse = ' and '), 'values')
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -1595,13 +1689,13 @@ shinyServer(function(session, input, output) {
       
       data = E_filter()
       log_rb = FALSE
-      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+      result_list = array_boxplot_function_2(data,target_names(),spot_names(),target_conditions(),selected_targets(),spots(),log_rb,input)
       
       id = 'RAW_filter'
       name = 'boxplot'
       
-      plot_Server(id,name,p)
-      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot'))
+      plot_Server(id,name,result_list$p, result_list$plot_height)
+      do.call(tagList,plot_UI(id,name,'Raw Data Expression Intensity Boxplot',result_list$plot_height))
     })
     
     E_filter_df = reactive({
@@ -1664,7 +1758,7 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -1688,13 +1782,13 @@ shinyServer(function(session, input, output) {
       
       data = E_corr()$E   
       log_rb = FALSE
-      p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+      result_list = array_boxplot_function_2(data,target_names(),spot_names(),target_conditions(),selected_targets(),spots(),log_rb,input)
       
       id = 'RAW_corr'
       name = 'boxplot'
       
-      plot_Server(id,name,p)
-      do.call(tagList,plot_UI(id,name,'Background Corrected Expression Intensity Boxplot'))
+      plot_Server(id,name,result_list$p, result_list$plot_height)
+      do.call(tagList,plot_UI(id,name,'Background Corrected Expression Intensity Boxplot',result_list$plot_height))
     })
     
     E_corr_df = reactive({
@@ -1746,7 +1840,7 @@ shinyServer(function(session, input, output) {
     })
     
     output[['RAW_corr-Heatmap_ui']] = renderUI({ 
-      df = E_corr()$E     
+      df = E_corr()$E      
       colnames(df) = target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
@@ -1757,7 +1851,7 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -1824,14 +1918,14 @@ shinyServer(function(session, input, output) {
         dplyr::select(-spot)
       log_rb = input$log_rb
       #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
-      p = array_boxplot_function(data,target_names(),E_norm()$spot,target_conditions(),selected_targets(),log_rb,input)
+      result_list = array_boxplot_function_2(data,target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),log_rb,input)
       
       
       id = 'RAW_norm'
       name = 'boxplot'
       
-      plot_Server(id,name,p)
-      do.call(tagList,plot_UI(id,name,'Background Corrected & Normalised Expression Intensity Boxplot'))
+      plot_Server(id,name,result_list$p, result_list$plot_height)
+      do.call(tagList,plot_UI(id,name,'Background Corrected & Normalised Expression Intensity Boxplot',result_list$plot_height))
     })
     
     output[['RAW_norm-CV_plot_ui']] = renderUI({     
@@ -1886,7 +1980,7 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),E_norm()$spot,input$r_col,input$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -2134,7 +2228,7 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),data()$protein,input$r_col,input$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      do.call(tagList,plot_UI(id,name))
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -2454,7 +2548,7 @@ shinyServer(function(session, input, output) {
         ht_list = array_HeatMap_function(m,targets(),samples,features$protein,input$r_col,input$heatmap_order)
         ht_list$p
         ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-        do.call(tagList,plot_UI(id,name))
+        do.call(tagList,plot_UI(id,name,ht_list$warning))
       }
       # df = E_norm() %>% 
       #   dplyr::select(-spot)
