@@ -10,7 +10,7 @@
 library(shiny)
 
 
-shinyServer(function(input, output) {
+shinyServer(function(session, input, output) {
   
 #### Functions ####
   
@@ -73,7 +73,7 @@ shinyServer(function(input, output) {
   
   
   #### Debugging and updating #####
-  hideTab('main','All Methods')
+  #hideTab('main','All Methods')
   
   output$debug_ui = renderUI({
     if(!grepl('public',getwd())){
@@ -121,11 +121,11 @@ shinyServer(function(input, output) {
 
   
   ##### Instructions #####
-  output$readme_markdown_ui = renderUI({
-    hideTab('main','Plots')
-    hideTab('main','Data')
+  output$instructions_markdown_ui = renderUI({
+    #hideTab('main','Plots')
+    #hideTab('main','Data')
     print('readme_markdown_ui')
-    includeMarkdown("README.md")
+    includeMarkdown("Instructions.md")
   })
   
 
@@ -171,11 +171,17 @@ shinyServer(function(input, output) {
       file_path_list
       list(name = file_list,path = file_path_list)
     })
-  
-    test_files = reactive({#withProgress(message = 'testing array files',{
-      req(array_file_list())
+   
+    test_files = reactive({#withProgress(message = 'testing array files',{ 
+      req(array_file_list())  
       #updateTabsetPanel(session,'main',selected = 'Instructions')
       #updateTabItems(inputId = "main", selected = "Instructions")
+      # 
+   
+    #Tab('main','targets')
+      values$targets = NULL
+      values$probes = NULL
+      values$proteins = NULL
       
       hideTab('main','probes')
       hideTab('main','proteins')
@@ -183,12 +189,6 @@ shinyServer(function(input, output) {
       hideTab('main','pipeline')
       hideTab('main','all')
       hideTab('main','sig')
-      values$targets = NULL
-      values$probes = NULL
-      values$proteins = NULL
-      #hideTab('main','proteins')
-      #hideTab('main','proteins')
-      #hideTab('main','proteins')
       # Create a Progress object
       progress <- shiny::Progress$new()
       on.exit(progress$close())
@@ -198,10 +198,11 @@ shinyServer(function(input, output) {
       file_path_list = array_file_list()$path
       row_list = c()
       col_list = c()
-      colnames_list = c()
+      colnames_list = list()
       rownames_list = c()
       i = 1
       n = length(file_name_list)
+      #colnames_list = c()
       for(i in c(1:length(file_name_list))){
         progress$inc(1/n, detail = paste(i,'of',n))
         print(i)
@@ -230,7 +231,7 @@ shinyServer(function(input, output) {
         }
         row_list = c(row_list,dim(df)[1])
         col_list = c(col_list,dim(df)[2])
-        colnames_list = c(colnames_list,paste(colnames(df),collapse =', '))
+        colnames_list[[file_name]] = colnames(df)
       }
       
       file_df = data.frame(File_name = file_name_list,
@@ -239,43 +240,121 @@ shinyServer(function(input, output) {
       file_df
       
       
-      
-      if(length(unique(row_list)) == 1 &
-         length(unique(col_list)) == 1 &
-         #length(unique(colnames_list)) == 1 &
-         length(unique(rownames_list)) == 1
-      ){
-        showTab('main','File Details')
-        showTab('main','Targets')
-        #showTab('main','Spots')
-        #showTab('main','Proteins')
-        #showTab('main','Plots')
-        #showTab('main','Data')
-        file_error = FALSE
+      file_error_list = list()
+      if(length(unique(row_list)) != 1){
+        file_error = 'There are differing number of spots on the arrays, only the intersection spots will be used'
+        file_error_list[['rows']] = file_error
         
-      }else{
-        hideTab('main','Targets')
-        hideTab('main','Spots')
-        hideTab('main','Proteins')
-        hideTab('main','Plots')
-        hideTab('main','Data')
-        file_error = TRUE
+      } 
+      #&
+      #    length(unique(col_list)) == 1 &
+      #    #length(unique(colnames_list)) == 1 &
+      #    length(unique(rownames_list)) == 1
+      # ){
+      #   # showTab('main','File Details')
+      #   # showTab('main','Targets')files
+      # 
+      #   #showTab('main','Spots')
+      #   #showTab('main','Proteins')
+      #   #showTab('main','Plots')
+      #   #showTab('main','Data')
+      #   file_error = FALSE
+      #   
+      # }else{
+      #   # hideTab('main','Targets')
+      #   # hideTab('main','Spots')
+      #   # hideTab('main','Proteins')
+      #   # hideTab('main','Plots')
+      #   # hideTab('main','Data')
+      #   file_error = 'The array files are too disparate to compare, check the number of spots in each file'
+      # }
+      
+      if(!TRUE %in% grepl('635|535',col_names)){
+        file_error = 'No array channels found in the uploaded files'
+        file_error_list[['cols']] = file_error
       }
-      list(file_df = file_df,file_error = file_error,col_names = col_names,type = type)
+      #file_error
+      
+      
+      #if(length(file_error_list) == 0){
+      #  hideTab('main','targets')
+      #}
+      colnames_list = unique(colnames_list)
+      col_names = colnames_list[1]
+      if(length(colnames_list) > 1){
+      
+        for(i in 2:length(colnames_list)){
+          col_names = intersect(unlist(col_names),unlist(colnames_list[i]))
+        }
+      }
+      col_names = unlist(col_names)
+      list(file_df = file_df,file_error = file_error_list, col_names = col_names,type = type,colnames_list = colnames_list)
     })#})
     
-    output$test_text = renderText({
+
+    output$file_num_text = renderText({
+  
+        #hideTab('main','files')
+        updateTabItems(session,"main", "Targets")
+        df = test_files()$file_df 
+        as.tbl(df)
+        
+        cmd = paste(dim(df)[1],'Files with',
+                    paste(unique(df$Number.of.Spots),collapse=', '),
+                    'spots and ',
+                    paste(unique(df$Number.of.Metric.Columns),collapse =', '),'columns')
+   
       
-      
+      print(cmd)
     })
     
-    data_col_names = reactive({ 
+    output$test_files_text_rows_ui = renderUI({ 
+   
+      if(length(test_files()$file_error) > 0){
+        if('rows' %in% names(test_files()$file_error)){
+          #updateTabItems(session,"main", "File Details")
+          span(tags$h4(test_files()$file_error$rows), style="color:red")
+        }
+      }
+        
+
+    }) 
+    
+    output$test_files_text_cols_ui = renderUI({ 
+      
+      if(length(test_files()$file_error) > 0){
+        if('cols' %in% names(test_files()$file_error)){
+          #updateTabItems(session,"main", "File Details")
+          span(tags$h4(test_files()$file_error$cols), style="color:red")
+        }
+      }
+      
+      
+    }) 
+    
+    
+    
+    data_col_names = reactive({  
       paste(test_files()$col_names)
     })
     
     output$data_columns_text = renderPrint({
       cat(paste(data_col_names(),collapse =', '))
     })
+    
+    output$data_columns_list_error_text = renderUI({
+      if(length(test_files()$colnames_list) > 1){
+        span(tags$h5('WARNING : There are different metric columns amongst the files, only the overlapping columns will be used'), style="color:orange")
+      }
+    })
+    
+    output$data_columns_list_text = renderPrint({
+      if(length(test_files()$colnames_list) > 1 ){
+        print(test_files()$colnames_list)
+      }
+    })
+    
+    
     
     output$test_files_table = DT::renderDataTable({
       df = test_files()$file_df  
@@ -285,7 +364,7 @@ shinyServer(function(input, output) {
       df_g
     })
     
-    output$test_files_text = renderPrint({
+    output$test_files_text_2 = renderPrint({
       df = test_files()$file_df 
       as.tbl(df)
       
@@ -296,19 +375,7 @@ shinyServer(function(input, output) {
       
     })
     
-    output$test_file_text = renderText({ 
-      if(test_files()$file_error == TRUE){
-        showTab('main','File Details')
-        updateTabItems(session,"main", "File Details")
-        print('The array files are too disparate to compare, check the number of spots in each file')
-      }else{
-        hideTab('main','File Details')
-        updateTabItems(session,"main", "Targets")
-        print('')
-      }
-    })
-    
-     
+  
 
   
     #### _Columns Selection ####
@@ -594,6 +661,11 @@ shinyServer(function(input, output) {
     
     output$target_table = DT::renderDataTable({
       showTab('main','probes')
+      
+ 
+      
+      #show(selector = '#main li a[data-value="probes"]')
+ 
       values$targets = 'hit'
       selected_targets()
     })
@@ -729,9 +801,12 @@ shinyServer(function(input, output) {
     output$spot_table = DT::renderDataTable({
       showTab('main','proteins')
       showTab('main','data')
+      
       values$probes = 'hit'
       spots()
     })
+    
+ 
     
     output$download_spots <- downloadHandler(
       filename = function(){"spots.txt"}, 
@@ -843,13 +918,19 @@ shinyServer(function(input, output) {
       #}
     })
     
-    
+    observeEvent(input$col, {
+      js$pageCol(input$col)
+    })
 
 
     
     output$proteins_table = DT::renderDataTable({
       showTab('main','pipeline')
       showTab('main','sig')
+  
+      
+      
+      
       values$proteins = 'hit'
       
       proteins() 

@@ -17,6 +17,11 @@ library(tibble)
 library(foreach) 
 
 library(shinydashboard)
+#library(shinyjs)
+
+
+app_version = 'full'
+#app_version = 'public'
 
 source('shiny_functions.R')
 #library(naniar)
@@ -37,14 +42,20 @@ if(node == 'WoW.local'){
 }
 
 paper_data_list = list(
-	#'EUR cohort' = 'www/EUR cohort/',
+	
 	'TR cohort' = 'www/TR cohort/',
 	'GSH cohort' = 'www/GSH Cohort/',
 	'JHB cohort' = 'www/JHB cohort/',
 	'PC cohort' = 'www/PC cohort/',
 	#'TR cohort' = 'www/TR cohort/',
-	'COVID HWC' = 'www/HWC'
+	'COVID HWC' = 'www/HWC',
+	'EUR cohort' = 'www/EUR cohort/',
+	'EUR cohort shors' = 'www/EUR cohort shorts/'
 )
+
+if(app_version == 'public'){
+	paper_data_list = paper_data_list[c('TR cohort','GSH cohort','JHB cohort')]
+}
 
 
 

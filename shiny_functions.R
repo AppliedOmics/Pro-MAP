@@ -25,6 +25,43 @@ counterServer <- function(id) {
 #### Functions #####
 
 
+header_UI = function(app_version){
+	#print(app_version)
+	#browser()
+	if(app_version == 'full'){
+		titlePanel("SPOT-Pro Full")
+	}else{
+		tagList(
+			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
+			tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
+			tags$h6('Mowoe MO., Lennard K., Garnett S., Talbot J., Jonas E., Blackburn J, (',
+							tagList(a("doi link - not available yet", href="doi link")),')'),
+			tags$h6('R script for pipeline available on Github (',
+							tagList(a("github link - not available yet", href="github link")),')')
+			)
+	}
+	#titlePanel("SPOT-Pro Full")
+	
+}
+
+spots_tab_UI = function(){
+	lst = tagList(tabPanel(title = uiOutput('probe_label'),value = 'probes',
+					 column(8,uiOutput('spot_file_upload_ui'),),
+					 
+					 column(2,downloadButton('download_spots',"Download")),
+					 column(2,actionButton('reset_spots','Reset')), 
+					 #column(12,uiOutput('gene_control_ui')),
+					 #uiOutput('R_spot_control_ui'),
+					 #uiOutput('G_spot_control_ui'),
+					 uiOutput('spot_columns_ui'),
+					 uiOutput('both_spot_control_ui'),
+					 radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
+					 column(12,DT::dataTableOutput('spot_table'))
+					 
+	))
+	do.call(tagList,lst)
+}
+
 #### PLOT and SERVER UI ####
 
 plot_UI = function(id,name,title = NULL){

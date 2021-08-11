@@ -4,53 +4,62 @@ library(shiny)
 
 shinyUI(fluidPage(
 
-
-    titlePanel("SPOT-Pro Full"),
+    #headerPanel(
+    #titlePanel("SPOT-Pro Full")
+    # titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
+    # tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
+    # tags$h6('Mowoe MO., Lennard K., Garnett S., Talbot J., Jonas E., Blackburn J, (',
+    #         tagList(a("doi link - not available yet", href="doi link")),')'),
+    # tags$h6('R script for pipeline available on Github (',
+    #         tagList(a("github link - not available yet", href="github link")),')'),
+    header_UI(app_version),
+    #),
     #fluidRow(
         #### sidebarPanel ####
         sidebarPanel(
           fluidRow(
-            column(12,
-                   
-                   
+            
+         
+        span(tags$h3('Data Upload'),style="color:#6b8eb7"),
                    column(4,uiOutput('debug_ui')),
                    column(4,uiOutput('pull_ui')),
                    column(4,uiOutput('update_ui')),
                    column(12,
-                          uiOutput('select_datasets_ui'),   
+                          uiOutput('select_datasets_ui')),   
 
-        fileInput(
+        column(12,fileInput(
             inputId = "gpr_files", 
-            label = "Choose gpr Files", 
-            multiple = TRUE,
-            accept = c(".gpr")
-        ),
-        
-        #uiOutput('array_type_ui'),
-        #uiOutput('array_colours_ui'),
-        #uiOutput('array_column_ui'),
-        #uiOutput('col_num_ui'),
-        #column(12,uiOutput('array_type_ui')),
+            label = "Upload array files", 
+            multiple = TRUE
+        )),
+        tags$hr(),
+        span(tags$h3('Array Properties'),style="color:#6b8eb7"),
         column(6,uiOutput('array_colours_ui')),
         column(6,uiOutput('array_column_ui')),
-        #uiOutput('col_num_ui'),
+    
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
         column(12,radioButtons('spot_filtering','Spot Filtering',c(T,F),inline = T)),
-        uiOutput('annotation_columns_ui'),
-        #uiOutput('sample_file_upload_ui'),
-        selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
-                                               'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
-        radioButtons('gg_grey','Grey Scale',c(FALSE,TRUE),inline = T),
-        selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2'),
-        radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
-        radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
-        radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
-        radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T),
-        radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
+        column(12,
+        uiOutput('annotation_columns_ui')),
         
-        )))),
+        tags$hr(),
+        span(tags$h3('Graph Properties'),style="color:#6b8eb7"),
+        column(12,
+          selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
+                                                 'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
+          radioButtons('gg_grey','Grey Scale',c(FALSE,TRUE),inline = T),
+          selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2'),
+          radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
+          radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
+          radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
+          radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T),
+          radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
+          )
+          )
+        
+        ),
     #### mainPanel ####
     mainPanel(
         #uiOutput('example_data_text_ui'),
@@ -63,10 +72,7 @@ shinyUI(fluidPage(
         column(8,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")
                
                ),
-        #column(4,selectInput('normalisation_method','Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
-        
-          
-          #column(2,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T))
+
         ),
         #column(9,uiOutput('protein_columns_ui')),
         column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')
@@ -75,16 +81,21 @@ shinyUI(fluidPage(
         #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
         column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
-          tabPanel('Instructions',
-                   uiOutput("readme_markdown_ui")
+          tabPanel(title = tags$h5("Instructions"), value = 'instructions',
+                   uiOutput("instructions_markdown_ui")
           ),
           #### _File Details #####
           tabPanel(title = tags$h5('File Details'), value = 'files',
-                   tags$h4(htmlOutput('test_files_text')),
+                   tags$h4(htmlOutput('file_num_text')),
+                   uiOutput('test_files_text_cols_ui'),
+                   uiOutput('test_files_text_rows_ui'),
+                   
                    tags$hr(),
                    uiOutput('name_column_ui'),
                    tags$h4('Data Columns'),
                    tags$h5(htmlOutput('data_columns_text')),
+                   uiOutput('data_columns_list_error_text'),
+                   verbatimTextOutput('data_columns_list_text'),
                    tags$hr(),
                    DT::dataTableOutput('test_files_table')
           ),
