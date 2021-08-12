@@ -3099,11 +3099,11 @@ MA_data = reactive({
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd)
     })})
   
-  output$cont_matrix_text_ui = renderUI({ 
+  output$cont_matrix_text_ui = renderUI({  
     if(length(input$condition_select) > 1){
       showTab('sig_panel','Table')
       showTab('sig_panel','Plots')
-      lst = list(tags$h5('eBayes_test()$cont_matrix'))
+      lst = list(tags$h5(eBayes_test()$cont_matrix))
     }else{
       hideTab('sig_panel','Table')
       hideTab('sig_panel','Plots')
