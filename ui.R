@@ -121,7 +121,7 @@ shinyUI(fluidPage(
                    column(12,
                    uiOutput('spot_control_ui'),
                    uiOutput('spot_remove_ui'),
-                   radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
+                   #radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
                    DT::dataTableOutput('spot_table'))
                    
           ),
@@ -184,14 +184,15 @@ shinyUI(fluidPage(
           
           #### _proteins ####
           tabPanel(title = uiOutput('protein_label'),value = 'proteins',
-                   column(9,uiOutput('protein_file_upload_ui'),),
+                   column(4,uiOutput('protein_file_upload_ui'),),
+                   column(5,uiOutput('protein_columns_ui')),
                    
                    column(2,downloadButton('download_proteins',"Download")),
                    column(1,actionButton('reset_proteins','Reset')),
                    column(12,uiOutput('protein_control_ui')),
                    column(3,uiOutput('drop_cols_ui')),
                    column(9,uiOutput('drop_rows_ui')),
-                   column(12,uiOutput('protein_columns_ui')),
+                   #column(12,uiOutput('protein_columns_ui')),
                    column(12,uiOutput('proteins_upload_error_ui')),
                    column(12,DT::dataTableOutput('proteins_table'))
           ),
@@ -244,6 +245,8 @@ shinyUI(fluidPage(
                        )
             )
         ),
+        
+        ### ALL METHODS PLOTS ####
         tabPanel(title = tags$h5('All Methods'),value = 'all',
                  column(3,uiOutput('MA_correction_ui')),
                  column(3,uiOutput('MA_normalisation_ui')),
@@ -268,9 +271,15 @@ shinyUI(fluidPage(
                  
                  
         ),
+        
+        ### Significance Testing ####
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
-                 selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH'),
-                 tabsetPanel(
+                 column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
+                 
+                 column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+                 column(3,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+                 column(2,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
+                 column(12,tabsetPanel(
                    tabPanel('eBayes',
                             textOutput('cont_matrix_text'),
                             tabsetPanel(
@@ -278,12 +287,23 @@ shinyUI(fluidPage(
                                        DT::dataTableOutput('eBays_table')
                                        ),
                               tabPanel('Plot',
-                                       uiOutput('eBayes_Heatmap_ui'))
+                                       tabsetPanel(
+                                         tabPanel('Volcano Plots',
+                                                  radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
+                                                  uiOutput('volcano_plot_ui')
+                                         ),
+                                                  #plotlyOutput('volcano_plots')),
+                                         tabPanel('Heatmap',
+                                                  uiOutput('eBayes_Heatmap_ui')
+                                                  )
+                                       )
+                              )
+                                       
                             )
                             )
                  )
                  
-                 )
+                 ))
         # tabPanel("Data",
         #          #tags$h2('E norm'),
         #          #column(12,DT::dataTableOutput('E_norm_table')),

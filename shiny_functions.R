@@ -114,6 +114,30 @@ ht_plot_Server <- function(id,name,p,plot_height,plot_width) {
 	)
 }
 
+volcano_plot_Server <- function(id,name,p,type,plot_height = 400) { 
+	moduleServer(
+		id,
+		function(input, output, session) {
+			if(type != 'gg plotly'){
+				output[[name]] = renderPlot({
+					p
+				},height = plot_height)
+			}else{
+				output[[name]] = renderPlotly({
+					p
+				})
+			}
+			
+			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+				filename = function() { paste0(id,'_',name,'.png') },
+				content = function(file) {
+					ggsave(file,p, width = 9, height = 6)
+				}
+			)
+		}
+	)
+}
+
 plotly_UI = function(id,name,title = NULL){
 	ns <- NS(id)
 	list(

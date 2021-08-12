@@ -135,7 +135,7 @@ shinyServer(function(session, input, output) {
     
     output$select_datasets_ui = renderUI({
       if(is.null(input$gpr_files$datapath)){
-        selectInput('dataset','Dataset',paper_data_list)
+        selectInput('dataset','Dataset',paper_data_list,'www/GSH Cohort/')
       }else{
         selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }
@@ -182,6 +182,9 @@ shinyServer(function(session, input, output) {
       values$targets = NULL
       values$probes = NULL
       values$proteins = NULL
+      
+      updateTabsetPanel(session, "main",
+                        selected = 'instructions')
       
       hideTab('main','probes')
       hideTab('main','proteins')
@@ -502,7 +505,7 @@ shinyServer(function(session, input, output) {
       
 
     
-    E = reactive({   
+    E = reactive({withProgress(message = 'Generating EListRaw object',{
       file_path_list = array_file_list()$path  
       file_path_list
           # if(input$spot_filtering == 'wtflags(0.1)'){
@@ -531,7 +534,7 @@ shinyServer(function(session, input, output) {
 
         E
     
-    })
+    })})
     
 
 
@@ -539,7 +542,7 @@ shinyServer(function(session, input, output) {
     
     #values$target_file is a reactive value, that serves as a global variabe, which can be affected by different reactive elements
     
-    # inputs that reste values$target file
+    # inputs that reset values$target file
     observeEvent(c(input$reset_targets,
                    input$gpr_files),{
                    values$target_file = NULL
@@ -570,7 +573,7 @@ shinyServer(function(session, input, output) {
     
     
     # reactive object that decided which targets file to upload. 
-    targets_upload = reactive({   
+    targets_upload = reactive({ withProgress(message = 'uploding targets',{  
       input$reset_targets    
       input$dataset
       input$gpr_files
@@ -630,7 +633,7 @@ shinyServer(function(session, input, output) {
    
       df$Name = as.character(df$Name)
       list(df = df, df_upload = df_upload, error = error)
-    }) 
+    }) })
     
     output$target_upload_error_ui = renderUI({
       if(!is.null(targets_upload()$error)){
@@ -648,6 +651,7 @@ shinyServer(function(session, input, output) {
     targets = reactive(targets_upload()$df)
     
     output$select_conditions_column_ui = renderUI({
+      req(targets())
       selectInput('select_conditions_column','Select Condition Column',colnames(targets()),colnames(targets()))
     })
     
@@ -659,6 +663,11 @@ shinyServer(function(session, input, output) {
     
     selected_targets = reactive({
       target_conditions() %>% filter(Condition %in% input$condition_select)
+    })
+    
+    selected_target_names = reactive({
+      target_names = selected_targets()$Name
+      target_names
     })
     
     output$target_table = DT::renderDataTable({
@@ -680,6 +689,7 @@ shinyServer(function(session, input, output) {
     ) 
     
     output$condition_select_ui = renderUI({
+      req(target_conditions())
       df = target_conditions()
       selectInput('condition_select','Select Conditions',unique(df$Condition),unique(df$Condition),multiple = T,width = 1200)
     })
@@ -702,6 +712,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$spot_columns_ui = renderUI({
+      req(input$select_annotation)
       input$dataset 
       input$gpr_files
       input$reset_proteins
@@ -726,14 +737,16 @@ shinyServer(function(session, input, output) {
     
     spot_names = reactive({
       input$reset_spots
-
+      req(input$spot_column)
+      req(E())
       spot_names = E()$genes[[input$spot_column]]
 
       spot_names
     })
     
     
-    spot_upload = reactive({  
+    spot_upload = reactive({  withProgress(message = 'Upload Spots',{
+      req(spot_names())
       input$reset_spots
       input$dataset
       input$gpr_files
@@ -743,16 +756,16 @@ shinyServer(function(session, input, output) {
       df$spot = spot_names()
       
       spot_names = spot_names()
-      if(input$remove_spot_duplicates == T){
-        while(TRUE %in% duplicated(spot_names)){
-          print(paste('hit :',i))
-          print(length(spot_names[duplicated(spot_names) == TRUE]))
-          spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
-          i = i + 1
-        }
-        TRUE %in% duplicated(spot_names)
-        df$unique_spot = spot_names
-      }
+      # if(input$remove_spot_duplicates == T){
+      #   while(TRUE %in% duplicated(spot_names)){
+      #     print(paste('hit :',i))
+      #     print(length(spot_names[duplicated(spot_names) == TRUE]))
+      #     spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
+      #     i = i + 1
+      #   }
+      #   TRUE %in% duplicated(spot_names)
+      #   df$unique_spot = spot_names
+      # }
 
       if(!is.null(values$spot_file)){
         if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt'))){
@@ -773,12 +786,13 @@ shinyServer(function(session, input, output) {
         df$Category = character(dim(df)[1])
       }
       df
-    })
+    })})
     
     output$spot_remove_ui = renderUI({
-      input$reset_spots
-      input$dataset
-      input$gpr_files
+      req(spot_upload()) 
+      req(input$reset_spots)
+      req(input$dataset)
+      req(input$gpr_files)
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
@@ -787,8 +801,9 @@ shinyServer(function(session, input, output) {
     })
     
     output$spot_control_ui = renderUI({
-      input$reset_spots
-      input$dataset
+      req(spot_upload())
+      req(input$reset_spots)
+      req(input$dataset)
       input$gpr_files
       df = spot_upload()
       as.tbl(df)
@@ -798,6 +813,7 @@ shinyServer(function(session, input, output) {
     })
     
     spots = reactive({
+      req(spot_upload())
       df = spot_upload()
       df$Category = 'analyte probe'
       df$Category[df$spot %in% input$select_remove] = 'removed probe'
@@ -807,6 +823,7 @@ shinyServer(function(session, input, output) {
     })
     
     removed_spots = reactive({
+      req(spots())
       spots() %>% 
         filter(!Category %in% c('removed probe')) %>% 
         pull(spot)
@@ -814,6 +831,8 @@ shinyServer(function(session, input, output) {
     
     
     output$spot_table = DT::renderDataTable({
+      req(spot_upload())
+      req(spots())
       showTab('main','proteins')
       showTab('main','data')
       
@@ -868,8 +887,8 @@ shinyServer(function(session, input, output) {
     })
     
     
-    protein_upload = reactive({ 
-
+    protein_upload = reactive({ withProgress(message = 'Uploading Proteins',{
+      req(data_full())
       input$reset_targets
       input$dataset
       input$gpr_files
@@ -906,10 +925,11 @@ shinyServer(function(session, input, output) {
       }
       
       list(df = df, upload_df = upload_df,error = error)
-    })
+    })})
     
     output$protein_control_ui = renderUI({
       #if(!is.null(values$data)){
+      req(protein_upload())
       input$reset_proteins
       df = protein_upload()$df
       as.tbl(df)
@@ -942,12 +962,8 @@ shinyServer(function(session, input, output) {
     output$proteins_table = DT::renderDataTable({
       showTab('main','pipeline')
       showTab('main','sig')
-  
-      
-      
-      
+      showTab('main','all')
       values$proteins = 'hit'
-      
       proteins() 
     })
     
@@ -1665,7 +1681,7 @@ shinyServer(function(session, input, output) {
     
     #----------------------------------SPOT FILTERING----------------------------------------
     
-    E_filter_before = reactive({
+    E_filter_before = reactive({withProgress(message = 'Spot Filtering',{
       E = E()
       if(!is.null(E()$weights) & input$apply_spot_filtering == T){
         E_fg = E$E
@@ -1677,7 +1693,7 @@ shinyServer(function(session, input, output) {
       }
       E$E
       E
-    })
+    })})
     
     E_filter = reactive({
       
@@ -1772,11 +1788,11 @@ shinyServer(function(session, input, output) {
     
 
     
-    E_corr = reactive({
+    E_corr = reactive({withProgress(message = 'Background Correction',{
         #backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method, offset = 0)
       backgroundCorrect(E_filter_before(), method = input$backgroundCorrect_method)
       
-    })
+    })})
     
     output[['RAW_corr-boxplot_ui']] = renderUI({   
       
@@ -1889,7 +1905,7 @@ shinyServer(function(session, input, output) {
       E_norm
     }
     
-    E_norm = reactive({   
+    E_norm = reactive({   withProgress(message = 'Normalisation',{
       
         data = E_corr()$E
         spot_names = spot_names()
@@ -1900,10 +1916,8 @@ shinyServer(function(session, input, output) {
         norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),removed_spots(),input$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
-        
-        #E_norm = E_norm[,c(targets()$Name[1:10],'spot')]
-        #E_norm
-    })
+
+    })})
     
     output$E_norm_table = DT::renderDataTable({
         E_norm()
@@ -1990,14 +2004,14 @@ shinyServer(function(session, input, output) {
     
     
     #---------------------------------Array weights----------------------------------
-      arrayw = reactive({
+    arrayw = reactive({withProgress(message = 'Array weights',{
         data = E_norm() %>% dplyr::select(-spot)
         aw = arrayWeights(data)
         names(aw) = colnames(data)
         aw
         
 
-    })
+    })})
     
     arrayw_df = reactive({
         df = as.data.frame(t(arrayw()))
@@ -2057,6 +2071,7 @@ shinyServer(function(session, input, output) {
     CV <- function(x) ( 100*(sd(x)/mean(x)))
     
     protein_collapse_function = function(df,spots,input){
+      
       data = df %>% 
         dplyr::select(-spot)
       colnames(data)
@@ -2078,10 +2093,13 @@ shinyServer(function(session, input, output) {
       data
     }
     
-    data_full = reactive({   
+    data_full = reactive({withProgress(message = 'Generating Final Data',{ 
       data = E_norm()
+      req(input$protein_column)
+      req(E_norm())
+      req(spots())
       protein_collapse_function(E_norm(),spots(),input)
-    })
+    })})
     
     
     output$drop_cols_ui = renderUI({
@@ -2109,7 +2127,7 @@ shinyServer(function(session, input, output) {
       data
     }
     
-    data = reactive({ 
+    data = reactive({ withProgress(message = 'Collate probes',{
       proteins_df = proteins()  
       data = data_full()
       df = protein_filter_function(data_full(),proteins(),input)
@@ -2127,31 +2145,8 @@ shinyServer(function(session, input, output) {
       }
       dim(df)
       df
-      #drops <- c("control 1", "control2", "control3")
-        #drops = input$drop_row
-        # df = proteins()
-        # as.tbl(df)
-        # drops = df[df[,input$drop_col] == input$drop_row,'spot']
-        # drops
-        # data = data_full()
-        # data <- data[!(row.names(data) %in% drops), ]
-        # data
-        
-        # (var <- rlang::parse_quosures(paste(input$drop_col))[[1]])
-        # df = proteins() 
-        # as.tbl(df)
-        # drops = df %>% 
-        #   filter(!!var %in% input$drop_row) %>% 
-        #   pull(protein)
-        # 
-        # drops
-        # data = data_full() 
-        # data = data %>%  
-        #   filter(!rownames(data) %in% drops)
-        # 
-        # rownames(data)
-        # data
-    })
+
+    })})
     
     #----------------------------Visualization of Condensed dataset-----------------------------------------
     
@@ -2410,7 +2405,7 @@ shinyServer(function(session, input, output) {
       threshold_df
     }
     
-    threshold = reactive({  
+    threshold = reactive({  withProgress(message = 'Calculating optimal cuttoffs',{
       input$threshold_control_column 
       data = data() %>% 
         column_to_rownames('protein')
@@ -2420,7 +2415,7 @@ shinyServer(function(session, input, output) {
       #threshold_df
       threshold_df = tryCatch({threshold_function(data,targets,input)}, error = function(e) {NULL})
       threshold_df
-    })
+    })})
     
     output$threshold_ui = renderUI({ 
       threshold_df = threshold()
@@ -3056,7 +3051,7 @@ MA_data = reactive({
   
   ### Differential Analysis ####
   
-  eBayes_test = reactive({ 
+  eBayes_test = reactive({ withProgress(message = 'eBayes',{
     df = data() %>% column_to_rownames('protein') 
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
@@ -3076,13 +3071,13 @@ MA_data = reactive({
     fit2
     
     Sig_Proteins <- topTable(fit2, adjust.method = input$mtc, number =30)
-    threshold <- Sig_Proteins$adj.P.Val < 0.05 
+    threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold)
     Sig_Proteins
     
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd)
-    })
+    })})
   
   output$cont_matrix_text = renderText({
     eBayes_test()$cont_matrix
@@ -3092,7 +3087,7 @@ MA_data = reactive({
     eBayes_test()$df
   })
   
-  eBayes_sig_data = reactive({
+  eBayes_sig_data = reactive({ 
     sig_df = eBayes_test()$df %>%  
       rownames_to_column('protein')
     as.tbl(sig_df)
@@ -3134,9 +3129,15 @@ MA_data = reactive({
     if(dim(m)[1] == 0){
       tags$h4('No significant proteins')
     }else{
-      plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+      id = 'EBayes'
+      name = 'Hcluster'
+      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+      ht_list$p
+      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+      do.call(tagList,plot_UI(id,name,ht_list$warning))
       
-      do.call(tagList,data_heatmap_UI('eBayes',plot_height))
+      #do.call(tagList,data_heatmap_UI('eBayes',plot_height))
     }
  
     # if(dim(m)[1] < max_heatmap_rows){
@@ -3156,6 +3157,70 @@ MA_data = reactive({
     
   })
   
+  
+  volcano_plot_function = function(sig_df,input){
+    plot_height = 600
+    type = input$volcano_type
+    if(input$volcano_type == 'gg plotly'){
+      type = 'ggplot'
+    }
+    
+    
+    (comp_cols = grep('_vs_',colnames(sig_df),value = T))
+    if(length(comp_cols) >0){
+      plot_height = 300 * length(comp_cols)
+      (other_cols = colnames(sig_df)[!colnames(sig_df) %in% comp_cols])
+      
+      df_l = sig_df %>% 
+        gather(comparison,logFC,comp_cols)
+      as.tbl(df_l)
+    }else{
+      df_l = sig_df %>% 
+        dplyr::mutate(comparison = 'vs')
+        
+    }
+     
+    if(type == 'ggplot'){
+      p = ggplot(df_l) + 
+        geom_point(aes(x = logFC,y = -log10(adj.P.Val), col = comparison, group = protein)) + 
+        geom_vline(aes(xintercept = as.numeric(input$fc_cutoff))) + 
+        geom_vline(aes(xintercept = as.numeric(input$fc_cutoff))) + 
+        geom_hline(aes(yintercept = -log10(as.numeric(input$pvalue_select)))) +
+        facet_grid(comparison ~ .)
+    }
+    
+
+    if(type == 'EnhancedVolcano'){
+      plot_height = 600
+      p = EnhancedVolcano(df_l,
+                      lab = df_l$protein,
+                      #selectLab =df_l$comparison,
+                      x = 'logFC',
+                      y = 'adj.P.Val',
+                      pCutoff = as.numeric(input$pvalue_select),
+                      #cutoffLineCol = 'red2',
+                      FCcutoff = as.numeric(input$fc_cutoff))
+    }
+    
+    list(p = p, plot_height = plot_height)
+  }
+
+  output$volcano_plot_ui = renderUI({
+    sig_df = eBayes_test()$df %>%   
+      rownames_to_column('protein')
+    result_list = volcano_plot_function(sig_df,input)
+    id = 'eBayes'
+    
+    name = paste('volcano',input$volcano_type,sep ='_')
+    volcano_plot_Server(id,name,result_list$p,input$volcano_type,result_list$plot_height)
+    if(input$volcano_type == 'gg plotly'){
+      plotly_UI(id,name)
+    }else{
+      plot_UI(id,name,NULL,result_list$plot_height)
+    }
+  })
+
+
   
   #targets()
   
