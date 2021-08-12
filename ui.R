@@ -75,11 +75,9 @@ shinyUI(fluidPage(
                ),
 
         ),
-        #column(9,uiOutput('protein_columns_ui')),
         column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')
-               #radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T),
                ),
-        #column(3,selectInput('spot_collapse','Collapse Spots by',c('mean','median','sum','CV'))),
+      
         column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
           tabPanel(title = tags$h5("Instructions"), value = 'instructions',
@@ -274,6 +272,7 @@ shinyUI(fluidPage(
         
         ### Significance Testing ####
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
+                
                  column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
                  
                  column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
@@ -281,12 +280,12 @@ shinyUI(fluidPage(
                  column(2,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
                  column(12,tabsetPanel(
                    tabPanel('eBayes',
-                            textOutput('cont_matrix_text'),
-                            tabsetPanel(
+                            uiOutput('cont_matrix_text_ui'),
+                            tabsetPanel(id = 'sig_panel',
                               tabPanel('Table',
                                        DT::dataTableOutput('eBays_table')
                                        ),
-                              tabPanel('Plot',
+                              tabPanel('Plots',
                                        tabsetPanel(
                                          tabPanel('Volcano Plots',
                                                   radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
@@ -304,26 +303,9 @@ shinyUI(fluidPage(
                  )
                  
                  ))
-        # tabPanel("Data",
-        #          #tags$h2('E norm'),
-        #          #column(12,DT::dataTableOutput('E_norm_table')),
-        #          
-        #          #column(10,tags$h2('Array Weights')),
-        #          #column(2,downloadButton('download_arrayw',"Download")),
-        #          
-        #         
-        #          
-        #          column(6,tags$h2('Data')),
-        #          column(2,downloadButton('download_data',"Data Table")),
-        #          column(2,downloadButton('download_ExpSet',"ExpSet")),
-        #          column(2,downloadButton('download_MSnSet',"MSnSet")),
-        #          
-        #          
-        #          
-        #          column(12,DT::dataTableOutput('data_table'))
-        #          
-        #          )
-    ))
+        )
+
+    )
 
 )
 

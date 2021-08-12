@@ -204,6 +204,9 @@ PlotTabs_UI <- function(id) {
 	ns <- NS(id)
 	list(
 		tabsetPanel(
+			tabPanel('Data Table',
+							 DT::dataTableOutput(ns('table'))
+							 ),
 			tabPanel('Plots',
 							 uiOutput(ns('boxplot_ui')),
 							 uiOutput(ns('CV_plot_ui')),
@@ -216,6 +219,47 @@ PlotTabs_UI <- function(id) {
 							 column(12,uiOutput(ns('Heatmap_ui')))
 			))
 	)
+}
+
+SigTest_UI = function(condtions){
+	print(conditions)
+	if(length(conditions) > 1){
+			lst = tagList(
+				column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
+				
+				column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+				column(3,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+				column(2,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
+				column(12,tabsetPanel(
+					tabPanel('eBayes',
+									 textOutput('cont_matrix_text'),
+									 tabsetPanel(
+									 	tabPanel('Table',
+									 					 DT::dataTableOutput('eBays_table')
+									 	),
+									 	tabPanel('Plot',
+									 					 tabsetPanel(
+									 					 	tabPanel('Volcano Plots',
+									 					 					 radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
+									 					 					 uiOutput('volcano_plot_ui')
+									 					 	),
+									 					 	#plotlyOutput('volcano_plots')),
+									 					 	tabPanel('Heatmap',
+									 					 					 uiOutput('eBayes_Heatmap_ui')
+									 					 	)
+									 					 )
+									 	)
+									 	
+									 )
+								)
+							)
+						)
+						
+						)
+	}else{
+		lst = tagList(span(tags$h4('A minimum of two conditions is required to do determine differential expression'), style="color:orange"))
+	}
+	lst
 }
 
 

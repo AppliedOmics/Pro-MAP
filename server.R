@@ -963,6 +963,10 @@ shinyServer(function(session, input, output) {
       showTab('main','pipeline')
       showTab('main','sig')
       showTab('main','all')
+      
+      if(length(selected_targets()$Condition) >1){
+        showTab('main','sig')
+      }
       values$proteins = 'hit'
       proteins() 
     })
@@ -1612,6 +1616,11 @@ shinyServer(function(session, input, output) {
       #CV_df
     })
     
+    
+    output[['RAW-table']] = DT::renderDataTable({
+      RAW_df()
+    })
+    
     output[['RAW-CV_plot_ui']] = renderUI({  
       df = RAW_df()
       data = CV_df_function(df,targets()) 
@@ -1723,6 +1732,10 @@ shinyServer(function(session, input, output) {
       df
     })
     
+    output[['RAW_filter-table']] = DT::renderDataTable({
+      E_filter_df()
+    })
+    
     output[['RAW_filter-CV_plot_ui']] = renderUI({     
       df = E_filter_df() 
       data = CV_df_function(df,targets())
@@ -1816,6 +1829,10 @@ shinyServer(function(session, input, output) {
       df
     })
     
+    output[['RAW_corr-table']] = DT::renderDataTable({
+      E_corr_df()
+    })
+    
     output[['RAW_corr-CV_plot_ui']] = renderUI({     
       df = E_corr_df() 
       data = CV_df_function(df,targets())
@@ -1879,7 +1896,7 @@ shinyServer(function(session, input, output) {
     #---------------------------------Normalization------------------------------------
     
 
-    pre_norm_function = function(data,spot_names,target_names,removed_spots,log_rb){
+    pre_norm_function = function(data,spot_names,target_names,selected_target_names,removed_spots,log_rb){
       df = as.data.frame(data)
       dim(df)
       colnames(df) <- target_names
@@ -1890,6 +1907,9 @@ shinyServer(function(session, input, output) {
       
       df_m = df_f %>% 
         dplyr::select(-spot)
+      
+      df_m = df_m %>% 
+        dplyr::select(one_of(selected_target_names))
       m = as.matrix(df_m)
       if(log_rb == T){
         m = log2(m)
@@ -1913,13 +1933,13 @@ shinyServer(function(session, input, output) {
         removed_spots = removed_spots()
         log_rb = input$log_rb
       
-        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),removed_spots(),input$log_rb)
+        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
 
     })})
     
-    output$E_norm_table = DT::renderDataTable({
+    output[['RAW_norm-table']] = DT::renderDataTable({
         E_norm()
     })
     
@@ -2581,30 +2601,30 @@ shinyServer(function(session, input, output) {
   })
   
     
-  multi_norm_function = function(corr_data,spot_names,target_names,removed_spots,log_rb,method,proteins,input){
+  multi_norm_function = function(corr_data,spot_names,target_names,selected_target_names,removed_spots,log_rb,method,proteins,input){
     
-    E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,removed_spots,log_rb)
+    E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     E_norm = norm_function(E_norm_list$m,method,E_norm_list$spots)
     E_proteins = protein_collapse_function(E_norm,spots(),input)
     E = protein_filter_function(E_proteins,proteins,input)
     
     E = as.data.frame(E) %>% dplyr::select(-one_of('protein'))
     
-    S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,removed_spots,log_rb)
+    S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
     S_proteins = protein_collapse_function(S_norm,spots(),input)
     S = protein_filter_function(S_proteins,proteins,input)
 
     S = as.data.frame(S) %>% dplyr::select(-one_of('protein'))
     
-    N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,removed_spots,log_rb)
+    N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
     N_proteins = protein_collapse_function(N_norm,spots(),input)
     N = protein_filter_function(N_proteins,proteins,input)
 
     N = as.data.frame(N) %>% dplyr::select(-one_of('protein'))
     
-    M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,removed_spots,log_rb)
+    M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
     M_proteins = protein_collapse_function(M_norm,spots(),input)
     M = protein_filter_function(M_proteins,proteins,input)
@@ -2628,14 +2648,14 @@ shinyServer(function(session, input, output) {
     
     
     method = "none"
-    E = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    E = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     
     method = "quantile"
-    Q = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    Q = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     method = "cyclicloess"
-    C = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    C = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     method = "scale"
-    S = multi_norm_function(corr_data,spot_names(),target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    S = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
     
     
     
@@ -3079,8 +3099,18 @@ MA_data = reactive({
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd)
     })})
   
-  output$cont_matrix_text = renderText({
-    eBayes_test()$cont_matrix
+  output$cont_matrix_text_ui = renderUI({ 
+    if(length(input$condition_select) > 1){
+      showTab('sig_panel','Table')
+      showTab('sig_panel','Plots')
+      lst = list(tags$h5('eBayes_test()$cont_matrix'))
+    }else{
+      hideTab('sig_panel','Table')
+      hideTab('sig_panel','Plots')
+      
+      lst = list(span(tags$h4('A minimum of two conditions is required to do determine differential expression'), style="color:orange"))
+    }
+    do.call(tagList,lst)
   })
   
   output$eBays_table = DT::renderDataTable({
@@ -3220,7 +3250,15 @@ MA_data = reactive({
     }
   })
 
-
+  output$sig_test_ui = renderUI({
+    (conditions = input$condition_select) 
+    print(conditions)
+    if(length(conditions) > 1){
+      do.call(tagList,SigTest_UI())
+    }else{
+      span(tags$h4('A minimum of two conditions is required to do determine differential expression'), style="color:orange")
+    }
+  })
   
   #targets()
   
