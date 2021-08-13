@@ -1557,7 +1557,7 @@ shinyServer(function(session, input, output) {
       m
     }
     
-    cont_matrix_function = function(df,targets){
+    cont_matrix_function = function(df,targets,input){
       time = factor(paste(targets$Condition), levels = unique(targets$Condition))
       time
       design = model.matrix(~0+time)
@@ -1565,12 +1565,25 @@ shinyServer(function(session, input, output) {
       
       conditions = unique(targets$Condition)
       comparison_list = c()
-      for(i in c(1:length(conditions))){
+      if(input$cont_matrix_comp == "All"){
+        for(i in c(1:length(conditions))){
+          for(j in c(1:length(conditions))){
+            
+            if(j > i){
+              #print(paste(i,j))
+              comparisons = paste0(conditions[i],'_vs_',conditions[j],' = ',conditions[i],'-',conditions[j])
+              #print(comparisons)
+              comparison_list = c(comparison_list,comparisons)
+            }
+          }
+        }
+      }else{
+        control = input$cont_matrix_comp
         for(j in c(1:length(conditions))){
-          
-          if(j > i){
+          comparison = conditions[j]
+          if(control != comparison){
             #print(paste(i,j))
-            comparisons = paste0(conditions[i],'_vs_',conditions[j],' = ',conditions[i],'-',conditions[j])
+            comparisons = paste0(comparison,'_vs_',control,' = ',comparison,'-',control)
             #print(comparisons)
             comparison_list = c(comparison_list,comparisons)
           }
@@ -1582,7 +1595,7 @@ shinyServer(function(session, input, output) {
       #print(cmd)
       eval(parse(text = cmd))
       cont.matrix
-      result = list(design = design, cont.matrix = cont.matrix,cmd = cmd)
+      result = list(design = design, cont.matrix = cont.matrix,cmd = cmd, comparison_list = comparison_list)
       return(result)
     }
     
@@ -3071,14 +3084,19 @@ MA_data = reactive({
   
   ### Differential Analysis ####
   
-  eBayes_test = reactive({ withProgress(message = 'eBayes',{
-    df = data() %>% column_to_rownames('protein') 
+  output$cont_matrix_comp_ui = renderUI({
+    selectInput('cont_matrix_comp','Contingency Matrix Comparison',c('All',input$condition_select),'All')
+  }) 
+  
+  
+  eBayes_test = reactive({ withProgress(message = 'eBayes',{ 
+    df = data() %>% column_to_rownames('protein')  
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     
     df = df[,selected_cols]
 
-    cont_matrix_list = cont_matrix_function(df,selected_targets())
+    cont_matrix_list = cont_matrix_function(df,selected_targets(),input)
     design = cont_matrix_list$design
     cont.matrix = cont_matrix_list$cont.matrix
     
@@ -3090,20 +3108,24 @@ MA_data = reactive({
     fit2 = eBayes(fit2)
     fit2
     
-    Sig_Proteins <- topTable(fit2, adjust.method = input$mtc, number =30)
+    Sig_Proteins <- topTable(fit2, adjust.method = input$mtc,number = dim(df)[1])
     threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold)
     Sig_Proteins
     
-    list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd)
+    list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
     })})
   
-  output$cont_matrix_text_ui = renderUI({  
+  output$cont_matrix_text_ui = renderUI({   
     if(length(input$condition_select) > 1){
       showTab('sig_panel','Table')
       showTab('sig_panel','Plots')
-      lst = list(tags$h5(eBayes_test()$cont_matrix))
+      #output$cont_html = renderPrint({
+      #  paste(eBayes_test()$comparison_list,collapse = '<br>')
+      #})
+      
+      lst = list(tags$h5(HTML(paste(eBayes_test()$comparison_list,collapse = '<br>'))))
     }else{
       hideTab('sig_panel','Table')
       hideTab('sig_panel','Plots')
@@ -3260,13 +3282,37 @@ MA_data = reactive({
     }
   })
   
+  
+  output$stat_MA_plot = renderPlot({
+    
+    df = eBayes_test()$df %>%   
+      rownames_to_column('protein')
+    
+    plot_df = df #%>% 
+      
+      #left_join(proteins())
+    
+    as.tbl(plot_df)
+    
+    
+
+      MA_plot = ggplot(plot_df) + 
+        geom_point(aes(y = logFC, x = AveExpr,col = threshold))
+
+    
+    MA_plot
+  })
+  
+  
   #targets()
   
   #E()$targets
   
+  #### Panel Labels ####
+  
   output$target_label = renderUI({
     if(is.null(values$targets)){
-      span(tags$h3('Next'), style="color:red")
+      span(tags$h4('Next >>'), style="color:#21b8cd")
     }else{
       tags$h5('Samples')
     }
@@ -3274,7 +3320,7 @@ MA_data = reactive({
   
   output$probe_label = renderUI({
     if(is.null(values$probes)){
-      span(tags$h3('Next'), style="color:red")
+      span(tags$h4('Next >>'), style="color:#21b8cd")
     }else{
       tags$h5('Probes')
     }
@@ -3282,7 +3328,7 @@ MA_data = reactive({
   
   output$protein_label = renderUI({
     if(is.null(values$proteins)){
-      span(tags$h3('Next'), style="color:red")
+      span(tags$h4('Next >>'), style="color:#21b8cd")
     }else{
       tags$h5('Proteins')
     }

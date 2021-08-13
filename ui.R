@@ -197,7 +197,7 @@ shinyUI(fluidPage(
           
 
         #### Pipeline ####
-        tabPanel(title = tags$h5('Pre Processing Pipeline'),value = 'pipeline',
+        tabPanel(title = tags$h5('Pre-Processing Pipeline'),value = 'pipeline',
             tabsetPanel(
         
               tabPanel('Raw Data',
@@ -272,8 +272,8 @@ shinyUI(fluidPage(
         
         ### Significance Testing ####
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
-                
-                 column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
+                 column(4,uiOutput('cont_matrix_comp_ui')),
+                 #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
                  
                  column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
                  column(3,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
@@ -291,6 +291,9 @@ shinyUI(fluidPage(
                                                   radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
                                                   uiOutput('volcano_plot_ui')
                                          ),
+                                         tabPanel('MA plot',
+                                                  plotOutput('stat_MA_plot')
+                                                  ),
                                                   #plotlyOutput('volcano_plots')),
                                          tabPanel('Heatmap',
                                                   uiOutput('eBayes_Heatmap_ui')
