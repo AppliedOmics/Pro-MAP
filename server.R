@@ -2599,7 +2599,7 @@ shinyServer(function(session, input, output) {
   #### Comparing Methods ####
   
     
-  corr = reactive({ 
+  corr = reactive({withProgress(message = 'multi background correction',{
     E = E_filter_before()
     
     E_corr <-  backgroundCorrect(E, method = "none")
@@ -2611,7 +2611,7 @@ shinyServer(function(session, input, output) {
          S = S_corr,
          M = M_corr,
          N = N_corr)
-  })
+  })})
   
     
   multi_norm_function = function(corr_data,spot_names,target_names,selected_target_names,removed_spots,log_rb,method,proteins,input){
@@ -2650,7 +2650,7 @@ shinyServer(function(session, input, output) {
          M = M,
          N = N)
   }
-  norm = reactive({
+  norm = reactive({withProgress(message = 'multi normalisation',{
     corr_data = corr()    
 
     spot_names = spot_names()
@@ -2678,25 +2678,41 @@ shinyServer(function(session, input, output) {
          C = C,
          S = S)
     
-  })
+  })})
 
+  eBayes_single_function = function(df){
+    fit <- lmFit(df)
+    fit2 <- eBayes(fit)
+    #fit2 <- as.data.frame(fit2)
+    Sig_Proteins <- topTable(fit2, adjust.method = input$mtc,number = dim(df)[1])
+    threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
+    length(which(threshold))
+    Sig_Proteins <- cbind(Sig_Proteins, threshold)
+    Sig_Proteins
+    list(df = as.data.frame(fit2), top_df = Sig_Proteins)
+  }
+  
   multi_fit_function = function(norm){
     
-    Rfit <- lmFit(norm$E)
-    Rfit2 <- eBayes(Rfit)
-    Rfit2 <- as.data.frame(Rfit2)
-    
-    Sfit <- lmFit(norm$S)
-    Sfit2 <- eBayes(Sfit)
-    Sfit2 <- as.data.frame(Sfit2)
-    
-    Mfit <- lmFit(norm$M)
-    Mfit2 <- eBayes(Mfit)
-    Mfit2 <- as.data.frame(Mfit2)
-    
-    Nfit <- lmFit(norm$N)
-    Nfit2 <- eBayes(Nfit)
-    Nfit2 <- as.data.frame(Nfit2)
+    # Rfit <- lmFit(norm$E)
+    # Rfit2 <- eBayes(Rfit)
+    # Rfit2 <- as.data.frame(Rfit2)
+    # 
+    # Sfit <- lmFit(norm$S)
+    # Sfit2 <- eBayes(Sfit)
+    # Sfit2 <- as.data.frame(Sfit2)
+    # 
+    # Mfit <- lmFit(norm$M)
+    # Mfit2 <- eBayes(Mfit)
+    # Mfit2 <- as.data.frame(Mfit2)
+    # 
+    # Nfit <- lmFit(norm$N)
+    # Nfit2 <- eBayes(Nfit)
+    # Nfit2 <- as.data.frame(Nfit2)
+    Rfit2 = eBayes_single_function(norm$E)
+    Sfit2 = eBayes_single_function(norm$S)
+    Mfit2 = eBayes_single_function(norm$M)
+    Nfit2 = eBayes_single_function(norm$N)
     
     list(E = Rfit2,
          S = Rfit2,
@@ -2730,27 +2746,27 @@ shinyServer(function(session, input, output) {
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold)
     Sig_Proteins
-    
-    list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
+    df =  as.data.frame(fit2)
+    list(top_df = Sig_Proteins, df = df,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
   }
   
   multi_DE_function = function(norm){
   
     df = norm$E
-    df$protein = proteins()$protein
-    Rfit2 <- eBayes_function(df)$df
+    df$protein = data()$protein
+    Rfit2 <- eBayes_function(df)
     
     df = norm$S
-    df$protein = proteins()$protein
-    Sfit2 <- eBayes_function(df)$df
+    df$protein = data()$protein
+    Sfit2 <- eBayes_function(df)
     
     df = norm$M
-    df$protein = proteins()$protein
-    Mfit2 <- eBayes_function(df)$df
+    df$protein = data()$protein
+    Mfit2 <- eBayes_function(df)
     
     df = norm$N
-    df$protein = proteins()$protein
-    Nfit2 <- eBayes_function(df)$df
+    df$protein = data()$protein
+    Nfit2 <- eBayes_function(df)
     
     list(E = Rfit2,
          S = Rfit2,
@@ -2767,23 +2783,23 @@ shinyServer(function(session, input, output) {
     
   })
    
-  Rfit = reactive({
+  Rfit = reactive({withProgress(message = 'multi fit',{
     list(E = multi_fit_function(norm()$E),
          Q = multi_fit_function(norm()$Q),
          C = multi_fit_function(norm()$C),
          S = multi_fit_function(norm()$S)
     )
     
-  })
+  })})
   
-  DE_Rfit = reactive({
-    list(E = multi_DE_function(norm()$E),
+  DE_Rfit = reactive({withProgress(message = 'multi DE fit',{
+    list(E = multi_DE_function(norm()$E), 
          Q = multi_DE_function(norm()$Q),
          C = multi_DE_function(norm()$C),
          S = multi_DE_function(norm()$S)
     )
     
-  })
+  })})
   
   # multi_df = reactive({
   #   norm = norm()$E
@@ -2799,117 +2815,145 @@ shinyServer(function(session, input, output) {
   
   
 
-  multi_Amean_function = function(fit,norm,column_name){
-    Amean <- cbind(fit$E[column_name], fit$S[column_name], fit$M[column_name], fit$N[column_name])
-    dim(Amean)
-    colnames(Amean) <- c("Rawdata","Subtraction","Movingminimum","Normexp")
-    as.tbl(as.data.frame(Amean))
-    Amean_l = Amean %>% 
-      as.data.frame() %>% 
-      gather(Correction,A)
-    
-    Amean_l$A[is.infinite(Amean_l$A)] = NA
-    Amean_l$Normalisation = norm
-    Amean_l
-  }
-  
-  Amean_data = reactive({
-    if(input$multi_DE == FALSE){
-      E_Amean = multi_Amean_function(Rfit()$E,"None",'Amean')  
-      S_Amean = multi_Amean_function(Rfit()$S,"Scale",'Amean')
-      Q_Amean = multi_Amean_function(Rfit()$Q,"Quantile",'Amean')
-      C_Amean = multi_Amean_function(Rfit()$C,"Cyclicloess",'Amean')
-    }else{
-      E_Amean = multi_Amean_function(DE_Rfit()$E,"None",'AveExpr')  
-      S_Amean = multi_Amean_function(DE_Rfit()$S,"Scale",'AveExpr')
-      Q_Amean = multi_Amean_function(DE_Rfit()$Q,"Quantile",'AveExpr')
-      C_Amean = multi_Amean_function(DE_Rfit()$C,"Cyclicloess",'AveExpr')
-    }
-    
-    Amean = rbind(E_Amean,S_Amean) %>% 
-      rbind(Q_Amean) %>% 
-      rbind(C_Amean)
-    
-    as.tbl(as.data.frame(Amean))
-    Amean$Correction = factor(Amean$Correction, levels = unique(Amean$Correction))
-    Amean$Normalisation = factor(Amean$Normalisation, levels = unique(Amean$Normalisation))
-    Amean
-    #Amean$A
-    
-  })
+  # multi_Amean_function = function(fit,norm,column_name,table){
+  #   Amean <- cbind(fit$E[[table]][column_name], fit$S[[table]][column_name], fit$M[[table]][column_name], fit$N[[table]][column_name])
+  #   dim(Amean)
+  #   colnames(Amean) <- c("Rawdata","Subtraction","Movingminimum","Normexp")
+  #   as.tbl(as.data.frame(Amean))
+  #   Amean_l = Amean %>% 
+  #     as.data.frame() %>% 
+  #     gather(Correction,A)
+  #   
+  #   Amean_l$A[is.infinite(Amean_l$A)] = NA
+  #   Amean_l$Normalisation = norm
+  #   Amean_l
+  # }
+  # 
+  # Amean_data = reactive({withProgress(message = 'A data',{
+  #   if(input$multi_DE == FALSE){
+  #     fit = Rfit()
+  #   }else{
+  #     fit = DE_Rfit()
+  #   }
+  #   if(input$multi_top == FALSE){
+  #     E_Amean = multi_Amean_function(fit$E,"None",'Amean','df')  
+  #     S_Amean = multi_Amean_function(fit$S,"Scale",'Amean','df')
+  #     Q_Amean = multi_Amean_function(fit$Q,"Quantile",'Amean','df')
+  #     C_Amean = multi_Amean_function(fit$C,"Cyclicloess",'Amean','df')
+  #   }else{
+  #     E_Amean = multi_Amean_function(fit$E,"None",'AveExpr','top_df')  
+  #     S_Amean = multi_Amean_function(fit$S,"Scale",'AveExpr','top_df')
+  #     Q_Amean = multi_Amean_function(fit$Q,"Quantile",'AveExpr','top_df')
+  #     C_Amean = multi_Amean_function(fit$C,"Cyclicloess",'AveExpr','top_df')
+  #   }
+  #   
+  #   Amean = rbind(E_Amean,S_Amean) %>% 
+  #     rbind(Q_Amean) %>% 
+  #     rbind(C_Amean)
+  #   
+  #   as.tbl(as.data.frame(Amean))
+  #   Amean$Correction = factor(Amean$Correction, levels = unique(Amean$Correction))
+  #   Amean$Normalisation = factor(Amean$Normalisation, levels = unique(Amean$Normalisation))
+  #   Amean
+  #   #Amean$A
+  #   
+  # })})
   
   
   
   output$MA_correction_ui = renderUI({
-    df = Amean_data() 
+    df = multi_fit_data() 
     selectInput('MA_correction','Background Correction',unique(df$Correction),unique(df$Correction),multiple = T)
   })
   
   output$MA_normalisation_ui = renderUI({
-    df = Amean_data()
+    df = multi_fit_data()
     selectInput('MA_normalisation','Normalisation',unique(df$Normalisation),unique(df$Normalisation),multiple = T)
   })
   
   
   
   
-  output$Amean_plot_ui = renderUI({
-      plot_height = single_plot_height * length(input$MA_normalisation)
-      output$Amean_plot = renderPlot({
-    
-          
-          Amean = Amean_data() %>% 
-            filter(Correction %in% input$MA_correction, 
-                   Normalisation %in% input$MA_normalisation)
-          
-          
-      
-      
-            p = ggplot(Amean, aes(x= Correction, y=A, fill=Correction))+
-              geom_boxplot()+
-              #theme_classic()+
-              theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
-              facet_grid(Normalisation ~ .)
-            q = quantile(Amean$A,na.rm = T)
-            if(input$MA_quantile == T){
-              p = p + 
-                ylim(q[1],q[3])
-            }
-            p
-          
-        },height = plot_height)
-      
-      plotOutput('Amean_plot',height = plot_height)
-  })
+  # output$Amean_plot_ui = renderUI({
+  #     plot_height = single_plot_height * length(input$MA_normalisation)
+  #     output$Amean_plot = renderPlot({
+  #   
+  #         
+  #         Amean = Amean_data() %>% 
+  #           filter(Correction %in% input$MA_correction, 
+  #                  Normalisation %in% input$MA_normalisation)
+  #         
+  #         
+  #     
+  #     
+  #           p = ggplot(Amean, aes(x= Correction, y=A, fill=Correction))+
+  #             geom_boxplot()+
+  #             #theme_classic()+
+  #             theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
+  #             facet_grid(Normalisation ~ .)
+  #           q = quantile(Amean$A,na.rm = T)
+  #           if(input$MA_quantile == T){
+  #             p = p + 
+  #               ylim(q[1],q[3])
+  #           }
+  #           p
+  #         
+  #       },height = plot_height)
+  #     
+  #     plotOutput('Amean_plot',height = plot_height)
+  # })
   
-  multi_M_function = function(data,norm,column_name){
-    Rfit2 = data$E
-    Sfit2 = data$S
-    Mfit2 = data$M
-    Nfit2 = data$N
-    
-    M <- cbind(Rfit2[column_name], Sfit2[column_name], Mfit2[column_name], Nfit2[column_name])
-    M <- as.data.frame(M)
-    colnames(M) = c("Rawdata","Subtraction","Movingminimum","Normexp")
-    #M = log2(M)
-    M_l = M %>% 
-      gather('Correction','M')
-    M_l$Normalisation = norm
-    M_l
+  # multi_M_function = function(data,norm,column_name,table){
+  #   Rfit2 = data$E
+  #   Sfit2 = data$S
+  #   Mfit2 = data$M
+  #   Nfit2 = data$N
+  #   
+  #   M <- cbind(Rfit2[[table]][column_name], Sfit2[[table]][column_name], Mfit2[[table]][column_name], Nfit2[[table]][column_name])
+  #   M <- as.data.frame(M)
+  #   colnames(M) = c("Rawdata","Subtraction","Movingminimum","Normexp")
+  #   #M = log2(M)
+  #   M_l = M %>% 
+  #     gather('Correction','M')
+  #   M_l$Normalisation = norm
+  #   M_l
+  # }
+  
+  multi_collate_fit_function = function(data,norm,table){
+    print('hit') 
+    Rfit2 = data$E[[table]]
+    Rfit2$Correction = 'Rawdata'
+    Sfit2 = data$S[[table]]
+    Sfit2$Correction = 'Subtraction'
+    Mfit2 = data$M[[table]]
+    Mfit2$Correction = 'Movingminimum'
+    Nfit2 = data$N[[table]]
+    Nfit2$Correction = 'Normexp'
+    df <- Rfit2 %>% 
+      rbind(Sfit2) %>% 
+      rbind(Mfit2) %>% 
+      rbind(Nfit2)
+    df$Normalisation = norm
+    df
   }
   
-  M_plot_data = reactive({
+  multi_fit_data = reactive({
+    #if(input$multi_DE == FALSE){
+    #  fit = Rfit()
+    #}else{
+    #  fit = DE_Rfit() 
+    #}
     
     if(input$multi_DE == FALSE){
-      E_M_l = multi_M_function(Rfit()$E,"None",'F')
-      S_M_l = multi_M_function(Rfit()$S,"Scale",'F')
-      Q_M_l = multi_M_function(Rfit()$Q,"Quantile",'F')
-      C_M_l = multi_M_function(Rfit()$C,"Cyclicloess",'F')
+      E_M_l = multi_collate_fit_function(Rfit()$E,"None",'df')
+      S_M_l = multi_collate_fit_function(Rfit()$S,"Scale",'df')
+      Q_M_l = multi_collate_fit_function(Rfit()$Q,"Quantile",'df')
+      C_M_l = multi_collate_fit_function(Rfit()$C,"Cyclicloess",'df')
     }else{
-      E_M_l = multi_M_function(DE_Rfit()$E,"None",'logFC')
-      S_M_l = multi_M_function(DE_Rfit()$S,"Scale",'logFC')
-      Q_M_l = multi_M_function(DE_Rfit()$Q,"Quantile",'logFC')
-      C_M_l = multi_M_function(DE_Rfit()$C,"Cyclicloess",'logFC')
+      E_M_l = multi_collate_fit_function(DE_Rfit()$E,"None",'top_df')
+      S_M_l = multi_collate_fit_function(DE_Rfit()$S,"Scale",'top_df')
+      Q_M_l = multi_collate_fit_function(DE_Rfit()$Q,"Quantile",'top_df')
+      C_M_l = multi_collate_fit_function(DE_Rfit()$C,"Cyclicloess",'top_df')
     }
     
     M_l = E_M_l %>% 
@@ -2921,94 +2965,190 @@ shinyServer(function(session, input, output) {
     
     M_l$Correction = factor(M_l$Correction, levels = unique(M_l$Correction))
     M_l$Normalisation = factor(M_l$Normalisation, levels = unique(M_l$Normalisation))
-    
     M_l
+    
   })
   
+  # M_plot_data = reactive({withProgress(message = 'M data',{
+  #    
+  #   if(input$multi_DE == FALSE){
+  #     fit = Rfit()
+  #   }else{
+  #     fit = DE_Rfit() 
+  #   }
+  # 
+  #   if(input$multi_top == FALSE){
+  #     E_M_l = multi_M_function(fit$E,"None",'F','df')
+  #     S_M_l = multi_M_function(fit$S,"Scale",'F','df')
+  #     Q_M_l = multi_M_function(fit$Q,"Quantile",'F','df')
+  #     C_M_l = multi_M_function(fit$C,"Cyclicloess",'F','df')
+  #   }else{
+  #     E_M_l = multi_M_function(fit$E,"None",'logFC','top_df')
+  #     S_M_l = multi_M_function(fit$S,"Scale",'logFC','top_df')
+  #     Q_M_l = multi_M_function(fit$Q,"Quantile",'logFC','top_df')
+  #     C_M_l = multi_M_function(fit$C,"Cyclicloess",'logFC','top_df')
+  #   }
+  #   
+  #   M_l = E_M_l %>% 
+  #     rbind(S_M_l) %>% 
+  #     rbind(Q_M_l) %>% 
+  #     rbind(C_M_l)
+  #   
+  #   as.tbl(M_l)
+  #   
+  #   M_l$Correction = factor(M_l$Correction, levels = unique(M_l$Correction))
+  #   M_l$Normalisation = factor(M_l$Normalisation, levels = unique(M_l$Normalisation))
+  #   
+  #   M_l
+  # })})
+  # 
   
-  output$M_plot_ui = renderUI({
+  output$M_plot_ui = renderUI({   
     plot_height = single_plot_height * length(input$MA_normalisation)
   
     output$M_plot = renderPlot({
       
-    
-      M_l = M_plot_data()  %>% 
+      #multi_fit_data
+      #M_l = M_plot_data()  %>% 
+      #  filter(Correction %in% input$MA_correction, 
+      #         Normalisation %in% input$MA_normalisation)
+      
+      M_l = multi_fit_data()  %>% 
         filter(Correction %in% input$MA_correction, 
                Normalisation %in% input$MA_normalisation)
-      if(input$log_rb_M == TRUE & input$multi_DE == FALSE){
-        p = ggplot(M_l, aes(x= Correction, y=log(M), fill=Correction))+
-          geom_boxplot()+
-          #theme_classic()+
-          theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
-          facet_grid(Normalisation ~ .)
-        q = quantile(log(M_l$M),na.rm = T)
-        if(input$MA_quantile == T){
-          p = p + 
-            ylim(q[1],q[3])
+
+      if(input$multi_DE == FALSE){
+        if(input$log_rb_M == TRUE){
+          p = ggplot(M_l, aes(x= Correction, y=log(F), fill=Correction))
+          q = quantile(log(M_l$F),na.rm = T)
+        }else{
+          p = ggplot(M_l, aes(x= Correction, y=F, fill=Correction)) 
+            p = p + scale_y_continuous(trans='log2')
+          q = quantile(M_l$F,na.rm = T)
         }
       }else{
-        p = ggplot(M_l, aes(x= Correction, y=M, fill=Correction))+
-          geom_boxplot()+
-          #theme_classic()+
+        p = ggplot(M_l, aes(x= Correction, y=logFC, fill=Correction))
+        q = quantile(M_l$logFC,na.rm = T)
+      }
+          p = p + geom_boxplot() +
+  
           theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
           facet_grid(Normalisation ~ .)
-        q = quantile(M_l$M,na.rm = T)
-        if(input$MA_quantile == T){
-          p = p + 
-            ylim(q[1],q[3])
-        }
-      }
+
+          if(input$plot_lim == 'Quantile'){
+            p = p +  ylim(q[2],q[4])
+          }
+          if(input$plot_lim == '2x Quantile'){
+            p = p +  ylim(q[2]/2,q[4]*2)
+          }
+
       p
     },height = plot_height)
   
     plotOutput('M_plot',height = plot_height)
   })
   
- 
-  MA_data = reactive({
-    A = Amean_data()
-    M = M_plot_data()
+  output$A_plot_ui = renderUI({   
+    plot_height = single_plot_height * length(input$MA_normalisation)
     
-    dim(A)
-    dim(M)
+    output$A_plot = renderPlot({
+      
+      #multi_fit_data
+      #M_l = M_plot_data()  %>% 
+      #  filter(Correction %in% input$MA_correction, 
+      #         Normalisation %in% input$MA_normalisation)
+      
+      M_l = multi_fit_data()  %>% 
+        filter(Correction %in% input$MA_correction, 
+               Normalisation %in% input$MA_normalisation)
+      
+      if(input$multi_DE == FALSE){
     
-    MA = A
-    MA$M = M$M
-    as.tbl(MA)
+        p = ggplot(M_l, aes(x= Correction, y=log(Amean), fill=Correction))
+        q = quantile(log(M_l$Amean),na.rm = T)
+       
+      }else{
+        p = ggplot(M_l, aes(x= Correction, y=AveExpr, fill=Correction))
+        q = quantile(M_l$AveExpr,na.rm = T)
+      }
+      p = p + geom_boxplot() +
+        
+        theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
+        facet_grid(Normalisation ~ .)
+      
+      if(input$plot_lim == 'Quantile'){
+        p = p +  ylim(q[2],q[4])
+      }
+      if(input$plot_lim == '2x Quantile'){
+        p = p +  ylim(q[2]/2,q[4]*2)
+      }
+      
+      p
+    },height = plot_height)
     
-    MA
+    plotOutput('A_plot',height = plot_height)
   })
+  
+ 
+  # MA_data = reactive({
+  #   A = Amean_data()
+  #   M = M_plot_data()
+  #   
+  #   dim(A)
+  #   dim(M)
+  #   
+  #   MA = A
+  #   MA$M = M$M
+  #   as.tbl(MA)
+  #   
+  #   MA
+  # })
 
 
-  output$MA_plot_ui = renderUI({
+  output$MA_plot_ui = renderUI({ 
     plot_height = single_plot_height * length(input$MA_normalisation)
     output$MA_plot = renderPlot({
-      MA = MA_data() %>% 
+      MA = multi_fit_data() %>% 
         filter(Correction %in% input$MA_correction, 
                Normalisation %in% input$MA_normalisation)
       as.tbl(MA)
-      if(input$log_rb_M == TRUE & input$multi_DE == FALSE){
       
-        ggplot(MA) + 
-          geom_point(aes(x = A, y = log(M))) + 
-          facet_grid(Normalisation ~ Correction)
+      
+      if(input$multi_DE == FALSE){
+        if(input$log_rb_M == TRUE){
+          p = ggplot(MA, aes(x= Amean, y=log(F)))
+          #q = quantile(log(M_l$F),na.rm = T)
+        }else{
+          p = ggplot(MA, aes(x= Amean, y=F))
+          p = p + scale_y_continuous(trans='log2')
+          #q = quantile(M_l$F,na.rm = T)
+        }
       }else{
-        ggplot(MA) + 
-          geom_point(aes(x = A, y = M)) + 
-          facet_grid(Normalisation ~ Correction)
+        p = ggplot(MA, aes(x= AveExpr, y=logFC, col=threshold)) + 
+          geom_hline(aes(yintercept = 0))
+        #q = quantile(M_l$logFC,na.rm = T)
       }
+      
+      p = p + 
+        geom_point() +
+        facet_grid(Normalisation ~ Correction)
+      p
+   
     },height = plot_height)
   
     plotOutput('MA_plot',height = plot_height)
   })
     
-  
-  multi_precision_function = function(data,norm){
-    #data = E_fit() 
-    Rfit2 = data$E
-    Sfit2 = data$S
-    Mfit2 = data$M
-    Nfit2 = data$N
+   
+  multi_precision_function = function(data,norm,table){
+    data = E_fit() 
+    Rfit2 = data$E[[table]]
+    Sfit2 = data$S[[table]]
+    Mfit2 = data$M[[table]]
+    Nfit2 = data$N[[table]]
+    
+    #df = multi_collate_fit_function(data,norm,table)
+    
     Raw_P <- cbind(log2(Rfit2$sigma^2), Rfit2$Amean)
     colnames(Raw_P) <- c("Raw_variance", "Raw_A")
     
@@ -3051,17 +3191,17 @@ shinyServer(function(session, input, output) {
     Precision_melt
   }
   
-  precision_data = reactive({
+  precision_data = reactive({withProgress(message = 'precision',{
     if(input$multi_DE == FALSE){
-      E_Precision_melt = multi_precision_function(Rfit()$E,"None")
-      S_Precision_melt = multi_precision_function(Rfit()$S,"Scale")
-      Q_Precision_melt = multi_precision_function(Rfit()$Q,"Quantile")
-      C_Precision_melt = multi_precision_function(Rfit()$C,"Cyclicloess")
+      E_Precision_melt = multi_precision_function(Rfit()$E,"None",'df')
+      S_Precision_melt = multi_precision_function(Rfit()$S,"Scale",'df')
+      Q_Precision_melt = multi_precision_function(Rfit()$Q,"Quantile",'df')
+      C_Precision_melt = multi_precision_function(Rfit()$C,"Cyclicloess",'df')
     }else{
-      E_Precision_melt = multi_precision_function(DE_Rfit()$E,"None")
-      S_Precision_melt = multi_precision_function(DE_Rfit()$S,"Scale")
-      Q_Precision_melt = multi_precision_function(DE_Rfit()$Q,"Quantile")
-      C_Precision_melt = multi_precision_function(DE_Rfit()$C,"Cyclicloess")
+      E_Precision_melt = multi_precision_function(DE_Rfit()$E,"None",'df')
+      S_Precision_melt = multi_precision_function(DE_Rfit()$S,"Scale",'df')
+      Q_Precision_melt = multi_precision_function(DE_Rfit()$Q,"Quantile",'df')
+      C_Precision_melt = multi_precision_function(DE_Rfit()$C,"Cyclicloess",'df')
     }
     
     Precision_melt = rbind(E_Precision_melt) %>% 
@@ -3074,7 +3214,7 @@ shinyServer(function(session, input, output) {
     Precision_melt$Normalisation = factor(Precision_melt$Normalisation, levels = unique(Precision_melt$Normalisation))
     
     Precision_melt
-  })
+  })})
   
   precision_plots = reactive({
 
@@ -3192,7 +3332,7 @@ shinyServer(function(session, input, output) {
   
   
   eBayes_test = reactive({ withProgress(message = 'eBayes',{ 
-    df = data() %>% column_to_rownames('protein')  
+    df = data() %>% column_to_rownames('protein')   
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     

@@ -67,17 +67,18 @@ shinyUI(fluidPage(
         column(3,uiOutput('select_conditions_column_ui')),
         column(6,uiOutput('condition_select_ui')),
         column(3,uiOutput('cont_matrix_comp_ui')),
-        column(8,
-        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)
-               ),
+       
+        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
+ 
         
-        column(8,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")
+        column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
                
-               ),
-
-        ),
-        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')
-               ),
+   
+        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
+        column(4,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+        
+        column(4,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+        column(4,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
       
         column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
@@ -250,16 +251,18 @@ shinyUI(fluidPage(
                  column(3,uiOutput('MA_correction_ui')),
                  column(3,uiOutput('MA_normalisation_ui')),
                  column(3,radioButtons('log_rb_M','log(M)',c(T,F),inline = T)),
-                 column(3,radioButtons('MA_quantile','Limit axes plots to Quantitles',c(T,F))),
-                 column(12,radioButtons('multi_DE','Differential Expression',c(F,T),inline = T)),
+                 #column(3,radioButtons('MA_quantile','Limit axes plots to Quantitles',c(T,F))),
+                 column(3,radioButtons('multi_DE','Differential Expression',c(F,T),inline = T)),
+                 #column(12,radioButtons('multi_top','topTable',c(F,T),inline = T)),
                  #tabsetPanel(
                 #   tabPanel('Single',
+                column(12),
                   tabsetPanel(
                        tabPanel('MA plot',
                           uiOutput('MA_plot_ui')
                        ),
-                       tabPanel('A mean Plot',
-                          uiOutput('Amean_plot_ui')
+                       tabPanel('A Plot',
+                          uiOutput('A_plot_ui')
                        ),
                        tabPanel('M plot',
                           uiOutput('M_plot_ui')
@@ -280,9 +283,7 @@ shinyUI(fluidPage(
       
                  #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
                  
-                 column(4,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
-                 column(4,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
-                 column(4,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
+                 
                  column(12,tabsetPanel(
                    tabPanel('eBayes',
                             uiOutput('cont_matrix_text_ui'),
