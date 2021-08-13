@@ -3141,7 +3141,7 @@ shinyServer(function(session, input, output) {
     
    
   multi_precision_function = function(data,norm,table){
-    data = E_fit() 
+    #data = E_fit() 
     Rfit2 = data$E[[table]]
     Sfit2 = data$S[[table]]
     Mfit2 = data$M[[table]]
