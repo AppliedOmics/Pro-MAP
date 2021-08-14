@@ -130,12 +130,22 @@ shinyServer(function(session, input, output) {
     values$collapse_boxplots = collapse_boxplots
     values$heatmap_order = heatmap_order
     values$min_corr = min_corr
+    values$volcano_type = volcano_type
     print('readme_markdown_ui')
     includeMarkdown("Instructions.md")
   })
   
   
   ##### Default Values ######
+  
+  observeEvent(values$app_version,{
+    if(values$app_version == 'pro'){
+      showTab('main','all')
+    }else{
+      hideTab('main','all')
+    }
+  })
+  
   output$header_version = renderUI({
     do.call(tagList,header_UI(values$app_version))
   })
@@ -219,7 +229,16 @@ shinyServer(function(session, input, output) {
     values$min_corr = input$min_corr
   })
 
+  
+  output$volcano_type_ui = renderUI({
+    if(values$app_version == 'pro'){
+      radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T)
+    }
+  })
 
+  observeEvent(input$volcano_type,{
+    values$volcano_type = input$volcano_type
+  })
     
   #### Inputs Options #####
     ##### _Select Datasets #####
@@ -1453,6 +1472,10 @@ shinyServer(function(session, input, output) {
   
     })
     
+    ### Pipeline #####
+    output$pipeline_ui = renderUI({
+      do.call(tagList,Pipeline_UI(values))
+    })
     
     #----------------------------Visualization of Raw data---------------------------------------------
     
@@ -1814,6 +1837,20 @@ shinyServer(function(session, input, output) {
       
     })
     
+    output[['RAW-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
+      df = RAW_df()  
+      spots = spots()
+      targets = targets()
+      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      
+      id = 'RAW'
+      name = 'triplicate_CV'
+      
+      CV_Server(id,name,plot_list)
+      
+      do.call(tagList,CV_UI(id,name,values))
+    })})
+    
     output$Raw_tabs_ui = renderUI({ 
       do.call(tagList,PlotTabs_UI(id = "RAW",values))
     })
@@ -1924,6 +1961,20 @@ shinyServer(function(session, input, output) {
       
     })
     
+    output[['RAW_filter-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
+      df = E_filter_df()  
+      spots = spots()
+      targets = targets()
+      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      
+      id = 'RAW_filter'
+      name = 'triplicate_CV'
+      
+      CV_Server(id,name,plot_list)
+      
+      do.call(tagList,CV_UI(id,name,values))
+    })})
+    
     output$Raw_filter_tabs_ui = renderUI({ 
       do.call(tagList,PlotTabs_UI(id = "RAW_filter",values))
     })
@@ -2022,6 +2073,20 @@ shinyServer(function(session, input, output) {
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
+    
+    output[['RAW_corr-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
+      df = E_corr_df()  
+      spots = spots()
+      targets = targets()
+      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      
+      id = 'RAW_corr'
+      name = 'triplicate_CV'
+      
+      CV_Server(id,name,plot_list)
+      
+      do.call(tagList,CV_UI(id,name,values))
+    })})
     
     output$Raw_corr_tabs_ui = renderUI({ 
       do.call(tagList,PlotTabs_UI(id = "RAW_corr",values))
@@ -2154,6 +2219,20 @@ shinyServer(function(session, input, output) {
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
+    
+    output[['RAW_norm-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
+      df = E_norm()  
+      spots = spots()
+      targets = targets()
+      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      
+      id = 'RAW_norm'
+      name = 'triplicate_CV'
+      
+      CV_Server(id,name,plot_list)
+      
+      do.call(tagList,CV_UI(id,name,values))
+    })})
     
     output$Raw_norm_tabs_ui = renderUI({ 
       do.call(tagList,PlotTabs_UI(id = "RAW_norm",values))
@@ -3578,8 +3657,8 @@ shinyServer(function(session, input, output) {
   
   volcano_plot_function = function(sig_df,input){
     plot_height = 600
-    type = input$volcano_type
-    if(input$volcano_type == 'gg plotly'){
+    type = values$volcano_type
+    if(values$volcano_type == 'gg plotly'){
       type = 'ggplot'
     }
     
@@ -3629,9 +3708,9 @@ shinyServer(function(session, input, output) {
     result_list = volcano_plot_function(sig_df,input)
     id = 'eBayes'
     
-    name = paste('volcano',input$volcano_type,sep ='_')
-    volcano_plot_Server(id,name,result_list$p,input$volcano_type,result_list$plot_height)
-    if(input$volcano_type == 'gg plotly'){
+    name = paste('volcano',values$volcano_type,sep ='_')
+    volcano_plot_Server(id,name,result_list$p,values$volcano_type,result_list$plot_height)
+    if(values$volcano_type == 'gg plotly'){
       plotly_UI(id,name)
     }else{
       plot_UI(id,name,NULL,result_list$plot_height)

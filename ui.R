@@ -202,50 +202,51 @@ shinyUI(fluidPage(
 
         #### Pipeline ####
         tabPanel(title = tags$h5('Pre-Processing Pipeline'),value = 'pipeline',
-            tabsetPanel(
-        
-              tabPanel('Raw Data',
-                       uiOutput('Raw_tabs_ui')
-                       ),
-              
-              tabPanel('Spot Filtering',
-                       uiOutput('Raw_filter_tabs_ui')),
-              
-              tabPanel('Background Correction',
-                       uiOutput('Raw_corr_tabs_ui'),
-              ),
-  
-              tabPanel('Normalisation',
-                       uiOutput('Raw_norm_tabs_ui')
-              ),
-              tabPanel('Array Weights',
-                      
-                       column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
-                       column(1),
-                       column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
-                       column(1),
-                       column(2,downloadButton('download_arrayw',"Download")),
-                       column(12,DT::dataTableOutput('arrayw_table')),
-                       
-                       column(12,uiOutput('arrayw_barplot_ui'))
-                     
-                       ),
-              tabPanel('Final Data',
-                       uiOutput('Data_tabs_ui')
-                       
-    
-              ),
-              tabPanel('Optimal Cutpoints',
-                       tags$h5('Calculates optimal cutpoints, as a minimum value set for specificity'),
-                       uiOutput('threshold_control_col_ui'),
-                     
-                       uiOutput('threshold_ui'),
-                       #tags$h6('3'),
-                       uiOutput('threshold_output_ui'),
-                       #tags$h6('4'),
-                       uiOutput('threshold_Heatmap_ui')
-                       )
-            )
+            uiOutput('pipeline_ui')
+            # tabsetPanel(
+            # 
+            #   tabPanel('Raw Data',
+            #            uiOutput('Raw_tabs_ui')
+            #            ),
+            #   
+            #   tabPanel('Spot Filtering',
+            #            uiOutput('Raw_filter_tabs_ui')),
+            #   
+            #   tabPanel('Background Correction',
+            #            uiOutput('Raw_corr_tabs_ui'),
+            #   ),
+            # 
+            #   tabPanel('Normalisation',
+            #            uiOutput('Raw_norm_tabs_ui')
+            #   ),
+            #   tabPanel('Array Weights',
+            #           
+            #            column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
+            #            column(1),
+            #            column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
+            #            column(1),
+            #            column(2,downloadButton('download_arrayw',"Download")),
+            #            column(12,DT::dataTableOutput('arrayw_table')),
+            #            
+            #            column(12,uiOutput('arrayw_barplot_ui'))
+            #          
+            #            ),
+            #   tabPanel('Final Data',
+            #            uiOutput('Data_tabs_ui')
+            #            
+            # 
+            #   ),
+            #   tabPanel('Optimal Cutpoints',
+            #            tags$h5('Calculates optimal cutpoints, as a minimum value set for specificity'),
+            #            uiOutput('threshold_control_col_ui'),
+            #          
+            #            uiOutput('threshold_ui'),
+            #            #tags$h6('3'),
+            #            uiOutput('threshold_output_ui'),
+            #            #tags$h6('4'),
+            #            uiOutput('threshold_Heatmap_ui')
+            #            )
+            # )
         ),
         
         ### ALL METHODS PLOTS ####
@@ -298,7 +299,8 @@ shinyUI(fluidPage(
                               tabPanel('Plots',
                                        tabsetPanel(
                                          tabPanel('Volcano Plots',
-                                                  radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
+                                                  uiOutput('volcano_type_ui'),
+                                                  #radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
                                                   uiOutput('volcano_plot_ui')
                                          ),
                                          tabPanel('MA plot',

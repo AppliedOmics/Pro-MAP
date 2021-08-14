@@ -56,6 +56,7 @@ plot_lim = 'None'
 collapse_boxplots = F
 heatmap_order = 'Cluster'
 min_corr = F
+volcano_type = 'EnhancedVolcano'
 
 ##### Files #####
 
