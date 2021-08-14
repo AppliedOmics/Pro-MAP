@@ -26,7 +26,8 @@ source('shiny_functions.R')
 
 #### options #####
 
-options(DT.options = list(pageLength = 25))
+options(DT.options = list(pageLength = 25),
+				datatable.options = list(rownames= FALSE))
 
 
 
@@ -67,7 +68,7 @@ if(node == 'WoW.local'){
 	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/Hazel/Data/HCW data files_06072021_HRM/'
 }
 
-paper_data_list = list(
+pro_data_list = list(
 	
 	'TR cohort' = 'www/TR cohort/',
 	'GSH cohort' = 'www/GSH Cohort/',
@@ -79,11 +80,12 @@ paper_data_list = list(
 	'EUR cohort shors' = 'www/EUR cohort shorts/'
 )
 
-if(app_version == 'basic'){
-	paper_data_list = paper_data_list[c('TR cohort','GSH cohort','JHB cohort')]
-}
 
-selected_dataset = 'www/TR Cohort/'
+basic_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort')]
+
+
+pro_dataset = 'www/TR Cohort/'
+basic_dataset = 'www/TR Cohort/'
 
 
 

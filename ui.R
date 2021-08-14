@@ -142,41 +142,32 @@ shinyUI(fluidPage(
           tabPanel(title = tags$h5('Data Tables'),value = 'data',
                    tabsetPanel(
                      tabPanel('ForeGround',
-                              tabsetPanel(selected = 'Plot',
-                                          tabPanel('Table',
+                              tabsetPanel(
+                                          tabPanel('Data Table',
                                                    uiOutput('foreground_table_ui'),
                                                    #DT::dataTableOutput('foreground_table')
                                           ),
-                                          tabPanel('Plot',
-                                                   tabsetPanel(
-                                                     tabPanel('Heatmap',
-                                                              uiOutput('foreground_heatmap_ui')
-                                                     ),
-                                                     tabPanel('CV',
-                                                              uiOutput('foreground_triplicate_cv_plot_ui')
-                                                     )
-                                                   )
-                                                   
-                                          )
+                                         tabPanel('CV',
+                                                  uiOutput('foreground_triplicate_cv_plot_ui')
+                                         ),
+                                         tabPanel('Heatmap',
+                                                  uiOutput('foreground_heatmap_ui')
+                                         )
                               )
                               
                               
                      ),
                      tabPanel('BackGround',
-                              tabsetPanel(selected = 'Plot',
+                              tabsetPanel(
                                           tabPanel('Table',
                                                    uiOutput('background_table_ui')
                                           ),
-                                          tabPanel('Plot',
-                                                   tabsetPanel(
-                                                     tabPanel("HeatMap",
-                                                              uiOutput('background_heatmap_ui')
-                                                     ),
-                                                     tabPanel('CV',
-                                                              uiOutput('background_triplicate_cv_plot_ui')
-                                                     )
-                                                   )
-                                                   
+                                          tabPanel('CV',
+                                                   uiOutput('background_triplicate_cv_plot_ui')
+                                          ),
+                                       
+                                          tabPanel("HeatMap",
+                                                   uiOutput('background_heatmap_ui')
                                           )
                               )
                      ),

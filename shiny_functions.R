@@ -169,12 +169,12 @@ plotly_Server <- function(id,name,p) {
 }
 
 
-table_UI = function(id,name){
+table_UI = function(id,name,title = NULL){
 	ns <- NS(id)
 	list(
-		column(11),
+		column(11,tags$h4(title)),
 		column(1,downloadButton(ns(paste0(name,'_downloadData')), 'csv')),
-		column(12,DT::dataTableOutput(ns(name)))
+		column(12,DT::dataTableOutput(ns(paste0(name,'_table'))))
 	)
 }
 
@@ -183,9 +183,9 @@ table_Server <- function(id,name,df) {
 		id,
 		function(input, output, session) {
 			
-			output[[name]] = DT::renderDataTable({
+			output[[paste0(name,'_table')]] = DT::renderDataTable({
 				df
-			})
+			},rownames = FALSE)
 			
 			output[[paste0(name,'_downloadData')]] <- downloadHandler(
 				filename = function() {
@@ -225,7 +225,44 @@ PlotTabs_UI <- function(id) {
 
 ### Pro UI ###
 
+CV_Server = function(id,name,plot_list){
+	table_Server(id,name,plot_list$df_list$df_cv)
+	table_Server(id,'triplicate_CV_mean',plot_list$df_list$df_cv_mean)
+	plot_Server(id,'triplicate_CV',plot_list$p)
+	plot_Server(id,'triplicate_CV_density',plot_list$d)
+	plot_Server(id,'triplicate_diff',plot_list$b)
+}
 
+CV_UI = function(id,name,values){
+	if(values$app_version == 'pro'){
+		lst = list(tabsetPanel(
+			tabPanel('Data Tables',
+							 table_UI(id,paste0(name,'_mean'),"Summary of triplicate CV's"),
+							 table_UI(id,name,'Triplicate spot statistics'),
+							 ),
+			tabPanel('Plots',
+							 plot_UI(id,name,"Boxplots of CV's for probe replicates"),
+							 plot_UI(id,paste0(name,'_density'),"Density plot of CV's for probe replicates"),
+							 plot_UI(id,'triplicate_diff','Boxplot of the absolute difference between probe replicate means and medians') 
+			)
+		
+		))
+	}else{
+		lst = list(tabsetPanel(
+			tabPanel('Data Tables',
+							 table_UI(id,paste0(name,'_mean'),"Summary of triplicate CV's"),
+							 table_UI(id,name,'Triplicate spot statistics'),
+			),
+			tabPanel('Plots',
+							 plot_UI(id,name,"Boxplots of CV's for probe replicates"),
+							 plot_UI(id,paste0(name,'_density'),"Density plot of CV's for probe replicates") 
+			)
+			
+		))
+	}
+				 
+	lst
+}
 
 
 

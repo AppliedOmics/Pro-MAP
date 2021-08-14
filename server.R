@@ -226,9 +226,18 @@ shinyServer(function(session, input, output) {
     
     output$select_datasets_ui = renderUI({
       if(is.null(input$gpr_files$datapath)){
-        selectInput('dataset','Dataset',paper_data_list,selected_dataset)
+        if(values$app_version == 'pro'){
+          selectInput('dataset','Dataset',pro_data_list,pro_dataset)
+        }else{
+          selectInput('dataset','Dataset',basic_data_list,basic_dataset)
+        }
       }else{
-        selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
+        if(values$app_version == 'pro'){
+          selectInput('dataset','Dataset',pro_data_list,'Upload')
+        }else{
+          selectInput('dataset','Dataset',basic_data_list,'Upload')
+        }
+        #selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }
       
     })
@@ -458,7 +467,7 @@ shinyServer(function(session, input, output) {
         summarise(FileNames = paste(File_name,collapse = ' ,')) %>% 
         ungroup()
       df_g
-    })
+    },rownames = FALSE)
     
     output$test_files_text_2 = renderPrint({
       df = test_files()$file_df 
@@ -729,7 +738,7 @@ shinyServer(function(session, input, output) {
     output$target_upload_error_ui = renderUI({
       if(!is.null(targets_upload()$error)){
         output$target_upload_error_text = renderPrint(cat(targets_upload()$error))
-        output$target_upload_df = DT::renderDataTable(targets_upload()$df_upload)
+        output$target_upload_df = DT::renderDataTable(targets_upload()$df_upload,rownames = FALSE)
         
         lst = list(span(tags$h4(htmlOutput('target_upload_error_text')), style="color:red"),
                    tags$h2('Uploaded Targets Table'),
@@ -770,7 +779,7 @@ shinyServer(function(session, input, output) {
  
       values$targets = 'hit'
       selected_targets()
-    })
+    },rownames = FALSE)
     
     output$download_targets <- downloadHandler(
       filename = function(){"targets.txt"}, 
@@ -837,7 +846,7 @@ shinyServer(function(session, input, output) {
     
     
     spot_upload = reactive({  withProgress(message = 'Upload Spots',{
-      req(spot_names())
+      req(spot_names()) 
       input$reset_spots
       input$dataset
       input$gpr_files
@@ -887,7 +896,7 @@ shinyServer(function(session, input, output) {
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
-      control = df$spot[df$Category == 'remove' | df$spot == 'EMPTY']
+      control = df$spot[df$Category == 'removed probe' | df$spot == 'EMPTY']
       selectInput('select_remove','Probes to Remove before Normalisation',proteins,control,multiple = T, width = 1200)
     })
     
@@ -899,7 +908,7 @@ shinyServer(function(session, input, output) {
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
-      control = df$spot[df$Category == 'control']
+      control = df$spot[df$Category == 'control probe']
       selectInput('select_control_spot','Control Probes (labelled by not removed)',proteins,control,multiple = T, width = 1200)
     })
     
@@ -929,7 +938,7 @@ shinyServer(function(session, input, output) {
       
       values$probes = 'hit'
       spots()
-    })
+    },rownames = FALSE)
     
  
     
@@ -1060,7 +1069,7 @@ shinyServer(function(session, input, output) {
       }
       values$proteins = 'hit'
       proteins() 
-    })
+    },rownames = FALSE)
     
     output$download_proteins <- downloadHandler(
       filename = function(){"proteins.txt"}, 
@@ -1238,15 +1247,22 @@ shinyServer(function(session, input, output) {
         mutate(CV = 100*(sd/mean),
                diff_mm = abs(mean-median)) 
         
-
+      df_cv_mean = df_cv %>% 
+        group_by(spot) %>% 
+          summarise(mean = mean(CV,na.rm = T),
+                    median = median(CV,na.rm = T),
+                    max = max(CV,na.rm = T),
+                    min = min(CV,na.rm = T)) %>% 
+        ungroup()
       
-      df_cv
+      list(df_cv = df_cv, df_cv_mean = df_cv_mean)
    
     }
     
     triplicate_cv_plot_function = function(df,spots,targets){withProgress(message = 'Calculating CV',{
       #df = foreground_table() 
-      df_cv = triplicate_CV_function(df)
+      df_list = triplicate_CV_function(df)
+      df_cv = df_list$df_cv
       if('Name' %in% colnames(spots)){
         spots = spots %>% 
           dplyr::select(-Name)
@@ -1260,12 +1276,14 @@ shinyServer(function(session, input, output) {
       q = quantile(df_cv$CV,na.rm=T)
       q
       if(values$collapse_boxplots == F){
-        p = ggplot(df_cv,aes(x = Name,y = CV, fill = Category, col = Condition)) +
-          geom_boxplot()
+        p = ggplot(df_cv,aes(x = Name,y = CV, col = Condition)) 
       }else{
-        p = ggplot(df_cv,aes(x = Condition,y = CV, fill = Category, col = Condition)) +
-          geom_boxplot()
+        p = ggplot(df_cv,aes(x = Condition,y = CV, col = Condition))
       }
+      
+      p = p + 
+        geom_boxplot() + 
+        facet_grid(Category ~ ., scales = 'free_y')
       if(values$plot_lim == 'Quantile'){
        p = p +  ylim(q[2],q[4])
       }
@@ -1305,26 +1323,21 @@ shinyServer(function(session, input, output) {
       b = gg_col_function(b)
       b
     })
-      list(p = p, d = d, b = b)
+      list(df_list = df_list,p = p, d = d, b = b)
     }
     
     output$foreground_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
-      df = foreground_table()
+      df = foreground_table()  
       spots = spots()
       targets = targets()
       plot_list = triplicate_cv_plot_function(df,spots(),targets())
-      plot_list$p
+    
       id = 'foreground'
       name = 'triplicate_CV'
-      plot_Server(id,'triplicate_CV',plot_list$p)
-      plot_Server(id,'triplicate_CV_density',plot_list$d)
-      plot_Server(id,'triplicate_diff',plot_list$b)
       
-      lst = list(plot_UI(id,'triplicate_CV',"Boxplots of CV's for probe replicates"),
-                 plot_UI(id,'triplicate_CV_density',"Density plot of CV's for probe replicates"),
-                 plot_UI(id,'triplicate_diff','Boxplot of the absolute difference between probe replicate means and medians'))
-      lst
-      do.call(tagList,lst)
+      CV_Server(id,name,plot_list)
+
+      do.call(tagList,CV_UI(id,name,values))
     })})
   
     background_table = reactive({
@@ -1357,23 +1370,37 @@ shinyServer(function(session, input, output) {
     })
     
     output$background_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
-      df = background_table()
+      df = background_table()  
       spots = spots()
       targets = targets()
       plot_list = triplicate_cv_plot_function(df,spots(),targets())
-      plot_list$p
+      
       id = 'background'
       name = 'triplicate_CV'
-      plot_Server(id,'triplicate_CV',plot_list$p)
-      plot_Server(id,'triplicate_CV_density',plot_list$d)
-      plot_Server(id,'triplicate_diff',plot_list$b)
       
-      lst = list(plot_UI(id,'triplicate_CV',"Boxplots of CV's for probe replicates"),
-                 plot_UI(id,'triplicate_CV_density',"Density plot of CV's for probe replicates"),
-                 plot_UI(id,'triplicate_diff','Boxplot of the absolute difference between probe replicate means and medians'))
-      lst
-      do.call(tagList,lst)
+      CV_Server(id,name,plot_list)
+      
+      do.call(tagList,CV_UI(id,name,values))
     })})
+    
+    # output$background_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
+    #   df = background_table()
+    #   spots = spots()
+    #   targets = targets()
+    #   plot_list = triplicate_cv_plot_function(df,spots(),targets())
+    #   plot_list$p
+    #   id = 'background'
+    #   name = 'triplicate_CV'
+    #   plot_Server(id,'triplicate_CV',plot_list$p)
+    #   plot_Server(id,'triplicate_CV_density',plot_list$d)
+    #   plot_Server(id,'triplicate_diff',plot_list$b)
+    #   
+    #   lst = list(plot_UI(id,'triplicate_CV',"Boxplots of CV's for probe replicates"),
+    #              plot_UI(id,'triplicate_CV_density',"Density plot of CV's for probe replicates"),
+    #              plot_UI(id,'triplicate_diff','Boxplot of the absolute difference between probe replicate means and medians'))
+    #   lst
+    #   do.call(tagList,lst)
+    # })})
 
     spot_filtering_E = reactive({
       df = E()$weights %>%  
@@ -1723,7 +1750,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW-table']] = DT::renderDataTable({
       RAW_df()
-    })
+    },rownames = FALSE)
     
     output[['RAW-CV_plot_ui']] = renderUI({  
       df = RAW_df()
@@ -1840,7 +1867,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-table']] = DT::renderDataTable({
       E_filter_df()
-    })
+    },rownames = FALSE)
     
     output[['RAW_filter-CV_plot_ui']] = renderUI({     
       df = E_filter_df() 
@@ -1939,7 +1966,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-table']] = DT::renderDataTable({
       E_corr_df()
-    })
+    },rownames = FALSE)
     
     output[['RAW_corr-CV_plot_ui']] = renderUI({     
       df = E_corr_df() 
@@ -2049,7 +2076,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-table']] = DT::renderDataTable({
         E_norm()
-    })
+    },rownames = FALSE)
     
     #----------------------------Visualization of Normalized data---------------------------------------------
     
@@ -2152,7 +2179,7 @@ shinyServer(function(session, input, output) {
     
     output$arrayw_table = DT::renderDataTable({
        arrayw_df()
-    })
+    },rownames = FALSE)
     
     output$download_arrayw <- downloadHandler(
         filename = function(){"arrayw.txt"}, 
@@ -2388,7 +2415,7 @@ shinyServer(function(session, input, output) {
     
     output$data_table = DT::renderDataTable({
         data()
-    })
+    },rownames = FALSE)
     
     output$download_data <- downloadHandler(
         filename = function(){"data.txt"}, 
@@ -2555,7 +2582,7 @@ shinyServer(function(session, input, output) {
       }else{
         output$threshold_G_df = DT::renderDataTable({
           threshold_df
-        })
+        },rownames = FALSE)
         lst = list(DT::dataTableOutput('threshold_G_df'))
       }
       do.call(tagList,lst)
@@ -2593,7 +2620,7 @@ shinyServer(function(session, input, output) {
       if(!is.null(threshold())){
         output$threshold_output_df = DT::renderDataTable({
           threshold_data() 
-        })
+        },rownames = FALSE)
         lst = list(column(12,
                           column(10,tags$h2('Data above threshold')),
                           column(2,downloadButton('download_threshold_MSnSet',"MSnSet")),
@@ -3476,7 +3503,7 @@ shinyServer(function(session, input, output) {
   
   output$eBays_table = DT::renderDataTable({
     eBayes_test()$df
-  })
+  },rownames = FALSE)
   
   eBayes_sig_data = reactive({ 
     sig_df = eBayes_test()$df %>%  
