@@ -50,12 +50,22 @@ shinyUI(fluidPage(
           selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
                                                  'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
           radioButtons('gg_grey','Grey Scale',c(FALSE,TRUE),inline = T),
-          selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2'),
-          radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T),
-          radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
-          radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
-          radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
-          radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)#,
+          selectInput('r_col','Colour Palettes',c('scale_color_grey',rownames(brewer.pal.info)),'Dark2')
+          ),
+        tags$hr(),
+        uiOutput('pro_heading_ui'),
+        #span(tags$h3('Pro Settings'),style="color:#6b8eb7"),
+        column(12,
+          uiOutput('app_version_ui'),
+          uiOutput('sep_categories_ui'),
+          uiOutput('collapse_boxplots_ui'),
+          uiOutput('plot_lim_ui'),
+          #radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T),
+          #radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
+          
+          uiOutput('heatmap_order_ui')#,
+          
+          #uiOutput('min_corr'),
           #radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
           )
           )

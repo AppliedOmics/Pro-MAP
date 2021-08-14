@@ -1,3 +1,5 @@
+#names(outputOptions(output))
+
 counterButton <- function(id, label = "Counter") {
 	ns <- NS(id)
 	tagList(
@@ -220,6 +222,8 @@ PlotTabs_UI <- function(id) {
 			))
 	)
 }
+
+### Pro UI ###
 
 
 

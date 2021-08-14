@@ -31,13 +31,13 @@ options(DT.options = list(pageLength = 25))
 
 
 #### Version #####
-app_version = 'full'
+app_version = 'pro'
 (node = Sys.info()["nodename"])
 if(grepl('metaomics',node)){
-	app_version = 'public'
+	app_version = 'basic'
 }
 
-app_version = 'public'
+#app_version = 'basic'
 
 
 #### Defaults #####
@@ -75,9 +75,11 @@ paper_data_list = list(
 	'EUR cohort shors' = 'www/EUR cohort shorts/'
 )
 
-if(app_version == 'public'){
+if(app_version == 'basic'){
 	paper_data_list = paper_data_list[c('TR cohort','GSH cohort','JHB cohort')]
 }
+
+selected_dataset = 'www/TR Cohort/'
 
 
 

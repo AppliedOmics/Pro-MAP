@@ -124,6 +124,7 @@ shinyServer(function(session, input, output) {
   output$instructions_markdown_ui = renderUI({
     #hideTab('main','Plots')
     #hideTab('main','Data')
+    values$app_version = app_version
     values$sep_categories = sep_categories
     values$plot_lim = plot_lim
     values$collapse_boxplots = collapse_boxplots
@@ -136,26 +137,84 @@ shinyServer(function(session, input, output) {
   
   ##### Default Values ######
   
-  observeInput(input$sep_categories,{
-    values$sep_categories = input$sep_categories
+  output$pro_heading_ui = renderUI({
+    if(app_version == 'pro'){
+      span(tags$h3('Pro Settings'),style="color:#6b8eb7")
+    }
   })
   
-  observeInput(input$plot_lim,{
+  
+  output$app_version_ui = renderUI({
+    if(app_version == 'pro'){
+      radioButtons('app_version','App Version',c('basic','pro'),app_version,inline = T)
+    }
+  })
+  
+  observeEvent(input$app_version,{
+    values$app_version = input$app_version
+  })
+  
+  # output$sep_categories_ui = renderUI({
+  #   if(values$app_version == 'pro'){
+  #     radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T)
+  #   }
+  # })
+  # 
+  # observeEvent(input$sep_categories,{
+  #   values$sep_categories = input$sep_categories
+  # })
+  
+  
+  output$sep_categories_ui = renderUI({ 
+    if(values$app_version == 'pro'){
+      radioButtons('sep_categories','Separate plots by category',c(F,T),F,inline = T)
+    }
+  })
+  
+  observeEvent(input$sep_categories,{
+    values$sep_categories = input$sep_categories
+  }) 
+  
+  output$plot_lim_ui = renderUI({ 
+    if(values$app_version == 'pro'){
+      radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),'None',inline = T)
+    }
+  })
+  
+  observeEvent(input$plot_lim,{
     values$plot_lim = input$plot_lim
   })
   
-  observeInput(input$collapse_boxplots,{
+  output$collapse_boxplots_ui = renderUI({ 
+    if(values$app_version == 'pro'){
+      radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T)
+    }
+  })
+  
+  observeEvent(input$collapse_boxplots,{
     values$collapse_boxplots = input$collapse_boxplots
   })
   
-  observeInput(input$heatmap_order,{
+  output$heatmap_order_ui = renderUI({ 
+    if(values$app_version == 'pro'){
+      radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T)
+    }
+  })
+  
+  observeEvent(input$heatmap_order,{
     values$heatmap_order = input$heatmap_order
   })
-  
-  observeInput(input$min_corr,{
-    values$min_corr = input$min_corr
+
+  output$heatmap_order_ui = renderUI({ 
+    if(values$app_version == 'pro'){
+      radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)
+    }
   })
   
+  observeEvent(input$min_corr,{
+    values$min_corr = input$min_corr
+  })
+
 
     
   #### Inputs Options #####
@@ -163,7 +222,7 @@ shinyServer(function(session, input, output) {
     
     output$select_datasets_ui = renderUI({
       if(is.null(input$gpr_files$datapath)){
-        selectInput('dataset','Dataset',paper_data_list,'www/GSH Cohort/')
+        selectInput('dataset','Dataset',paper_data_list,selected_dataset)
       }else{
         selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }
@@ -817,10 +876,10 @@ shinyServer(function(session, input, output) {
     })})
     
     output$spot_remove_ui = renderUI({
-      req(spot_upload()) 
-      req(input$reset_spots)
-      req(input$dataset)
-      req(input$gpr_files)
+      #req(spot_upload()) 
+      #req(input$reset_spots)
+      #req(input$dataset)
+      #req(input$gpr_files)
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
@@ -829,10 +888,10 @@ shinyServer(function(session, input, output) {
     })
     
     output$spot_control_ui = renderUI({
-      req(spot_upload())
-      req(input$reset_spots)
-      req(input$dataset)
-      input$gpr_files
+      #req(spot_upload())
+      #req(input$reset_spots)
+      #req(input$dataset)
+      #input$gpr_files
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
@@ -1153,7 +1212,7 @@ shinyServer(function(session, input, output) {
       m = E()$E 
       id = 'foreground'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
     })
@@ -1196,22 +1255,22 @@ shinyServer(function(session, input, output) {
       as.tbl(df_cv)
       q = quantile(df_cv$CV,na.rm=T)
       q
-      if(input$collapse_boxplots == F){
+      if(values$collapse_boxplots == F){
         p = ggplot(df_cv,aes(x = Name,y = CV, fill = Category, col = Condition)) +
           geom_boxplot()
       }else{
         p = ggplot(df_cv,aes(x = Condition,y = CV, fill = Category, col = Condition)) +
           geom_boxplot()
       }
-      if(input$plot_lim == 'Quantile'){
+      if(values$plot_lim == 'Quantile'){
        p = p +  ylim(q[2],q[4])
       }
-      if(input$plot_lim == '2x Quantile'){
+      if(values$plot_lim == '2x Quantile'){
         p = p +  ylim(q[2]/2,q[4]*2)
       }
       p = gg_col_function(p)
       p
-      if(input$collapse_boxplots == F){
+      if(values$collapse_boxplots == F){
         
         d = ggplot(df_cv,aes(x = CV, group = Name,col = Condition)) +
           geom_density() + 
@@ -1224,7 +1283,7 @@ shinyServer(function(session, input, output) {
       d = gg_col_function(d)
       
       bq = quantile(df_cv$diff_mm,na.rm=T)
-      if(input$collapse_boxplots == F){
+      if(values$collapse_boxplots == F){
         b = ggplot(df_cv, aes(x = Name, y = diff_mm, fill = Category, col = Condition)) + 
           geom_boxplot() + 
           ylab('Difference between Mean and Median')
@@ -1233,10 +1292,10 @@ shinyServer(function(session, input, output) {
           geom_boxplot() + 
           ylab('Difference between Mean and Median')
       }
-      if(input$plot_lim == 'Quantile'){
+      if(values$plot_lim == 'Quantile'){
         b = b +  ylim(bq[2],bq[4])
       }
-      if(input$plot_lim == '2x Quantile'){
+      if(values$plot_lim == '2x Quantile'){
         b = b +  ylim(bq[2]/2,bq[4]*2)
       }
       b = gg_col_function(b)
@@ -1287,7 +1346,7 @@ shinyServer(function(session, input, output) {
       m = E()$Eb 
       id = 'backhground'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
 
@@ -1347,7 +1406,7 @@ shinyServer(function(session, input, output) {
         
           id = 'spot_filtering'
           name = 'Hcluster'
-          ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+          ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
           ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
           do.call(tagList,plot_UI(id,name,ht_list$warning))
           
@@ -1386,7 +1445,7 @@ shinyServer(function(session, input, output) {
         filter(Name %in% selected_targets$Name)
       as.tbl(df_l)
       p = ggplot(df_l)
-      if(input$collapse_boxplots == F){
+      if(values$collapse_boxplots == F){
         
         if(length(unique(df_l$Condition)) > 1 ){
           p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, col = Condition))
@@ -1409,11 +1468,11 @@ shinyServer(function(session, input, output) {
       
       p 
     }
-    
+     
     array_boxplot_function_2 = function(data,target_names,spot_names,
                                         targets,selected_targets,
                                         spots,
-                                        log_rb,input){
+                                        log_rb,input,values){
       df = data.frame(data)
       #if(log_rb == TRUE){
       #  df = log2(df)
@@ -1435,7 +1494,7 @@ shinyServer(function(session, input, output) {
         filter(Name %in% selected_targets$Name) 
       as.tbl(df_l)
       p = ggplot(df_l)
-      if(input$collapse_boxplots == F){
+      if(values$collapse_boxplots == F){
         #p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, fill = Condition, col = Category))
         
         if(length(unique(df_l$Condition)) > 1 ){
@@ -1458,7 +1517,7 @@ shinyServer(function(session, input, output) {
       #  p = p + facet_grid(Category ~ ., scales = 'free')
       #}
       plot_height = 400
-      if(input$sep_categories == TRUE){
+      if(values$sep_categories == TRUE){
         if(length(unique(df_l$Category)) > 1){
           p = p + facet_grid(Category ~ ., scales = 'free')
           plot_height = 300 * length(unique(df_l$Category))
@@ -1567,7 +1626,7 @@ shinyServer(function(session, input, output) {
     }
     
     log_min_function = function(m,input){
-      if(input$min_corr == TRUE){
+      if(values$min_corr == TRUE){
         m[m < 1] = 1
       }
       if(input$log_rb == TRUE){
@@ -1577,7 +1636,7 @@ shinyServer(function(session, input, output) {
     }
     
     neg_corr_function = function(m,input){
-      if(input$min_corr == TRUE){
+      if(values$min_corr == TRUE){
         m[is.na(m)] = 0
         m[is.infinite(m)] = 0 
         m[m < 0] = 0
@@ -1637,7 +1696,7 @@ shinyServer(function(session, input, output) {
                                    target_names(),spot_names(),
                                    target_conditions(),selected_targets(),
                                    spots(),
-                                   log_rb,input)
+                                   log_rb,input,values)
       p
       id = 'RAW'
       name = 'boxplot'
@@ -1716,7 +1775,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       
 
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width) 
       #title = paste('removed ',paste(ht_list$removed,collapse = ' and '), 'values')
@@ -1755,7 +1814,9 @@ shinyServer(function(session, input, output) {
       
       data = E_filter()
       log_rb = FALSE
-      result_list = array_boxplot_function_2(data,target_names(),spot_names(),target_conditions(),selected_targets(),spots(),log_rb,input)
+      result_list = array_boxplot_function_2(data,
+                                             target_names(),spot_names(),target_conditions(),selected_targets(),spots(),
+                                             log_rb,input,values)
       
       id = 'RAW_filter'
       name = 'boxplot'
@@ -1825,7 +1886,7 @@ shinyServer(function(session, input, output) {
       
       id = 'RAW_filter'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -1852,7 +1913,9 @@ shinyServer(function(session, input, output) {
       
       data = E_corr()$E   
       log_rb = FALSE
-      result_list = array_boxplot_function_2(data,target_names(),spot_names(),target_conditions(),selected_targets(),spots(),log_rb,input)
+      result_list = array_boxplot_function_2(data,
+                                             target_names(),spot_names(),target_conditions(),selected_targets(),spots(),
+                                             log_rb,input,values)
       
       id = 'RAW_corr'
       name = 'boxplot'
@@ -1922,7 +1985,7 @@ shinyServer(function(session, input, output) {
       
       id = 'RAW_corr'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -1993,7 +2056,9 @@ shinyServer(function(session, input, output) {
         dplyr::select(-spot)
       log_rb = input$log_rb
       #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
-      result_list = array_boxplot_function_2(data,target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),log_rb,input)
+      result_list = array_boxplot_function_2(data,
+                                             target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),
+                                             log_rb,input,values)
       
       
       id = 'RAW_norm'
@@ -2052,7 +2117,7 @@ shinyServer(function(session, input, output) {
       
       id = 'RAW_norm'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),E_norm()$spot,input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,targets(),selected_targets(),E_norm()$spot,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2215,7 +2280,7 @@ shinyServer(function(session, input, output) {
     output[['Data-boxplot_ui']] = renderUI({   
       df = data() %>% 
         dplyr::select(-protein)
-      input$collapse_boxplots
+      values$collapse_boxplots
       p = array_boxplot_function(df,colnames(df),rownames(df),target_conditions(),selected_targets(),input$log_rb,input)
       
       id = 'Data'
@@ -2281,7 +2346,7 @@ shinyServer(function(session, input, output) {
       id = 'Data'
       name = 'Hcluster'
 
-      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),data()$protein,input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2601,7 +2666,7 @@ shinyServer(function(session, input, output) {
         
         id = 'Cutoff'
         name = 'Hcluster'
-        ht_list = array_HeatMap_function(m,targets(),samples,features$protein,input$r_col,input$heatmap_order)
+        ht_list = array_HeatMap_function(m,targets(),samples,features$protein,input$r_col,values$heatmap_order)
         ht_list$p
         ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
         do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -3063,10 +3128,10 @@ shinyServer(function(session, input, output) {
           theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
           facet_grid(Normalisation ~ .)
 
-          if(input$plot_lim == 'Quantile'){
+          if(values$plot_lim == 'Quantile'){
             p = p +  ylim(q[2],q[4])
           }
-          if(input$plot_lim == '2x Quantile'){
+          if(values$plot_lim == '2x Quantile'){
             p = p +  ylim(q[2]/2,q[4]*2)
           }
 
@@ -3104,10 +3169,10 @@ shinyServer(function(session, input, output) {
         theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") +
         facet_grid(Normalisation ~ .)
       
-      if(input$plot_lim == 'Quantile'){
+      if(values$plot_lim == 'Quantile'){
         p = p +  ylim(q[2],q[4])
       }
-      if(input$plot_lim == '2x Quantile'){
+      if(values$plot_lim == '2x Quantile'){
         p = p +  ylim(q[2]/2,q[4]*2)
       }
       
@@ -3453,7 +3518,7 @@ shinyServer(function(session, input, output) {
     }else{
       id = 'EBayes'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
+      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
