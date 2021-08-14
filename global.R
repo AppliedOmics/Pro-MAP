@@ -57,6 +57,12 @@ collapse_boxplots = F
 heatmap_order = 'Cluster'
 min_corr = F
 volcano_type = 'EnhancedVolcano'
+drop_by_weight = FALSE
+log_rb_default = TRUE
+array_weight_threshold = 0.5
+pvalue_select = 0.05
+mtc = 'BH'
+fc_cutoff = 1.5
 
 ##### Files #####
 
@@ -81,8 +87,11 @@ pro_data_list = list(
 	'EUR cohort shors' = 'www/EUR cohort shorts/'
 )
 
+if(!node == 'WoW.local'){
+	pro_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort')]
+}
 
-basic_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort')]
+basic_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort')]
 
 
 pro_dataset = 'www/TR Cohort/'

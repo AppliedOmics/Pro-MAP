@@ -302,7 +302,7 @@ Pipeline_UI = function(values){
 								 
 								 column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
 								 column(1),
-								 column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
+								 column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),drop_by_weight,inline = T)),
 								 column(1),
 								 column(2,downloadButton('download_arrayw',"Download")),
 								 column(12,DT::dataTableOutput('arrayw_table')),
@@ -364,6 +364,33 @@ Pipeline_UI = function(values){
 	}
 }
 
-
+Main_header_UI = function(values){
+	if(values$app_version == 'pro'){
+		lst = list(
+			column(12,
+						 column(4,uiOutput('select_conditions_column_ui')),
+						 column(4,uiOutput('condition_select_ui'))
+						 
+			),
+			column(12,
+						 column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
+						 column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
+						 column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
+			)
+		)
+	}else{
+		lst = list(
+			column(12,
+						 column(4,uiOutput('select_conditions_column_ui')),
+						 column(4,uiOutput('condition_select_ui'))
+			),
+			column(12,
+						 column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
+						 column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
+			)
+		)
+	}
+	lst
+}
 
 

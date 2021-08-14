@@ -131,6 +131,12 @@ shinyServer(function(session, input, output) {
     values$heatmap_order = heatmap_order
     values$min_corr = min_corr
     values$volcano_type = volcano_type
+    values$log_rb = log_rb_default
+    values$drop_by_weight = drop_by_weight
+    values$array_weight_threshold = array_weight_threshold
+    values$pvalue_select = pvalue_select
+    values$mtc = mtc
+    values$fc_cutoff = fc_cutoff
     print('readme_markdown_ui')
     includeMarkdown("Instructions.md")
   })
@@ -181,7 +187,7 @@ shinyServer(function(session, input, output) {
   
   output$sep_categories_ui = renderUI({ 
     if(values$app_version == 'pro'){
-      radioButtons('sep_categories','Separate plots by category',c(F,T),F,inline = T)
+      radioButtons('sep_categories','Separate plots by category',c(F,T),sep_categories,inline = T)
     }
   })
   
@@ -191,7 +197,7 @@ shinyServer(function(session, input, output) {
   
   output$plot_lim_ui = renderUI({ 
     if(values$app_version == 'pro'){
-      radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),'None',inline = T)
+      radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),plot_lim,inline = T)
     }
   })
   
@@ -201,7 +207,7 @@ shinyServer(function(session, input, output) {
   
   output$collapse_boxplots_ui = renderUI({ 
     if(values$app_version == 'pro'){
-      radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T)
+      radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),collapse_boxplots,inline = T)
     }
   })
   
@@ -211,7 +217,7 @@ shinyServer(function(session, input, output) {
   
   output$heatmap_order_ui = renderUI({ 
     if(values$app_version == 'pro'){
-      radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T)
+      radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),heatmap_order,inline = T)
     }
   })
   
@@ -221,7 +227,7 @@ shinyServer(function(session, input, output) {
 
   output$heatmap_order_ui = renderUI({ 
     if(values$app_version == 'pro'){
-      radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)
+      radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),min_corr,inline = T)
     }
   })
   
@@ -232,12 +238,48 @@ shinyServer(function(session, input, output) {
   
   output$volcano_type_ui = renderUI({
     if(values$app_version == 'pro'){
-      radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T)
+      radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),volcano_type,inline = T)
     }
   })
 
   observeEvent(input$volcano_type,{
     values$volcano_type = input$volcano_type
+  })
+  
+
+  
+  observeEvent(input$log_rb,{
+    values$log_rb = input$log_rb
+  })
+  
+  observeEvent(input$drop_by_weight,{
+    values$drop_by_weight = input$drop_by_weight
+  })
+  
+  observeEvent(input$array_weight_threshold,{
+    values$array_weight_threshold = input$array_weight_threshold
+  })
+  
+
+  
+  observeEvent(input$fc_cutoff,{
+    values$fc_cutoff = input$fc_cutoff
+  })
+  
+  observeEvent(input$mtc,{
+    values$mtc = input$mtc
+  })
+  
+  observeEvent(input$pvalue_select,{
+    values$pvalue_select = input$pvalue_select
+  })
+
+  
+  
+  #### UI objects #####
+  
+  output$main_header_options_ui = renderUI({
+    do.call(tagList,Main_header_UI(values))
   })
     
   #### Inputs Options #####
@@ -1081,7 +1123,11 @@ shinyServer(function(session, input, output) {
     output$proteins_table = DT::renderDataTable({
       showTab('main','pipeline')
       showTab('main','sig')
-      showTab('main','all')
+      if(values$app_version == 'pro'){
+        showTab('main','all')
+      }else{
+        hideTab('main','all')
+      }
       
       if(length(selected_targets()$Condition) >1){
         showTab('main','sig')
@@ -1683,7 +1729,7 @@ shinyServer(function(session, input, output) {
       if(values$min_corr == TRUE){
         m[m < 1] = 1
       }
-      if(input$log_rb == TRUE){
+      if(values$log_rb == TRUE){
         m = log2(m)
       }
       m
@@ -2127,13 +2173,13 @@ shinyServer(function(session, input, output) {
     
     E_norm = reactive({   withProgress(message = 'Normalisation',{
       
-        data = E_corr()$E
+        data = E_corr()$E  
         spot_names = spot_names()
         target_names = target_names()
         removed_spots = removed_spots()
-        log_rb = input$log_rb
+        log_rb = values$log_rb
       
-        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb)
+        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb)
         E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
         E_norm
 
@@ -2150,7 +2196,7 @@ shinyServer(function(session, input, output) {
        
       data = E_norm() %>% 
         dplyr::select(-spot)
-      log_rb = input$log_rb
+      log_rb = values$log_rb
       #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
       result_list = array_boxplot_function_2(data,
                                              target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),
@@ -2285,7 +2331,7 @@ shinyServer(function(session, input, output) {
             p = p + facet_grid(Group ~ .)
           }
            
-            p = p + geom_hline(yintercept = input$array_weight_threshold, linetype = 'dashed')# +
+            p = p + geom_hline(yintercept = values$array_weight_threshold, linetype = 'dashed')# +
             #ggtitle('Weights')
         p = gg_fill_function(p)
         p
@@ -2371,11 +2417,11 @@ shinyServer(function(session, input, output) {
       dim(df)
       keep_weight = arrayw_df() %>% 
         gather() %>% 
-        filter(value >= input$array_weight_threshold) %>% 
+        filter(value >= values$array_weight_threshold) %>% 
         pull(key)
       keep_weight
       
-      if(input$drop_by_weight == TRUE){
+      if(values$drop_by_weight == TRUE){
         df = df %>% 
           dplyr::select(one_of(c('protein',keep_weight)))
       }
@@ -2391,7 +2437,7 @@ shinyServer(function(session, input, output) {
       df = data() %>% 
         dplyr::select(-protein)
       values$collapse_boxplots
-      p = array_boxplot_function(df,colnames(df),rownames(df),target_conditions(),selected_targets(),input$log_rb,input)
+      p = array_boxplot_function(df,colnames(df),rownames(df),target_conditions(),selected_targets(),values$log_rb,input)
       
       id = 'Data'
       name = 'boxplot'
@@ -2859,19 +2905,19 @@ shinyServer(function(session, input, output) {
     spot_names = spot_names()
     target_names = target_names()
     removed_spots = removed_spots()
-    log_rb = input$log_rb
+    log_rb = values$log_rb
     proteins = proteins()
     
     
     method = "none"
-    E = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    E = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
     
     method = "quantile"
-    Q = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    Q = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
     method = "cyclicloess"
-    C = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    C = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
     method = "scale"
-    S = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),input$log_rb,method,proteins(),input)
+    S = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
     
     
     

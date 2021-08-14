@@ -3,19 +3,9 @@ library(shiny)
 
 
 shinyUI(fluidPage(
-
-    #headerPanel(
-    #titlePanel("SPOT-Pro Full")
-    # titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
-    # tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
-    # tags$h6('Mowoe MO., Lennard K., Garnett S., Talbot J., Jonas E., Blackburn J, (',
-    #         tagList(a("doi link - not available yet", href="doi link")),')'),
-    # tags$h6('R script for pipeline available on Github (',
-    #         tagList(a("github link - not available yet", href="github link")),')'),
     uiOutput('header_version'),
     
-    #),
-    #fluidRow(
+ 
         #### sidebarPanel ####
         sidebarPanel(
           fluidRow(
@@ -74,21 +64,18 @@ shinyUI(fluidPage(
         ),
     #### mainPanel ####
     mainPanel(
+      uiOutput('main_header_options_ui'),
         #uiOutput('example_data_text_ui'),
-      column(12,
-        column(4,uiOutput('select_conditions_column_ui')),
-        column(4,uiOutput('condition_select_ui')),
-        column(4,uiOutput('cont_matrix_comp_ui'))
-        ),
-      column(12,
-        column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
- 
-        
-        column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
-               
-   
-        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
-      ),
+      # column(12,
+      #   column(4,uiOutput('select_conditions_column_ui')),
+      #   column(4,uiOutput('condition_select_ui')),
+      #   column(4,uiOutput('cont_matrix_comp_ui'))
+      #   ),
+      # column(12,
+      #   column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
+      #   column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
+      #   column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
+      # ),
         
       
         column(12,tabsetPanel(id = 'main',
@@ -283,11 +270,11 @@ shinyUI(fluidPage(
         
         ### Significance Testing ####
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
-      
+                 column(3,uiOutput('cont_matrix_comp_ui')),
                  #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
-                 column(4,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
-                 column(4,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
-                 column(4,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
+                 column(3,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+                 column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+                 column(3,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
                  
                  column(12,tabsetPanel(
                    tabPanel('eBayes',
