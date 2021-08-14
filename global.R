@@ -64,6 +64,7 @@ pvalue_select = 0.05
 mtc = 'BH'
 fc_cutoff = 1.5
 spot_collapse_digits = FALSE
+cont_matrix_comp = 'All'
 
 ##### Files #####
 
@@ -84,8 +85,8 @@ pro_data_list = list(
 	'PC cohort' = 'www/PC cohort/',
 	#'TR cohort' = 'www/TR cohort/',
 	'COVID HWC' = 'www/HWC',
-	'EUR cohort' = 'www/EUR cohort/',
-	'EUR cohort shors' = 'www/EUR cohort shorts/'
+	#'EUR cohort' = 'www/EUR cohort/',
+	'EUR cohort' = 'www/EUR cohort shorts/'
 )
 
 if(!node == 'WoW.local'){

@@ -64,6 +64,9 @@ Array Weights and the final data table can be downloaded for futher use.
 #	Bugs to fix
 	
 - check annotation column assignment for difference file types. 
+- Expression Set Downloads
+- plots and heatmaps after arrays weight filtering
+- check the requirements on the significance testing table
 
 
 # Additions

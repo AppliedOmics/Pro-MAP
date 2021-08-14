@@ -138,6 +138,7 @@ shinyServer(function(session, input, output) {
     values$mtc = mtc
     values$fc_cutoff = fc_cutoff
     values$spot_collapse_digits = spot_collapse_digits
+    values$cont_matrix_comp = cont_matrix_comp 
     print('readme_markdown_ui')
     includeMarkdown("Instructions.md")
   })
@@ -273,6 +274,10 @@ shinyServer(function(session, input, output) {
   
   observeEvent(input$pvalue_select,{
     values$pvalue_select = input$pvalue_select
+  })
+  
+  observeEvent(input$cont_matrix_comp,{
+    values$cont_matrix_comp = input$cont_matrix_comp
   })
 
   
@@ -1758,7 +1763,7 @@ shinyServer(function(session, input, output) {
       
       conditions = unique(targets$Condition)
       comparison_list = c()
-      if(input$cont_matrix_comp == "All"){
+      if(values$cont_matrix_comp == "All"){
         for(i in c(1:length(conditions))){
           for(j in c(1:length(conditions))){
             
@@ -1771,7 +1776,7 @@ shinyServer(function(session, input, output) {
           }
         }
       }else{
-        control = input$cont_matrix_comp
+        control = values$cont_matrix_comp
         for(j in c(1:length(conditions))){
           comparison = conditions[j]
           if(control != comparison){
@@ -2898,28 +2903,28 @@ shinyServer(function(session, input, output) {
     E_proteins = protein_collapse_function(E_norm,spots(),input)
     E = protein_filter_function(E_proteins,proteins,input)
     
-    E = as.data.frame(E) %>% dplyr::select(-one_of('protein'))
+    E = as.data.frame(E) %>% dplyr::select(-one_of('protein','Category'))
     
     S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
     S_proteins = protein_collapse_function(S_norm,spots(),input)
     S = protein_filter_function(S_proteins,proteins,input)
 
-    S = as.data.frame(S) %>% dplyr::select(-one_of('protein'))
+    S = as.data.frame(S) %>% dplyr::select(-one_of('protein','Category'))
     
     N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
     N_proteins = protein_collapse_function(N_norm,spots(),input)
     N = protein_filter_function(N_proteins,proteins,input)
 
-    N = as.data.frame(N) %>% dplyr::select(-one_of('protein'))
+    N = as.data.frame(N) %>% dplyr::select(-one_of('protein','Category'))
     
     M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
     M_proteins = protein_collapse_function(M_norm,spots(),input)
     M = protein_filter_function(M_proteins,proteins,input)
 
-    M = as.data.frame(M) %>% dplyr::select(-one_of('protein'))
+    M = as.data.frame(M) %>% dplyr::select(-one_of('protein','Category'))
 
     
     list(E = E,
@@ -3028,7 +3033,7 @@ shinyServer(function(session, input, output) {
   }
   
   multi_DE_function = function(norm){
-  
+   
     df = norm$E
     df$protein = data()$protein
     Rfit2 <- eBayes_function(df)
@@ -3061,7 +3066,7 @@ shinyServer(function(session, input, output) {
   })
    
   Rfit = reactive({withProgress(message = 'multi fit',{
-    list(E = multi_fit_function(norm()$E),
+    list(E = multi_fit_function(norm()$E), 
          Q = multi_fit_function(norm()$Q),
          C = multi_fit_function(norm()$C),
          S = multi_fit_function(norm()$S)
@@ -3070,7 +3075,7 @@ shinyServer(function(session, input, output) {
   })})
   
   DE_Rfit = reactive({withProgress(message = 'multi DE fit',{
-    list(E = multi_DE_function(norm()$E), 
+    list(E = multi_DE_function(norm()$E),
          Q = multi_DE_function(norm()$Q),
          C = multi_DE_function(norm()$C),
          S = multi_DE_function(norm()$S)
