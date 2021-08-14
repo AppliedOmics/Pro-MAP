@@ -137,6 +137,7 @@ shinyServer(function(session, input, output) {
     values$pvalue_select = pvalue_select
     values$mtc = mtc
     values$fc_cutoff = fc_cutoff
+    values$spot_collapse_digits = spot_collapse_digits
     print('readme_markdown_ui')
     includeMarkdown("Instructions.md")
   })
@@ -969,16 +970,16 @@ shinyServer(function(session, input, output) {
       df = spot_upload()
       as.tbl(df)
       proteins = df$spot
-      control = df$spot[df$Category == 'control probe']
-      selectInput('select_control_spot','Control Probes (labelled by not removed)',proteins,control,multiple = T, width = 1200)
+      control = df$spot[df$Category == 'control']
+      selectInput('select_control_spot','Control Probes (labelled but not removed)',proteins,control,multiple = T, width = 1200)
     })
     
     spots = reactive({
       req(spot_upload())
       df = spot_upload()
-      df$Category = 'analyte probe'
+      df$Category = 'analyte'
       df$Category[df$spot %in% input$select_remove] = 'removed probe'
-      df$Category[df$spot %in% input$select_control_spot] = 'control probe'
+      df$Category[df$spot %in% input$select_control_spot] = 'control'
       #df$Category[df$Category == 'remove' & !df$spot %in% input$select_remove] = ''
       df
     })
@@ -1054,8 +1055,10 @@ shinyServer(function(session, input, output) {
       input$dataset
       input$gpr_files
 
-     
-      df = data.frame(protein = data_full()$protein)
+      df = data_full() %>% 
+        dplyr::select('protein','Category')
+      
+      #df = data.frame(protein = data_full()$protein)
       error = NULL
       upload_df = NULL
       protein_file_path = NULL
@@ -1095,8 +1098,8 @@ shinyServer(function(session, input, output) {
       df = protein_upload()$df
       as.tbl(df)
       proteins = df$protein
-      control = df$protein[df$Category == 'control']
-      selectInput('select_controls','Controls',proteins,control,multiple = T, width = 1200)
+      control = df$protein[df$Category == 'other']
+      selectInput('select_controls','Other',proteins,control,multiple = T, width = 1200)
       #}
     })
     
@@ -1104,11 +1107,14 @@ shinyServer(function(session, input, output) {
       #if(!is.null(protein_upload())){
       #req(input$select_controls)
       df = protein_upload()$df
+      #df$Category = 'analyte'
+      df$Category[df$protein == ''] = 'EMPTY'
       df$Category[df$protein == ''] = 'EMPTY'
       df$Category[df$protein == 'EMPTY'] = 'EMPTY'
+      df$Category[df$protein == 'empty'] = 'EMPTY'
       if(!is.null(input$select_controls)){
-        df$Category[df$protein %in% input$select_controls] = 'control'
-        df$Category[df$Category == 'control' & !df$protein %in% input$select_controls] = 'analyte'
+        df$Category[df$protein %in% input$select_controls] = 'other'
+        #df$Category[df$Category == 'control' & !df$protein %in% input$select_controls] = 'analyte'
       }
       df
       #}
@@ -2213,6 +2219,10 @@ shinyServer(function(session, input, output) {
     output[['RAW_norm-CV_plot_ui']] = renderUI({     
       df = E_norm() 
       data = CV_df_function(df,targets())
+      #proteins = proteins() %>% 
+      #  dplyr::rename('spot' = protein)
+      
+      
       p = CV_plot_function(data,targets(),spots())
       p = gg_fill_function(p)
       
@@ -2250,16 +2260,16 @@ shinyServer(function(session, input, output) {
     })
     
     output[['RAW_norm-Heatmap_ui']] = renderUI({ 
-      df = E_norm() %>% 
+      df = E_norm() %>%  
         dplyr::select(-spot)
-      colnames(df) = target_names()
+      colnames(df) = selected_target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       
       id = 'RAW_norm'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),E_norm()$spot,input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),E_norm()$spot,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2365,12 +2375,16 @@ shinyServer(function(session, input, output) {
         left_join(spots)
       as.tbl(df_spots)
       colnames(df_spots)
-      df_spots$protein <- gsub("\\.[[:digit:]]*$", "", df_spots[,input$protein_column])
+      if(values$spot_collapse_digits == TRUE){
+        df_spots$protein <- gsub("\\.[[:digit:]]*$", "", df_spots[,input$protein_column])
+      }else{
+        df_spots$protein = df_spots[,input$protein_column]
+      }
       df_collapse = df_spots %>% 
-        dplyr::select(one_of(c('protein',colnames(data))))
+        dplyr::select(one_of(c('protein','Category',colnames(data))))
       colnames(df_collapse)
       
-      data <- as.data.frame(df_collapse) %>% group_by(protein) %>%
+      data <- as.data.frame(df_collapse) %>% group_by(protein,Category) %>%
         summarise_all(funs(mean))
       data
     }
@@ -2380,7 +2394,8 @@ shinyServer(function(session, input, output) {
       req(input$protein_column)
       req(E_norm())
       req(spots())
-      protein_collapse_function(E_norm(),spots(),input)
+      df = protein_collapse_function(E_norm(),spots(),input)
+      df
     })})
     
     
@@ -2411,13 +2426,14 @@ shinyServer(function(session, input, output) {
     
     data = reactive({ withProgress(message = 'Collate probes',{
       proteins_df = proteins()  
-      data = data_full()
-      df = protein_filter_function(data_full(),proteins(),input)
+      data = data_full() %>% 
+        dplyr::select(-Category)
+      df = protein_filter_function(data,proteins(),input)
       df$protein
       dim(df)
       keep_weight = arrayw_df() %>% 
         gather() %>% 
-        filter(value >= values$array_weight_threshold) %>% 
+        filter(value <= values$array_weight_threshold) %>% 
         pull(key)
       keep_weight
       
@@ -2426,14 +2442,14 @@ shinyServer(function(session, input, output) {
           dplyr::select(one_of(c('protein',keep_weight)))
       }
       dim(df)
-      df
+      as.data.frame(df)
 
     })})
     
     #----------------------------Visualization of Condensed dataset-----------------------------------------
     
     
-    output[['Data-boxplot_ui']] = renderUI({   
+    output[['Data-boxplot_ui']] = renderUI({    
       df = data() %>% 
         dplyr::select(-protein)
       values$collapse_boxplots
@@ -2452,11 +2468,15 @@ shinyServer(function(session, input, output) {
     })
     
     output[['Data-CV_plot_ui']] = renderUI({     
-      df = data_df()
+      df = data_df()  
       data = CV_df_function(df,targets())
-      p = CV_plot_function(data,targets(),spots())
+      proteins = proteins() %>% 
+        dplyr::rename('spot' = protein)
+      
+      p = CV_plot_function(data,targets(),proteins)
       p = gg_fill_function(p)
       
+      p
       id = 'Data'
       name = 'CV'
       title = "Background Corrected & Normalised CV's across arrays for all probes"
@@ -2467,8 +2487,10 @@ shinyServer(function(session, input, output) {
     
     output[['Data-MA_plot_ui']] = renderUI({
       
-      df = data_df() 
-      p = MA_plot_function(df,spots())
+      df = data_df()  
+      proteins = proteins() %>% 
+        dplyr::rename('spot' = protein)
+      p = MA_plot_function(df,proteins)
       
       id = 'Data'
       name = 'MA'
@@ -2491,10 +2513,10 @@ shinyServer(function(session, input, output) {
     })
     
     output[['Data-Heatmap_ui']] = renderUI({ 
-      df = data() %>% 
+      df = data() %>%  
         column_to_rownames('protein')
         #dplyr::select(-protein)
-      colnames(df) = target_names()
+      colnames(df) = selected_target_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
@@ -2502,7 +2524,7 @@ shinyServer(function(session, input, output) {
       id = 'Data'
       name = 'Hcluster'
 
-      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2513,18 +2535,24 @@ shinyServer(function(session, input, output) {
       #do.call(tagList,PlotTabs_UI(id = "Data"))
       
       ns <- NS("Data")
+      
       lst = list(
         tabsetPanel(
           tabPanel('Table',
+                   column(6,tags$h4(htmlOutput('data_dim_text'))),
                    column(2,downloadButton('download_data',"Data Table")),
                    column(2,downloadButton('download_ExpSet',"ExpSet")),
                    column(2,downloadButton('download_MSnSet',"MSnSet")),
-                   column(12,tags$h4(htmlOutput('data_dim_text'))),
+                   
                    column(12,DT::dataTableOutput('data_table'))
           ),
-          tabPanel('Plots',
-                   uiOutput(ns('boxplot_ui')),
-                   uiOutput(ns('CV_plot_ui')),
+          tabPanel('Boxplot',
+                   uiOutput(ns('boxplot_ui'))
+                   ),
+          tabPanel('CV',
+                   uiOutput(ns('CV_plot_ui'))
+                   ),
+          tabPanel('Missing Values',
                    uiOutput(ns('missing_plot_ui'))
           ),
           tabPanel("MA Plots",
@@ -2550,7 +2578,7 @@ shinyServer(function(session, input, output) {
     )
     
     output$data_dim_text = renderPrint({
-      print(paste(dim(data())[1],'proteins and ',dim(data())[2],'targets'))
+      cat(paste(dim(data())[1],'proteins and ',dim(data())[2],'samples'))
     })
     
     # expression_set_function = function(data,targets,proteins){

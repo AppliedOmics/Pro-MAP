@@ -51,9 +51,9 @@ single_plot_height = 300
 max_heatmap_rows = 1000
 multi_plot_height = 600
 
-sep_categories = T
+sep_categories = FALSE
 plot_lim = 'None'
-collapse_boxplots = F
+collapse_boxplots = FALSE
 heatmap_order = 'Cluster'
 min_corr = F
 volcano_type = 'EnhancedVolcano'
@@ -63,6 +63,7 @@ array_weight_threshold = 0.5
 pvalue_select = 0.05
 mtc = 'BH'
 fc_cutoff = 1.5
+spot_collapse_digits = FALSE
 
 ##### Files #####
 

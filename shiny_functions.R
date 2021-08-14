@@ -344,10 +344,11 @@ Pipeline_UI = function(values){
 			),
 			tabPanel('Array Weights',
 							 
-							 column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
-							 column(1),
-							 column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
-							 column(1),
+							 #column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
+							 #column(1),
+							 #column(4,radioButtons('drop_by_weight','Drop arrays >= array weight threshold',c(FALSE,TRUE),inline = T)),
+							 #column(1),
+							 column(10),
 							 column(2,downloadButton('download_arrayw',"Download")),
 							 column(12,DT::dataTableOutput('arrayw_table')),
 							 
