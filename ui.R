@@ -55,8 +55,8 @@ shinyUI(fluidPage(
           radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
           radioButtons('collapse_boxplots','Collapse plot by condition',c(F,T),inline = T),
           radioButtons('heatmap_order','Heatmap',c('Cluster','Order','None','dend'),inline = T),
-          radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T),
-          radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
+          radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),inline = T)#,
+          #radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
           )
           )
         

@@ -22,20 +22,40 @@ library(EnhancedVolcano)
 #library(shinyjs)
 
 
-app_version = 'full'
-#app_version = 'public'
-
 source('shiny_functions.R')
-#library(naniar)
+
+#### options #####
 
 options(DT.options = list(pageLength = 25))
-node = Sys.info()["nodename"]
-data_dir = 'www/'
+
+
+
+#### Version #####
+app_version = 'full'
+(node = Sys.info()["nodename"])
+if(grepl('metaomics',node)){
+	app_version = 'public'
+}
+
+app_version = 'public'
+
+
+#### Defaults #####
 
 single_plot_height = 300
 max_heatmap_rows = 1000
-
 multi_plot_height = 600
+
+sep_categories = T
+plot_lim = 'None'
+collapse_boxplots = F
+heatmap_order = 'Cluster'
+min_corr = F
+
+##### Files #####
+
+
+data_dir = 'www/'
 if(node == 'WoW.local'){
 	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/Hazel/Data/Raw Data/'
 	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/SCaMP/Data/Prostate cancer EUR/'

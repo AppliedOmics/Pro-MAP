@@ -124,8 +124,36 @@ shinyServer(function(session, input, output) {
   output$instructions_markdown_ui = renderUI({
     #hideTab('main','Plots')
     #hideTab('main','Data')
+    values$sep_categories = sep_categories
+    values$plot_lim = plot_lim
+    values$collapse_boxplots = collapse_boxplots
+    values$heatmap_order = heatmap_order
+    values$min_corr = min_corr
     print('readme_markdown_ui')
     includeMarkdown("Instructions.md")
+  })
+  
+  
+  ##### Default Values ######
+  
+  observeInput(input$sep_categories,{
+    values$sep_categories = input$sep_categories
+  })
+  
+  observeInput(input$plot_lim,{
+    values$plot_lim = input$plot_lim
+  })
+  
+  observeInput(input$collapse_boxplots,{
+    values$collapse_boxplots = input$collapse_boxplots
+  })
+  
+  observeInput(input$heatmap_order,{
+    values$heatmap_order = input$heatmap_order
+  })
+  
+  observeInput(input$min_corr,{
+    values$min_corr = input$min_corr
   })
   
 
@@ -1705,7 +1733,7 @@ shinyServer(function(session, input, output) {
     
     E_filter_before = reactive({withProgress(message = 'Spot Filtering',{
       E = E()
-      if(!is.null(E()$weights) & input$apply_spot_filtering == T){
+      if(!is.null(E()$weights)){
         E_fg = E$E
         E_fg
         E_weights = E()$weights
