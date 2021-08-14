@@ -137,7 +137,7 @@ shinyServer(function(session, input, output) {
   
   ##### Default Values ######
   output$header_version = renderUI({
-    header_UI(values$app_version)
+    do.call(tagList,header_UI(values$app_version))
   })
   
   

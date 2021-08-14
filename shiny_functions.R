@@ -31,9 +31,9 @@ header_UI = function(app_version){
 	#print(app_version)
 	#browser()
 	if(app_version == 'pro'){
-		titlePanel("SCaMP Pro")
+		lst = list(titlePanel("SCaMP Pro"))
 	}else{
-		tagList(
+		lst = list(
 			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
 			tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
 			tags$h6('Mowoe MO., Lennard K., Garnett S., Talbot J., Jonas E., Blackburn J, (',
@@ -43,7 +43,7 @@ header_UI = function(app_version){
 			)
 	}
 	#titlePanel("SPOT-Pro Full")
-	
+	lst
 }
 
 spots_tab_UI = function(){
