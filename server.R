@@ -136,6 +136,10 @@ shinyServer(function(session, input, output) {
   
   
   ##### Default Values ######
+  output$header_version = renderUI({
+    header_UI(values$app_version)
+  })
+  
   
   output$pro_heading_ui = renderUI({
     if(app_version == 'pro'){

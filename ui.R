@@ -12,7 +12,8 @@ shinyUI(fluidPage(
     #         tagList(a("doi link - not available yet", href="doi link")),')'),
     # tags$h6('R script for pipeline available on Github (',
     #         tagList(a("github link - not available yet", href="github link")),')'),
-    header_UI(app_version),
+    uiOutput('header_version'),
+    
     #),
     #fluidRow(
         #### sidebarPanel ####

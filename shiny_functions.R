@@ -30,7 +30,7 @@ counterServer <- function(id) {
 header_UI = function(app_version){
 	#print(app_version)
 	#browser()
-	if(app_version == 'full'){
+	if(app_version == 'pro'){
 		titlePanel("SCaMP Pro")
 	}else{
 		tagList(

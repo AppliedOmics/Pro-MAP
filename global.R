@@ -35,6 +35,10 @@ app_version = 'pro'
 (node = Sys.info()["nodename"])
 if(grepl('metaomics',node)){
 	app_version = 'basic'
+}else{
+	if(!grepl('Pro',getwd())){
+		app_version = 'basic'
+	}
 }
 
 #app_version = 'basic'
