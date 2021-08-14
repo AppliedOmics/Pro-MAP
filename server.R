@@ -1815,7 +1815,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$Raw_tabs_ui = renderUI({ 
-      do.call(tagList,PlotTabs_UI(id = "RAW"))
+      do.call(tagList,PlotTabs_UI(id = "RAW",values))
     })
     
     
@@ -1925,7 +1925,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$Raw_filter_tabs_ui = renderUI({ 
-      do.call(tagList,PlotTabs_UI(id = "RAW_filter"))
+      do.call(tagList,PlotTabs_UI(id = "RAW_filter",values))
     })
     
     
@@ -2024,7 +2024,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$Raw_corr_tabs_ui = renderUI({ 
-      do.call(tagList,PlotTabs_UI(id = "RAW_corr"))
+      do.call(tagList,PlotTabs_UI(id = "RAW_corr",values))
     })
     
 
@@ -2156,7 +2156,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$Raw_norm_tabs_ui = renderUI({ 
-      do.call(tagList,PlotTabs_UI(id = "RAW_norm"))
+      do.call(tagList,PlotTabs_UI(id = "RAW_norm",values))
     })
     
     

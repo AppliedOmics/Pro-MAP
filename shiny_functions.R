@@ -36,7 +36,7 @@ header_UI = function(app_version){
 		lst = list(
 			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
 			tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
-			tags$h6('Mowoe MO., Lennard K., Garnett S., Talbot J., Jonas E., Blackburn J, (',
+			tags$h6('Mowoe MO., Garnett S., Lennard K., Talbot J., Jonas E., Blackburn J, (',
 							tagList(a("doi link - not available yet", href="doi link")),')'),
 			tags$h6('R script for pipeline available on Github (',
 							tagList(a("github link - not available yet", href="github link")),')')
@@ -202,25 +202,39 @@ table_Server <- function(id,name,df) {
 
 ### Plot Tabs ####
 
-PlotTabs_UI <- function(id) {
+PlotTabs_UI <- function(id,values) {
 	ns <- NS(id)
-	list(
-		tabsetPanel(
-			tabPanel('Data Table',
-							 DT::dataTableOutput(ns('table'))
-							 ),
-			tabPanel('Plots',
-							 uiOutput(ns('boxplot_ui')),
-							 uiOutput(ns('CV_plot_ui')),
-							 uiOutput(ns('missing_plot_ui'))
-			),
-			tabPanel("MA Plots",
-							 uiOutput(ns('MA_plot_ui')),
-			),
-			tabPanel('Clustering',
-							 column(12,uiOutput(ns('Heatmap_ui')))
-			))
-	)
+	if(values$app_version == 'pro'){
+			lst = list(
+				tabsetPanel(
+					tabPanel('Data Table',
+									 DT::dataTableOutput(ns('table'))
+									 ),
+					tabPanel('Plots',
+									 uiOutput(ns('boxplot_ui')),
+									 uiOutput(ns('CV_plot_ui')),
+									 uiOutput(ns('missing_plot_ui'))
+					),
+					tabPanel("MA Plots",
+									 uiOutput(ns('MA_plot_ui')),
+					),
+					tabPanel('Clustering',
+									 column(12,uiOutput(ns('Heatmap_ui')))
+					))
+			)
+	}else{
+		lst = list(
+			tabsetPanel(
+				tabPanel('Plots',
+								 uiOutput(ns('boxplot_ui')),
+								 uiOutput(ns('CV_plot_ui')),
+								 uiOutput(ns('missing_plot_ui'))
+				),
+				tabPanel('Clustering',
+								 column(12,uiOutput(ns('Heatmap_ui')))
+				))
+		)
+	}
 }
 
 ### Pro UI ###
