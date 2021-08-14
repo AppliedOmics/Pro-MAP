@@ -75,21 +75,21 @@ shinyUI(fluidPage(
     #### mainPanel ####
     mainPanel(
         #uiOutput('example_data_text_ui'),
-        column(3,uiOutput('select_conditions_column_ui')),
-        column(6,uiOutput('condition_select_ui')),
-        column(3,uiOutput('cont_matrix_comp_ui')),
-       
+      column(12,
+        column(4,uiOutput('select_conditions_column_ui')),
+        column(4,uiOutput('condition_select_ui')),
+        column(4,uiOutput('cont_matrix_comp_ui'))
+        ),
+      column(12,
         column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
  
         
         column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
                
    
-        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
-        column(4,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+        column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
+      ),
         
-        column(4,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
-        column(4,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
       
         column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
@@ -284,7 +284,9 @@ shinyUI(fluidPage(
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
       
                  #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
-                 
+                 column(4,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+                 column(4,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+                 column(4,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
                  
                  column(12,tabsetPanel(
                    tabPanel('eBayes',

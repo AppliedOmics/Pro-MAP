@@ -1,513 +1,513 @@
-"Block"	"Column"	"Row"	"ID"	"spot"	"B635.SD"	"Name"	"Category"
-1	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-1	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-1	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-1	4	1	"COL6A1"	"COL6A1"	NA	NA	"analyte probe"
-1	5	1	"CT62"	"CT62"	NA	NA	"analyte probe"
-1	6	1	"DSCR8/MMA1"	"DSCR8/MMA1"	NA	NA	"analyte probe"
-1	7	1	"MAGEA3"	"MAGEA3"	NA	NA	"analyte probe"
-1	8	1	"SOX1"	"SOX1"	NA	NA	"analyte probe"
-1	1	2	"MAGEA5"	"MAGEA5"	NA	NA	"analyte probe"
-1	2	2	"MART-1"	"MART-1"	NA	NA	"analyte probe"
-1	3	2	"NY-CO-45"	"NY-CO-45"	NA	NA	"analyte probe"
-1	4	2	"THEG"	"THEG"	NA	NA	"analyte probe"
-1	5	2	"TYR"	"TYR"	NA	NA	"analyte probe"
-1	6	2	"ZNF165"	"ZNF165"	NA	NA	"analyte probe"
-1	7	2	"CDK7"	"CDK7"	NA	NA	"analyte probe"
-1	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-1	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-1	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-1	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-1	4	3	"COL6A1"	"COL6A1"	NA	NA	"analyte probe"
-1	5	3	"CT62"	"CT62"	NA	NA	"analyte probe"
-1	6	3	"DSCR8/MMA1"	"DSCR8/MMA1"	NA	NA	"analyte probe"
-1	7	3	"MAGEA3"	"MAGEA3"	NA	NA	"analyte probe"
-1	8	3	"SOX1"	"SOX1"	NA	NA	"analyte probe"
-1	1	4	"MAGEA5"	"MAGEA5"	NA	NA	"analyte probe"
-1	2	4	"MART-1"	"MART-1"	NA	NA	"analyte probe"
-1	3	4	"NY-CO-45"	"NY-CO-45"	NA	NA	"analyte probe"
-1	4	4	"THEG"	"THEG"	NA	NA	"analyte probe"
-1	5	4	"TYR"	"TYR"	NA	NA	"analyte probe"
-1	6	4	"ZNF165"	"ZNF165"	NA	NA	"analyte probe"
-1	7	4	"CDK7"	"CDK7"	NA	NA	"analyte probe"
-1	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-1	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-1	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-1	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-1	4	5	"COL6A1"	"COL6A1"	NA	NA	"analyte probe"
-1	5	5	"CT62"	"CT62"	NA	NA	"analyte probe"
-1	6	5	"DSCR8/MMA1"	"DSCR8/MMA1"	NA	NA	"analyte probe"
-1	7	5	"MAGEA3"	"MAGEA3"	NA	NA	"analyte probe"
-1	8	5	"SOX1"	"SOX1"	NA	NA	"analyte probe"
-1	1	6	"MAGEA5"	"MAGEA5"	NA	NA	"analyte probe"
-1	2	6	"MART-1"	"MART-1"	NA	NA	"analyte probe"
-1	3	6	"NY-CO-45"	"NY-CO-45"	NA	NA	"analyte probe"
-1	4	6	"THEG"	"THEG"	NA	NA	"analyte probe"
-1	5	6	"TYR"	"TYR"	NA	NA	"analyte probe"
-1	6	6	"ZNF165"	"ZNF165"	NA	NA	"analyte probe"
-1	7	6	"BAGE4"	"BAGE4"	NA	NA	"analyte probe"
-1	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-1	1	7	"p53 M133T"	"p53 M133T"	NA	NA	"analyte probe"
-1	2	7	"CDK7"	"CDK7"	NA	NA	"analyte probe"
-1	3	7	"p53 M133T"	"p53 M133T"	NA	NA	"analyte probe"
-1	4	7	"BAGE4"	"BAGE4"	NA	NA	"analyte probe"
-1	5	7	"p53 M133T"	"p53 M133T"	NA	NA	"analyte probe"
-1	6	7	"BAGE4"	"BAGE4"	NA	NA	"analyte probe"
-1	7	7	"empty"	"empty"	NA	NA	"removed probe"
-1	8	7	"empty"	"empty"	NA	NA	"removed probe"
-1	1	8	"ACVR2A"	"ACVR2A"	NA	NA	"analyte probe"
-1	2	8	"PIM1"	"PIM1"	NA	NA	"analyte probe"
-1	3	8	"ACVR2A"	"ACVR2A"	NA	NA	"analyte probe"
-1	4	8	"PIM1"	"PIM1"	NA	NA	"analyte probe"
-1	5	8	"ACVR2A"	"ACVR2A"	NA	NA	"analyte probe"
-1	6	8	"PIM1"	"PIM1"	NA	NA	"analyte probe"
-1	7	8	"empty"	"empty"	NA	NA	"removed probe"
-1	8	8	"empty"	"empty"	NA	NA	"removed probe"
-2	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-2	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-2	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-2	4	1	"CEP290"	"CEP290"	NA	NA	"analyte probe"
-2	5	1	"CT47.11"	"CT47.11"	NA	NA	"analyte probe"
-2	6	1	"DDX53"	"DDX53"	NA	NA	"analyte probe"
-2	7	1	"MAGEA2"	"MAGEA2"	NA	NA	"analyte probe"
-2	8	1	"DPPA2"	"DPPA2"	NA	NA	"analyte probe"
-2	1	2	"MAGEA4v4"	"MAGEA4v4"	NA	NA	"analyte probe"
-2	2	2	"MAGEB6"	"MAGEB6"	NA	NA	"analyte probe"
-2	3	2	"NXF2"	"NXF2"	NA	NA	"analyte probe"
-2	4	2	"SYCP1"	"SYCP1"	NA	NA	"analyte probe"
-2	5	2	"TSSK6"	"TSSK6"	NA	NA	"analyte probe"
-2	6	2	"XAGE3av2"	"XAGE3av2"	NA	NA	"analyte probe"
-2	7	2	"CDK4"	"CDK4"	NA	NA	"analyte probe"
-2	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-2	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-2	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-2	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-2	4	3	"CEP290"	"CEP290"	NA	NA	"analyte probe"
-2	5	3	"CT47.11"	"CT47.11"	NA	NA	"analyte probe"
-2	6	3	"DDX53"	"DDX53"	NA	NA	"analyte probe"
-2	7	3	"MAGEA2"	"MAGEA2"	NA	NA	"analyte probe"
-2	8	3	"DPPA2"	"DPPA2"	NA	NA	"analyte probe"
-2	1	4	"MAGEA4v4"	"MAGEA4v4"	NA	NA	"analyte probe"
-2	2	4	"MAGEB6"	"MAGEB6"	NA	NA	"analyte probe"
-2	3	4	"NXF2"	"NXF2"	NA	NA	"analyte probe"
-2	4	4	"SYCP1"	"SYCP1"	NA	NA	"analyte probe"
-2	5	4	"TSSK6"	"TSSK6"	NA	NA	"analyte probe"
-2	6	4	"XAGE3av2"	"XAGE3av2"	NA	NA	"analyte probe"
-2	7	4	"CDK4"	"CDK4"	NA	NA	"analyte probe"
-2	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-2	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-2	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-2	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-2	4	5	"CEP290"	"CEP290"	NA	NA	"analyte probe"
-2	5	5	"CT47.11"	"CT47.11"	NA	NA	"analyte probe"
-2	6	5	"DDX53"	"DDX53"	NA	NA	"analyte probe"
-2	7	5	"MAGEA2"	"MAGEA2"	NA	NA	"analyte probe"
-2	8	5	"DPPA2"	"DPPA2"	NA	NA	"analyte probe"
-2	1	6	"MAGEA4v4"	"MAGEA4v4"	NA	NA	"analyte probe"
-2	2	6	"MAGEB6"	"MAGEB6"	NA	NA	"analyte probe"
-2	3	6	"NXF2"	"NXF2"	NA	NA	"analyte probe"
-2	4	6	"SYCP1"	"SYCP1"	NA	NA	"analyte probe"
-2	5	6	"TSSK6"	"TSSK6"	NA	NA	"analyte probe"
-2	6	6	"XAGE3av2"	"XAGE3av2"	NA	NA	"analyte probe"
-2	7	6	"BAGE3"	"BAGE3"	NA	NA	"analyte probe"
-2	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-2	1	7	"p53 S392A"	"p53 S392A"	NA	NA	"analyte probe"
-2	2	7	"CDK4"	"CDK4"	NA	NA	"analyte probe"
-2	3	7	"p53 S392A"	"p53 S392A"	NA	NA	"analyte probe"
-2	4	7	"BAGE3"	"BAGE3"	NA	NA	"analyte probe"
-2	5	7	"p53 S392A"	"p53 S392A"	NA	NA	"analyte probe"
-2	6	7	"BAGE3"	"BAGE3"	NA	NA	"analyte probe"
-2	7	7	"empty"	"empty"	NA	NA	"removed probe"
-2	8	7	"empty"	"empty"	NA	NA	"removed probe"
-2	1	8	"SOX2"	"SOX2"	NA	NA	"analyte probe"
-2	2	8	"MAP9"	"MAP9"	NA	NA	"analyte probe"
-2	3	8	"SOX2"	"SOX2"	NA	NA	"analyte probe"
-2	4	8	"MAP9"	"MAP9"	NA	NA	"analyte probe"
-2	5	8	"SOX2"	"SOX2"	NA	NA	"analyte probe"
-2	6	8	"MAP9"	"MAP9"	NA	NA	"analyte probe"
-2	7	8	"empty"	"empty"	NA	NA	"removed probe"
-2	8	8	"empty"	"empty"	NA	NA	"removed probe"
-3	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-3	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-3	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-3	4	1	"CCDC33"	"CCDC33"	NA	NA	"analyte probe"
-3	5	1	"CSAG2"	"CSAG2"	NA	NA	"analyte probe"
-3	6	1	"CXorf48.1"	"CXorf48.1"	NA	NA	"analyte probe"
-3	7	1	"MAGEA11"	"MAGEA11"	NA	NA	"analyte probe"
-3	8	1	"SPATS1 (isoform a)"	"SPATS1 (isoform a)"	NA	NA	"analyte probe"
-3	1	2	"MAGEA4v3"	"MAGEA4v3"	NA	NA	"analyte probe"
-3	2	2	"MAGEB5"	"MAGEB5"	NA	NA	"analyte probe"
-3	3	2	"NLRP4"	"NLRP4"	NA	NA	"analyte probe"
-3	4	2	"SYCE1"	"SYCE1"	NA	NA	"analyte probe"
-3	5	2	"TSGA10"	"TSGA10"	NA	NA	"analyte probe"
-3	6	2	"XAGE3av1"	"XAGE3av1"	NA	NA	"analyte probe"
-3	7	2	"CDK2"	"CDK2"	NA	NA	"analyte probe"
-3	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-3	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-3	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-3	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-3	4	3	"CCDC33"	"CCDC33"	NA	NA	"analyte probe"
-3	5	3	"CSAG2"	"CSAG2"	NA	NA	"analyte probe"
-3	6	3	"CXorf48.1"	"CXorf48.1"	NA	NA	"analyte probe"
-3	7	3	"MAGEA11"	"MAGEA11"	NA	NA	"analyte probe"
-3	8	3	"SPATS1 (isoform a)"	"SPATS1 (isoform a)"	NA	NA	"analyte probe"
-3	1	4	"MAGEA4v3"	"MAGEA4v3"	NA	NA	"analyte probe"
-3	2	4	"MAGEB5"	"MAGEB5"	NA	NA	"analyte probe"
-3	3	4	"NLRP4"	"NLRP4"	NA	NA	"analyte probe"
-3	4	4	"SYCE1"	"SYCE1"	NA	NA	"analyte probe"
-3	5	4	"TSGA10"	"TSGA10"	NA	NA	"analyte probe"
-3	6	4	"XAGE3av1"	"XAGE3av1"	NA	NA	"analyte probe"
-3	7	4	"CDK2"	"CDK2"	NA	NA	"analyte probe"
-3	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-3	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-3	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-3	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-3	4	5	"CCDC33"	"CCDC33"	NA	NA	"analyte probe"
-3	5	5	"CSAG2"	"CSAG2"	NA	NA	"analyte probe"
-3	6	5	"CXorf48.1"	"CXorf48.1"	NA	NA	"analyte probe"
-3	7	5	"MAGEA11"	"MAGEA11"	NA	NA	"analyte probe"
-3	8	5	"SPATS1 (isoform a)"	"SPATS1 (isoform a)"	NA	NA	"analyte probe"
-3	1	6	"MAGEA4v3"	"MAGEA4v3"	NA	NA	"analyte probe"
-3	2	6	"MAGEB5"	"MAGEB5"	NA	NA	"analyte probe"
-3	3	6	"NLRP4"	"NLRP4"	NA	NA	"analyte probe"
-3	4	6	"SYCE1"	"SYCE1"	NA	NA	"analyte probe"
-3	5	6	"TSGA10"	"TSGA10"	NA	NA	"analyte probe"
-3	6	6	"XAGE3av1"	"XAGE3av1"	NA	NA	"analyte probe"
-3	7	6	"BAGE2"	"BAGE2"	NA	NA	"analyte probe"
-3	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-3	1	7	"p53 K382R"	"p53 K382R"	NA	NA	"analyte probe"
-3	2	7	"CDK2"	"CDK2"	NA	NA	"analyte probe"
-3	3	7	"p53 K382R"	"p53 K382R"	NA	NA	"analyte probe"
-3	4	7	"BAGE2"	"BAGE2"	NA	NA	"analyte probe"
-3	5	7	"p53 K382R"	"p53 K382R"	NA	NA	"analyte probe"
-3	6	7	"BAGE2"	"BAGE2"	NA	NA	"analyte probe"
-3	7	7	"empty"	"empty"	NA	NA	"removed probe"
-3	8	7	"empty"	"empty"	NA	NA	"removed probe"
-3	1	8	"XAGE1B"	"XAGE1B"	NA	NA	"analyte probe"
-3	2	8	"ITGB1"	"ITGB1"	NA	NA	"analyte probe"
-3	3	8	"XAGE1B"	"XAGE1B"	NA	NA	"analyte probe"
-3	4	8	"ITGB1"	"ITGB1"	NA	NA	"analyte probe"
-3	5	8	"XAGE1B"	"XAGE1B"	NA	NA	"analyte probe"
-3	6	8	"ITGB1"	"ITGB1"	NA	NA	"analyte probe"
-3	7	8	"empty"	"empty"	NA	NA	"removed probe"
-3	8	8	"empty"	"empty"	NA	NA	"removed probe"
-4	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-4	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-4	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-4	4	1	"BAGE5"	"BAGE5"	NA	NA	"analyte probe"
-4	5	1	"COX6B2"	"COX6B2"	NA	NA	"analyte probe"
-4	6	1	"CTAG2"	"CTAG2"	NA	NA	"analyte probe"
-4	7	1	"MAGEA10"	"MAGEA10"	NA	NA	"analyte probe"
-4	8	1	"TKTL1 (isoform a)"	"TKTL1 (isoform a)"	NA	NA	"analyte probe"
-4	1	2	"MAGEA4v2"	"MAGEA4v2"	NA	NA	"analyte probe"
-4	2	2	"MAGEB1"	"MAGEB1"	NA	NA	"analyte probe"
-4	3	2	"MICA"	"MICA"	NA	NA	"analyte probe"
-4	4	2	"SSX4"	"SSX4"	NA	NA	"analyte probe"
-4	5	2	"TPTE"	"TPTE"	NA	NA	"analyte probe"
-4	6	2	"XAGE-2"	"XAGE-2"	NA	NA	"analyte probe"
-4	7	2	"AKT1"	"AKT1"	NA	NA	"analyte probe"
-4	8	2	"ICL"	"ICL"	NA	NA	"removed probe"
-4	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-4	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-4	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-4	4	3	"BAGE5"	"BAGE5"	NA	NA	"analyte probe"
-4	5	3	"COX6B2"	"COX6B2"	NA	NA	"analyte probe"
-4	6	3	"CTAG2"	"CTAG2"	NA	NA	"analyte probe"
-4	7	3	"MAGEA10"	"MAGEA10"	NA	NA	"analyte probe"
-4	8	3	"TKTL1 (isoform a)"	"TKTL1 (isoform a)"	NA	NA	"analyte probe"
-4	1	4	"MAGEA4v2"	"MAGEA4v2"	NA	NA	"analyte probe"
-4	2	4	"MAGEB1"	"MAGEB1"	NA	NA	"analyte probe"
-4	3	4	"MICA"	"MICA"	NA	NA	"analyte probe"
-4	4	4	"SSX4"	"SSX4"	NA	NA	"analyte probe"
-4	5	4	"TPTE"	"TPTE"	NA	NA	"analyte probe"
-4	6	4	"XAGE-2"	"XAGE-2"	NA	NA	"analyte probe"
-4	7	4	"AKT1"	"AKT1"	NA	NA	"analyte probe"
-4	8	4	"ICL"	"ICL"	NA	NA	"removed probe"
-4	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-4	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-4	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-4	4	5	"BAGE5"	"BAGE5"	NA	NA	"analyte probe"
-4	5	5	"COX6B2"	"COX6B2"	NA	NA	"analyte probe"
-4	6	5	"CTAG2"	"CTAG2"	NA	NA	"analyte probe"
-4	7	5	"MAGEA10"	"MAGEA10"	NA	NA	"analyte probe"
-4	8	5	"TKTL1 (isoform a)"	"TKTL1 (isoform a)"	NA	NA	"analyte probe"
-4	1	6	"MAGEA4v2"	"MAGEA4v2"	NA	NA	"analyte probe"
-4	2	6	"MAGEB1"	"MAGEB1"	NA	NA	"analyte probe"
-4	3	6	"MICA"	"MICA"	NA	NA	"analyte probe"
-4	4	6	"SSX4"	"SSX4"	NA	NA	"analyte probe"
-4	5	6	"TPTE"	"TPTE"	NA	NA	"analyte probe"
-4	6	6	"XAGE-2"	"XAGE-2"	NA	NA	"analyte probe"
-4	7	6	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-4	8	6	"ICL"	"ICL"	NA	NA	"removed probe"
-4	1	7	"p53 S46A"	"p53 S46A"	NA	NA	"analyte probe"
-4	2	7	"AKT1"	"AKT1"	NA	NA	"analyte probe"
-4	3	7	"p53 S46A"	"p53 S46A"	NA	NA	"analyte probe"
-4	4	7	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-4	5	7	"p53 S46A"	"p53 S46A"	NA	NA	"analyte probe"
-4	6	7	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-4	7	7	"empty"	"empty"	NA	NA	"removed probe"
-4	8	7	"empty"	"empty"	NA	NA	"removed probe"
-4	1	8	"5T4/TPBG"	"5T4/TPBG"	NA	NA	"analyte probe"
-4	2	8	"ACVR2B"	"ACVR2B"	NA	NA	"analyte probe"
-4	3	8	"5T4/TPBG"	"5T4/TPBG"	NA	NA	"analyte probe"
-4	4	8	"ACVR2B"	"ACVR2B"	NA	NA	"analyte probe"
-4	5	8	"5T4/TPBG"	"5T4/TPBG"	NA	NA	"analyte probe"
-4	6	8	"ACVR2B"	"ACVR2B"	NA	NA	"analyte probe"
-4	7	8	"empty"	"empty"	NA	NA	"removed probe"
-4	8	8	"empty"	"empty"	NA	NA	"removed probe"
-5	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-5	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-5	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-5	4	1	"GAGE5"	"GAGE5"	NA	NA	"analyte probe"
-5	5	1	"HORMAD1"	"HORMAD1"	NA	NA	"analyte probe"
-5	6	1	"MAGEA1"	"MAGEA1"	NA	NA	"analyte probe"
-5	7	1	"PBK"	"PBK"	NA	NA	"analyte probe"
-5	8	1	"BCCP-myc"	"BCCP-myc"	NA	NA	"analyte probe"
-5	1	2	"SILV"	"SILV"	NA	NA	"analyte probe"
-5	2	2	"SPANXC"	"SPANXC"	NA	NA	"analyte probe"
-5	3	2	"SSX2A"	"SSX2A"	NA	NA	"analyte probe"
-5	4	2	"MAPK3"	"MAPK3"	NA	NA	"analyte probe"
-5	5	2	"CALM1"	"CALM1"	NA	NA	"analyte probe"
-5	6	2	"p53 S6A"	"p53 S6A"	NA	NA	"analyte probe"
-5	7	2	"p53 Q136x"	"p53 Q136x"	NA	NA	"analyte probe"
-5	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-5	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-5	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-5	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-5	4	3	"GAGE5"	"GAGE5"	NA	NA	"analyte probe"
-5	5	3	"HORMAD1"	"HORMAD1"	NA	NA	"analyte probe"
-5	6	3	"MAGEA1"	"MAGEA1"	NA	NA	"analyte probe"
-5	7	3	"PBK"	"PBK"	NA	NA	"analyte probe"
-5	8	3	"BCCP-myc"	"BCCP-myc"	NA	NA	"analyte probe"
-5	1	4	"SILV"	"SILV"	NA	NA	"analyte probe"
-5	2	4	"SPANXC"	"SPANXC"	NA	NA	"analyte probe"
-5	3	4	"SSX2A"	"SSX2A"	NA	NA	"analyte probe"
-5	4	4	"MAPK3"	"MAPK3"	NA	NA	"analyte probe"
-5	5	4	"CALM1"	"CALM1"	NA	NA	"analyte probe"
-5	6	4	"p53 S6A"	"p53 S6A"	NA	NA	"analyte probe"
-5	7	4	"p53 Q136x"	"p53 Q136x"	NA	NA	"analyte probe"
-5	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-5	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-5	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-5	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-5	4	5	"GAGE5"	"GAGE5"	NA	NA	"analyte probe"
-5	5	5	"HORMAD1"	"HORMAD1"	NA	NA	"analyte probe"
-5	6	5	"MAGEA1"	"MAGEA1"	NA	NA	"analyte probe"
-5	7	5	"PBK"	"PBK"	NA	NA	"analyte probe"
-5	8	5	"BCCP-myc"	"BCCP-myc"	NA	NA	"analyte probe"
-5	1	6	"SILV"	"SILV"	NA	NA	"analyte probe"
-5	2	6	"SPANXC"	"SPANXC"	NA	NA	"analyte probe"
-5	3	6	"SSX2A"	"SSX2A"	NA	NA	"analyte probe"
-5	4	6	"MAPK3"	"MAPK3"	NA	NA	"analyte probe"
-5	5	6	"CALM1"	"CALM1"	NA	NA	"analyte probe"
-5	6	6	"p53 S6A"	"p53 S6A"	NA	NA	"analyte probe"
-5	7	6	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-5	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-5	1	7	"EGFR"	"EGFR"	NA	NA	"analyte probe"
-5	2	7	"p53 Q136x"	"p53 Q136x"	NA	NA	"analyte probe"
-5	3	7	"EGFR"	"EGFR"	NA	NA	"analyte probe"
-5	4	7	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-5	5	7	"EGFR"	"EGFR"	NA	NA	"analyte probe"
-5	6	7	"biotin-hIgG 10ng/ul"	"biotin-hIgG 10ng/ul"	NA	NA	"removed probe"
-5	7	7	"empty"	"empty"	NA	NA	"removed probe"
-5	8	7	"empty"	"empty"	NA	NA	"removed probe"
-5	1	8	"NANOG"	"NANOG"	NA	NA	"analyte probe"
-5	2	8	"GDF3"	"GDF3"	NA	NA	"analyte probe"
-5	3	8	"NANOG"	"NANOG"	NA	NA	"analyte probe"
-5	4	8	"GDF3"	"GDF3"	NA	NA	"analyte probe"
-5	5	8	"NANOG"	"NANOG"	NA	NA	"analyte probe"
-5	6	8	"GDF3"	"GDF3"	NA	NA	"analyte probe"
-5	7	8	"empty"	"empty"	NA	NA	"removed probe"
-5	8	8	"empty"	"empty"	NA	NA	"removed probe"
-6	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-6	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-6	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-6	4	1	"GAGE4"	"GAGE4"	NA	NA	"analyte probe"
-6	5	1	"GRWD1"	"GRWD1"	NA	NA	"analyte probe"
-6	6	1	"LIP1"	"LIP1"	NA	NA	"analyte probe"
-6	7	1	"p53"	"p53"	NA	NA	"analyte probe"
-6	8	1	"NY-ESO-1 ORF2"	"NY-ESO-1 ORF2"	NA	NA	"analyte probe"
-6	1	2	"SGY-1"	"SGY-1"	NA	NA	"analyte probe"
-6	2	2	"SPANXB1"	"SPANXB1"	NA	NA	"analyte probe"
-6	3	2	"SSX1"	"SSX1"	NA	NA	"analyte probe"
-6	4	2	"MAPK1"	"MAPK1"	NA	NA	"analyte probe"
-6	5	2	"SRC"	"SRC"	NA	NA	"analyte probe"
-6	6	2	"CTNNB1"	"CTNNB1"	NA	NA	"analyte probe"
-6	7	2	"P53 T18A"	"P53 T18A"	NA	NA	"analyte probe"
-6	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-6	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-6	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-6	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-6	4	3	"GAGE4"	"GAGE4"	NA	NA	"analyte probe"
-6	5	3	"GRWD1"	"GRWD1"	NA	NA	"analyte probe"
-6	6	3	"LIP1"	"LIP1"	NA	NA	"analyte probe"
-6	7	3	"p53"	"p53"	NA	NA	"analyte probe"
-6	8	3	"NY-ESO-1 ORF2"	"NY-ESO-1 ORF2"	NA	NA	"analyte probe"
-6	1	4	"SGY-1"	"SGY-1"	NA	NA	"analyte probe"
-6	2	4	"SPANXB1"	"SPANXB1"	NA	NA	"analyte probe"
-6	3	4	"SSX1"	"SSX1"	NA	NA	"analyte probe"
-6	4	4	"MAPK1"	"MAPK1"	NA	NA	"analyte probe"
-6	5	4	"SRC"	"SRC"	NA	NA	"analyte probe"
-6	6	4	"CTNNB1"	"CTNNB1"	NA	NA	"analyte probe"
-6	7	4	"P53 T18A"	"P53 T18A"	NA	NA	"analyte probe"
-6	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-6	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-6	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-6	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-6	4	5	"GAGE4"	"GAGE4"	NA	NA	"analyte probe"
-6	5	5	"GRWD1"	"GRWD1"	NA	NA	"analyte probe"
-6	6	5	"LIP1"	"LIP1"	NA	NA	"analyte probe"
-6	7	5	"p53"	"p53"	NA	NA	"analyte probe"
-6	8	5	"NY-ESO-1 ORF2"	"NY-ESO-1 ORF2"	NA	NA	"analyte probe"
-6	1	6	"SGY-1"	"SGY-1"	NA	NA	"analyte probe"
-6	2	6	"SPANXB1"	"SPANXB1"	NA	NA	"analyte probe"
-6	3	6	"SSX1"	"SSX1"	NA	NA	"analyte probe"
-6	4	6	"MAPK1"	"MAPK1"	NA	NA	"analyte probe"
-6	5	6	"SRC"	"SRC"	NA	NA	"analyte probe"
-6	6	6	"CTNNB1"	"CTNNB1"	NA	NA	"analyte probe"
-6	7	6	"biotin-ahIgG"	"biotin-ahIgG"	NA	NA	"removed probe"
-6	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-6	1	7	"cytochrome P450 reductase"	"cytochrome P450 reductase"	NA	NA	"analyte probe"
-6	2	7	"P53 T18A"	"P53 T18A"	NA	NA	"analyte probe"
-6	3	7	"cytochrome P450 reductase"	"cytochrome P450 reductase"	NA	NA	"analyte probe"
-6	4	7	"biotin-ahIgG"	"biotin-ahIgG"	NA	NA	"removed probe"
-6	5	7	"cytochrome P450 reductase"	"cytochrome P450 reductase"	NA	NA	"analyte probe"
-6	6	7	"biotin-ahIgG"	"biotin-ahIgG"	NA	NA	"removed probe"
-6	7	7	"empty"	"empty"	NA	NA	"removed probe"
-6	8	7	"empty"	"empty"	NA	NA	"removed probe"
-6	1	8	"POU5F1/OCT3/OCT4A var. 1"	"POU5F1/OCT3/OCT4A var. 1"	NA	NA	"analyte probe"
-6	2	8	"DPPA3"	"DPPA3"	NA	NA	"analyte probe"
-6	3	8	"POU5F1/OCT3/OCT4A var. 1"	"POU5F1/OCT3/OCT4A var. 1"	NA	NA	"analyte probe"
-6	4	8	"DPPA3"	"DPPA3"	NA	NA	"analyte probe"
-6	5	8	"POU5F1/OCT3/OCT4A var. 1"	"POU5F1/OCT3/OCT4A var. 1"	NA	NA	"analyte probe"
-6	6	8	"DPPA3"	"DPPA3"	NA	NA	"analyte probe"
-6	7	8	"empty"	"empty"	NA	NA	"removed probe"
-6	8	8	"empty"	"empty"	NA	NA	"removed probe"
-7	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-7	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-7	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-7	4	1	"GAGE2A"	"GAGE2A"	NA	NA	"analyte probe"
-7	5	1	"GAGE7"	"GAGE7"	NA	NA	"analyte probe"
-7	6	1	"LEMD1"	"LEMD1"	NA	NA	"analyte probe"
-7	7	1	"OIP5"	"OIP5"	NA	NA	"analyte probe"
-7	8	1	"CAMEL"	"CAMEL"	NA	NA	"analyte probe"
-7	1	2	"ROPN1"	"ROPN1"	NA	NA	"analyte probe"
-7	2	2	"SPANXA1"	"SPANXA1"	NA	NA	"analyte probe"
-7	3	2	"SPO11"	"SPO11"	NA	NA	"analyte probe"
-7	4	2	"FGFR2"	"FGFR2"	NA	NA	"analyte probe"
-7	5	2	"RAF"	"RAF"	NA	NA	"analyte probe"
-7	6	2	"CREB1"	"CREB1"	NA	NA	"analyte probe"
-7	7	2	"p53 S15A"	"p53 S15A"	NA	NA	"analyte probe"
-7	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-7	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-7	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-7	4	3	"GAGE2A"	"GAGE2A"	NA	NA	"analyte probe"
-7	5	3	"GAGE7"	"GAGE7"	NA	NA	"analyte probe"
-7	6	3	"LEMD1"	"LEMD1"	NA	NA	"analyte probe"
-7	7	3	"OIP5"	"OIP5"	NA	NA	"analyte probe"
-7	8	3	"CAMEL"	"CAMEL"	NA	NA	"analyte probe"
-7	1	4	"ROPN1"	"ROPN1"	NA	NA	"analyte probe"
-7	2	4	"SPANXA1"	"SPANXA1"	NA	NA	"analyte probe"
-7	3	4	"SPO11"	"SPO11"	NA	NA	"analyte probe"
-7	4	4	"FGFR2"	"FGFR2"	NA	NA	"analyte probe"
-7	5	4	"RAF"	"RAF"	NA	NA	"analyte probe"
-7	6	4	"CREB1"	"CREB1"	NA	NA	"analyte probe"
-7	7	4	"p53 S15A"	"p53 S15A"	NA	NA	"analyte probe"
-7	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-7	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-7	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-7	4	5	"GAGE2A"	"GAGE2A"	NA	NA	"analyte probe"
-7	5	5	"GAGE7"	"GAGE7"	NA	NA	"analyte probe"
-7	6	5	"LEMD1"	"LEMD1"	NA	NA	"analyte probe"
-7	7	5	"OIP5"	"OIP5"	NA	NA	"analyte probe"
-7	8	5	"CAMEL"	"CAMEL"	NA	NA	"analyte probe"
-7	1	6	"ROPN1"	"ROPN1"	NA	NA	"analyte probe"
-7	2	6	"SPANXA1"	"SPANXA1"	NA	NA	"analyte probe"
-7	3	6	"SPO11"	"SPO11"	NA	NA	"analyte probe"
-7	4	6	"FGFR2"	"FGFR2"	NA	NA	"analyte probe"
-7	5	6	"RAF"	"RAF"	NA	NA	"analyte probe"
-7	6	6	"CREB1"	"CREB1"	NA	NA	"analyte probe"
-7	7	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	1	7	"cytochrome P450 3A4"	"cytochrome P450 3A4"	NA	NA	"analyte probe"
-7	2	7	"p53 S15A"	"p53 S15A"	NA	NA	"analyte probe"
-7	3	7	"cytochrome P450 3A4"	"cytochrome P450 3A4"	NA	NA	"analyte probe"
-7	4	7	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	5	7	"cytochrome P450 3A4"	"cytochrome P450 3A4"	NA	NA	"analyte probe"
-7	6	7	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-7	7	7	"empty"	"empty"	NA	NA	"removed probe"
-7	8	7	"empty"	"empty"	NA	NA	"removed probe"
-7	1	8	"CEACAM 1 isoform 1"	"CEACAM 1 isoform 1"	NA	NA	"analyte probe"
-7	2	8	"DPPA4"	"DPPA4"	NA	NA	"analyte probe"
-7	3	8	"CEACAM 1 isoform 1"	"CEACAM 1 isoform 1"	NA	NA	"analyte probe"
-7	4	8	"DPPA4"	"DPPA4"	NA	NA	"analyte probe"
-7	5	8	"CEACAM 1 isoform 1"	"CEACAM 1 isoform 1"	NA	NA	"analyte probe"
-7	6	8	"DPPA4"	"DPPA4"	NA	NA	"analyte probe"
-7	7	8	"empty"	"empty"	NA	NA	"removed probe"
-7	8	8	"empty"	"empty"	NA	NA	"removed probe"
-8	1	1	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-8	2	1	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-8	3	1	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-8	4	1	"GAGE1"	"GAGE1"	NA	NA	"analyte probe"
-8	5	1	"GAGE6"	"GAGE6"	NA	NA	"analyte probe"
-8	6	1	"LDHC"	"LDHC"	NA	NA	"analyte probe"
-8	7	1	"NY-ESO-1"	"NY-ESO-1"	NA	NA	"analyte probe"
-8	8	1	"CTAG2/LAGE-1b/LAGE-1L"	"CTAG2/LAGE-1b/LAGE-1L"	NA	NA	"analyte probe"
-8	1	2	"RELT"	"RELT"	NA	NA	"analyte probe"
-8	2	2	"SPAG9"	"SPAG9"	NA	NA	"analyte probe"
-8	3	2	"SPANXD"	"SPANXD"	NA	NA	"analyte probe"
-8	4	2	"FES"	"FES"	NA	NA	"analyte probe"
-8	5	2	"PRKCZ"	"PRKCZ"	NA	NA	"analyte probe"
-8	6	2	"CDC25A"	"CDC25A"	NA	NA	"analyte probe"
-8	7	2	"p53 C141Y"	"p53 C141Y"	NA	NA	"analyte probe"
-8	8	2	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-8	1	3	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-8	2	3	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-8	3	3	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-8	4	3	"GAGE1"	"GAGE1"	NA	NA	"analyte probe"
-8	5	3	"GAGE6"	"GAGE6"	NA	NA	"analyte probe"
-8	6	3	"LDHC"	"LDHC"	NA	NA	"analyte probe"
-8	7	3	"NY-ESO-1"	"NY-ESO-1"	NA	NA	"analyte probe"
-8	8	3	"CTAG2/LAGE-1b/LAGE-1L"	"CTAG2/LAGE-1b/LAGE-1L"	NA	NA	"analyte probe"
-8	1	4	"RELT"	"RELT"	NA	NA	"analyte probe"
-8	2	4	"SPAG9"	"SPAG9"	NA	NA	"analyte probe"
-8	3	4	"SPANXD"	"SPANXD"	NA	NA	"analyte probe"
-8	4	4	"FES"	"FES"	NA	NA	"analyte probe"
-8	5	4	"PRKCZ"	"PRKCZ"	NA	NA	"analyte probe"
-8	6	4	"CDC25A"	"CDC25A"	NA	NA	"analyte probe"
-8	7	4	"p53 C141Y"	"p53 C141Y"	NA	NA	"analyte probe"
-8	8	4	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-8	1	5	"Cy5 BSA 5ng/ul"	"Cy5 BSA 5ng/ul"	NA	NA	"control probe"
-8	2	5	"Cy5 BSA 10ng/ul"	"Cy5 BSA 10ng/ul"	NA	NA	"control probe"
-8	3	5	"Cy5 BSA 15ng/ul"	"Cy5 BSA 15ng/ul"	NA	NA	"control probe"
-8	4	5	"GAGE1"	"GAGE1"	NA	NA	"analyte probe"
-8	5	5	"GAGE6"	"GAGE6"	NA	NA	"analyte probe"
-8	6	5	"LDHC"	"LDHC"	NA	NA	"analyte probe"
-8	7	5	"NY-ESO-1"	"NY-ESO-1"	NA	NA	"analyte probe"
-8	8	5	"CTAG2/LAGE-1b/LAGE-1L"	"CTAG2/LAGE-1b/LAGE-1L"	NA	NA	"analyte probe"
-8	1	6	"RELT"	"RELT"	NA	NA	"analyte probe"
-8	2	6	"SPAG9"	"SPAG9"	NA	NA	"analyte probe"
-8	3	6	"SPANXD"	"SPANXD"	NA	NA	"analyte probe"
-8	4	6	"FES"	"FES"	NA	NA	"analyte probe"
-8	5	6	"PRKCZ"	"PRKCZ"	NA	NA	"analyte probe"
-8	6	6	"CDC25A"	"CDC25A"	NA	NA	"analyte probe"
-8	7	6	"FTHL17"	"FTHL17"	NA	NA	"analyte probe"
-8	8	6	"Buffer"	"Buffer"	NA	NA	"analyte probe"
-8	1	7	"p53 L344P"	"p53 L344P"	NA	NA	"analyte probe"
-8	2	7	"p53 C141Y"	"p53 C141Y"	NA	NA	"analyte probe"
-8	3	7	"p53 L344P"	"p53 L344P"	NA	NA	"analyte probe"
-8	4	7	"FTHL17"	"FTHL17"	NA	NA	"analyte probe"
-8	5	7	"p53 L344P"	"p53 L344P"	NA	NA	"analyte probe"
-8	6	7	"FTHL17"	"FTHL17"	NA	NA	"analyte probe"
-8	7	7	"empty"	"empty"	NA	NA	"removed probe"
-8	8	7	"empty"	"empty"	NA	NA	"removed probe"
-8	1	8	"ROPN1A"	"ROPN1A"	NA	NA	"analyte probe"
-8	2	8	"BORIS B0"	"BORIS B0"	NA	NA	"analyte probe"
-8	3	8	"ROPN1A"	"ROPN1A"	NA	NA	"analyte probe"
-8	4	8	"BORIS B0"	"BORIS B0"	NA	NA	"analyte probe"
-8	5	8	"ROPN1A"	"ROPN1A"	NA	NA	"analyte probe"
-8	6	8	"BORIS B0"	"BORIS B0"	NA	NA	"analyte probe"
-8	7	8	"empty"	"empty"	NA	NA	"removed probe"
-8	8	8	"empty"	"empty"	NA	NA	"removed probe"
+Block	Column	Row	ID	spot	Category
+1	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+1	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+1	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+1	4	1	COL6A1	COL6A1	analyte probe
+1	5	1	CT62	CT62	analyte probe
+1	6	1	DSCR8/MMA1	DSCR8/MMA1	analyte probe
+1	7	1	MAGEA3	MAGEA3	analyte probe
+1	8	1	SOX1	SOX1	analyte probe
+1	1	2	MAGEA5	MAGEA5	analyte probe
+1	2	2	MART-1	MART-1	analyte probe
+1	3	2	NY-CO-45	NY-CO-45	analyte probe
+1	4	2	THEG	THEG	analyte probe
+1	5	2	TYR	TYR	analyte probe
+1	6	2	ZNF165	ZNF165	analyte probe
+1	7	2	CDK7	CDK7	analyte probe
+1	8	2	Buffer	Buffer	analyte probe
+1	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+1	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+1	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+1	4	3	COL6A1	COL6A1	analyte probe
+1	5	3	CT62	CT62	analyte probe
+1	6	3	DSCR8/MMA1	DSCR8/MMA1	analyte probe
+1	7	3	MAGEA3	MAGEA3	analyte probe
+1	8	3	SOX1	SOX1	analyte probe
+1	1	4	MAGEA5	MAGEA5	analyte probe
+1	2	4	MART-1	MART-1	analyte probe
+1	3	4	NY-CO-45	NY-CO-45	analyte probe
+1	4	4	THEG	THEG	analyte probe
+1	5	4	TYR	TYR	analyte probe
+1	6	4	ZNF165	ZNF165	analyte probe
+1	7	4	CDK7	CDK7	analyte probe
+1	8	4	Buffer	Buffer	analyte probe
+1	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+1	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+1	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+1	4	5	COL6A1	COL6A1	analyte probe
+1	5	5	CT62	CT62	analyte probe
+1	6	5	DSCR8/MMA1	DSCR8/MMA1	analyte probe
+1	7	5	MAGEA3	MAGEA3	analyte probe
+1	8	5	SOX1	SOX1	analyte probe
+1	1	6	MAGEA5	MAGEA5	analyte probe
+1	2	6	MART-1	MART-1	analyte probe
+1	3	6	NY-CO-45	NY-CO-45	analyte probe
+1	4	6	THEG	THEG	analyte probe
+1	5	6	TYR	TYR	analyte probe
+1	6	6	ZNF165	ZNF165	analyte probe
+1	7	6	BAGE4	BAGE4	analyte probe
+1	8	6	Buffer	Buffer	analyte probe
+1	1	7	p53 M133T	p53 M133T	analyte probe
+1	2	7	CDK7	CDK7	analyte probe
+1	3	7	p53 M133T	p53 M133T	analyte probe
+1	4	7	BAGE4	BAGE4	analyte probe
+1	5	7	p53 M133T	p53 M133T	analyte probe
+1	6	7	BAGE4	BAGE4	analyte probe
+1	7	7	empty	empty	removed probe
+1	8	7	empty	empty	removed probe
+1	1	8	ACVR2A	ACVR2A	analyte probe
+1	2	8	PIM1	PIM1	analyte probe
+1	3	8	ACVR2A	ACVR2A	analyte probe
+1	4	8	PIM1	PIM1	analyte probe
+1	5	8	ACVR2A	ACVR2A	analyte probe
+1	6	8	PIM1	PIM1	analyte probe
+1	7	8	empty	empty	removed probe
+1	8	8	empty	empty	removed probe
+2	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+2	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+2	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+2	4	1	CEP290	CEP290	analyte probe
+2	5	1	CT47.11	CT47.11	analyte probe
+2	6	1	DDX53	DDX53	analyte probe
+2	7	1	MAGEA2	MAGEA2	analyte probe
+2	8	1	DPPA2	DPPA2	analyte probe
+2	1	2	MAGEA4v4	MAGEA4v4	analyte probe
+2	2	2	MAGEB6	MAGEB6	analyte probe
+2	3	2	NXF2	NXF2	analyte probe
+2	4	2	SYCP1	SYCP1	analyte probe
+2	5	2	TSSK6	TSSK6	analyte probe
+2	6	2	XAGE3av2	XAGE3av2	analyte probe
+2	7	2	CDK4	CDK4	analyte probe
+2	8	2	Buffer	Buffer	analyte probe
+2	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+2	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+2	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+2	4	3	CEP290	CEP290	analyte probe
+2	5	3	CT47.11	CT47.11	analyte probe
+2	6	3	DDX53	DDX53	analyte probe
+2	7	3	MAGEA2	MAGEA2	analyte probe
+2	8	3	DPPA2	DPPA2	analyte probe
+2	1	4	MAGEA4v4	MAGEA4v4	analyte probe
+2	2	4	MAGEB6	MAGEB6	analyte probe
+2	3	4	NXF2	NXF2	analyte probe
+2	4	4	SYCP1	SYCP1	analyte probe
+2	5	4	TSSK6	TSSK6	analyte probe
+2	6	4	XAGE3av2	XAGE3av2	analyte probe
+2	7	4	CDK4	CDK4	analyte probe
+2	8	4	Buffer	Buffer	analyte probe
+2	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+2	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+2	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+2	4	5	CEP290	CEP290	analyte probe
+2	5	5	CT47.11	CT47.11	analyte probe
+2	6	5	DDX53	DDX53	analyte probe
+2	7	5	MAGEA2	MAGEA2	analyte probe
+2	8	5	DPPA2	DPPA2	analyte probe
+2	1	6	MAGEA4v4	MAGEA4v4	analyte probe
+2	2	6	MAGEB6	MAGEB6	analyte probe
+2	3	6	NXF2	NXF2	analyte probe
+2	4	6	SYCP1	SYCP1	analyte probe
+2	5	6	TSSK6	TSSK6	analyte probe
+2	6	6	XAGE3av2	XAGE3av2	analyte probe
+2	7	6	BAGE3	BAGE3	analyte probe
+2	8	6	Buffer	Buffer	analyte probe
+2	1	7	p53 S392A	p53 S392A	analyte probe
+2	2	7	CDK4	CDK4	analyte probe
+2	3	7	p53 S392A	p53 S392A	analyte probe
+2	4	7	BAGE3	BAGE3	analyte probe
+2	5	7	p53 S392A	p53 S392A	analyte probe
+2	6	7	BAGE3	BAGE3	analyte probe
+2	7	7	empty	empty	removed probe
+2	8	7	empty	empty	removed probe
+2	1	8	SOX2	SOX2	analyte probe
+2	2	8	MAP9	MAP9	analyte probe
+2	3	8	SOX2	SOX2	analyte probe
+2	4	8	MAP9	MAP9	analyte probe
+2	5	8	SOX2	SOX2	analyte probe
+2	6	8	MAP9	MAP9	analyte probe
+2	7	8	empty	empty	removed probe
+2	8	8	empty	empty	removed probe
+3	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+3	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+3	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+3	4	1	CCDC33	CCDC33	analyte probe
+3	5	1	CSAG2	CSAG2	analyte probe
+3	6	1	CXorf48.1	CXorf48.1	analyte probe
+3	7	1	MAGEA11	MAGEA11	analyte probe
+3	8	1	SPATS1 (isoform a)	SPATS1 (isoform a)	analyte probe
+3	1	2	MAGEA4v3	MAGEA4v3	analyte probe
+3	2	2	MAGEB5	MAGEB5	analyte probe
+3	3	2	NLRP4	NLRP4	analyte probe
+3	4	2	SYCE1	SYCE1	analyte probe
+3	5	2	TSGA10	TSGA10	analyte probe
+3	6	2	XAGE3av1	XAGE3av1	analyte probe
+3	7	2	CDK2	CDK2	analyte probe
+3	8	2	Buffer	Buffer	analyte probe
+3	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+3	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+3	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+3	4	3	CCDC33	CCDC33	analyte probe
+3	5	3	CSAG2	CSAG2	analyte probe
+3	6	3	CXorf48.1	CXorf48.1	analyte probe
+3	7	3	MAGEA11	MAGEA11	analyte probe
+3	8	3	SPATS1 (isoform a)	SPATS1 (isoform a)	analyte probe
+3	1	4	MAGEA4v3	MAGEA4v3	analyte probe
+3	2	4	MAGEB5	MAGEB5	analyte probe
+3	3	4	NLRP4	NLRP4	analyte probe
+3	4	4	SYCE1	SYCE1	analyte probe
+3	5	4	TSGA10	TSGA10	analyte probe
+3	6	4	XAGE3av1	XAGE3av1	analyte probe
+3	7	4	CDK2	CDK2	analyte probe
+3	8	4	Buffer	Buffer	analyte probe
+3	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+3	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+3	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+3	4	5	CCDC33	CCDC33	analyte probe
+3	5	5	CSAG2	CSAG2	analyte probe
+3	6	5	CXorf48.1	CXorf48.1	analyte probe
+3	7	5	MAGEA11	MAGEA11	analyte probe
+3	8	5	SPATS1 (isoform a)	SPATS1 (isoform a)	analyte probe
+3	1	6	MAGEA4v3	MAGEA4v3	analyte probe
+3	2	6	MAGEB5	MAGEB5	analyte probe
+3	3	6	NLRP4	NLRP4	analyte probe
+3	4	6	SYCE1	SYCE1	analyte probe
+3	5	6	TSGA10	TSGA10	analyte probe
+3	6	6	XAGE3av1	XAGE3av1	analyte probe
+3	7	6	BAGE2	BAGE2	analyte probe
+3	8	6	Buffer	Buffer	analyte probe
+3	1	7	p53 K382R	p53 K382R	analyte probe
+3	2	7	CDK2	CDK2	analyte probe
+3	3	7	p53 K382R	p53 K382R	analyte probe
+3	4	7	BAGE2	BAGE2	analyte probe
+3	5	7	p53 K382R	p53 K382R	analyte probe
+3	6	7	BAGE2	BAGE2	analyte probe
+3	7	7	empty	empty	removed probe
+3	8	7	empty	empty	removed probe
+3	1	8	XAGE1B	XAGE1B	analyte probe
+3	2	8	ITGB1	ITGB1	analyte probe
+3	3	8	XAGE1B	XAGE1B	analyte probe
+3	4	8	ITGB1	ITGB1	analyte probe
+3	5	8	XAGE1B	XAGE1B	analyte probe
+3	6	8	ITGB1	ITGB1	analyte probe
+3	7	8	empty	empty	removed probe
+3	8	8	empty	empty	removed probe
+4	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+4	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+4	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+4	4	1	BAGE5	BAGE5	analyte probe
+4	5	1	COX6B2	COX6B2	analyte probe
+4	6	1	CTAG2	CTAG2	analyte probe
+4	7	1	MAGEA10	MAGEA10	analyte probe
+4	8	1	TKTL1 (isoform a)	TKTL1 (isoform a)	analyte probe
+4	1	2	MAGEA4v2	MAGEA4v2	analyte probe
+4	2	2	MAGEB1	MAGEB1	analyte probe
+4	3	2	MICA	MICA	analyte probe
+4	4	2	SSX4	SSX4	analyte probe
+4	5	2	TPTE	TPTE	analyte probe
+4	6	2	XAGE-2	XAGE-2	analyte probe
+4	7	2	AKT1	AKT1	analyte probe
+4	8	2	ICL	ICL	removed probe
+4	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+4	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+4	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+4	4	3	BAGE5	BAGE5	analyte probe
+4	5	3	COX6B2	COX6B2	analyte probe
+4	6	3	CTAG2	CTAG2	analyte probe
+4	7	3	MAGEA10	MAGEA10	analyte probe
+4	8	3	TKTL1 (isoform a)	TKTL1 (isoform a)	analyte probe
+4	1	4	MAGEA4v2	MAGEA4v2	analyte probe
+4	2	4	MAGEB1	MAGEB1	analyte probe
+4	3	4	MICA	MICA	analyte probe
+4	4	4	SSX4	SSX4	analyte probe
+4	5	4	TPTE	TPTE	analyte probe
+4	6	4	XAGE-2	XAGE-2	analyte probe
+4	7	4	AKT1	AKT1	analyte probe
+4	8	4	ICL	ICL	removed probe
+4	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+4	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+4	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+4	4	5	BAGE5	BAGE5	analyte probe
+4	5	5	COX6B2	COX6B2	analyte probe
+4	6	5	CTAG2	CTAG2	analyte probe
+4	7	5	MAGEA10	MAGEA10	analyte probe
+4	8	5	TKTL1 (isoform a)	TKTL1 (isoform a)	analyte probe
+4	1	6	MAGEA4v2	MAGEA4v2	analyte probe
+4	2	6	MAGEB1	MAGEB1	analyte probe
+4	3	6	MICA	MICA	analyte probe
+4	4	6	SSX4	SSX4	analyte probe
+4	5	6	TPTE	TPTE	analyte probe
+4	6	6	XAGE-2	XAGE-2	analyte probe
+4	7	6	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+4	8	6	ICL	ICL	removed probe
+4	1	7	p53 S46A	p53 S46A	analyte probe
+4	2	7	AKT1	AKT1	analyte probe
+4	3	7	p53 S46A	p53 S46A	analyte probe
+4	4	7	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+4	5	7	p53 S46A	p53 S46A	analyte probe
+4	6	7	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+4	7	7	empty	empty	removed probe
+4	8	7	empty	empty	removed probe
+4	1	8	5T4/TPBG	5T4/TPBG	analyte probe
+4	2	8	ACVR2B	ACVR2B	analyte probe
+4	3	8	5T4/TPBG	5T4/TPBG	analyte probe
+4	4	8	ACVR2B	ACVR2B	analyte probe
+4	5	8	5T4/TPBG	5T4/TPBG	analyte probe
+4	6	8	ACVR2B	ACVR2B	analyte probe
+4	7	8	empty	empty	removed probe
+4	8	8	empty	empty	removed probe
+5	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+5	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+5	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+5	4	1	GAGE5	GAGE5	analyte probe
+5	5	1	HORMAD1	HORMAD1	analyte probe
+5	6	1	MAGEA1	MAGEA1	analyte probe
+5	7	1	PBK	PBK	analyte probe
+5	8	1	BCCP-myc	BCCP-myc	analyte probe
+5	1	2	SILV	SILV	analyte probe
+5	2	2	SPANXC	SPANXC	analyte probe
+5	3	2	SSX2A	SSX2A	analyte probe
+5	4	2	MAPK3	MAPK3	analyte probe
+5	5	2	CALM1	CALM1	analyte probe
+5	6	2	p53 S6A	p53 S6A	analyte probe
+5	7	2	p53 Q136x	p53 Q136x	analyte probe
+5	8	2	Buffer	Buffer	analyte probe
+5	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+5	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+5	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+5	4	3	GAGE5	GAGE5	analyte probe
+5	5	3	HORMAD1	HORMAD1	analyte probe
+5	6	3	MAGEA1	MAGEA1	analyte probe
+5	7	3	PBK	PBK	analyte probe
+5	8	3	BCCP-myc	BCCP-myc	analyte probe
+5	1	4	SILV	SILV	analyte probe
+5	2	4	SPANXC	SPANXC	analyte probe
+5	3	4	SSX2A	SSX2A	analyte probe
+5	4	4	MAPK3	MAPK3	analyte probe
+5	5	4	CALM1	CALM1	analyte probe
+5	6	4	p53 S6A	p53 S6A	analyte probe
+5	7	4	p53 Q136x	p53 Q136x	analyte probe
+5	8	4	Buffer	Buffer	analyte probe
+5	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+5	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+5	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+5	4	5	GAGE5	GAGE5	analyte probe
+5	5	5	HORMAD1	HORMAD1	analyte probe
+5	6	5	MAGEA1	MAGEA1	analyte probe
+5	7	5	PBK	PBK	analyte probe
+5	8	5	BCCP-myc	BCCP-myc	analyte probe
+5	1	6	SILV	SILV	analyte probe
+5	2	6	SPANXC	SPANXC	analyte probe
+5	3	6	SSX2A	SSX2A	analyte probe
+5	4	6	MAPK3	MAPK3	analyte probe
+5	5	6	CALM1	CALM1	analyte probe
+5	6	6	p53 S6A	p53 S6A	analyte probe
+5	7	6	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+5	8	6	Buffer	Buffer	analyte probe
+5	1	7	EGFR	EGFR	analyte probe
+5	2	7	p53 Q136x	p53 Q136x	analyte probe
+5	3	7	EGFR	EGFR	analyte probe
+5	4	7	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+5	5	7	EGFR	EGFR	analyte probe
+5	6	7	biotin-hIgG 10ng/ul	biotin-hIgG 10ng/ul	removed probe
+5	7	7	empty	empty	removed probe
+5	8	7	empty	empty	removed probe
+5	1	8	NANOG	NANOG	analyte probe
+5	2	8	GDF3	GDF3	analyte probe
+5	3	8	NANOG	NANOG	analyte probe
+5	4	8	GDF3	GDF3	analyte probe
+5	5	8	NANOG	NANOG	analyte probe
+5	6	8	GDF3	GDF3	analyte probe
+5	7	8	empty	empty	removed probe
+5	8	8	empty	empty	removed probe
+6	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+6	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+6	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+6	4	1	GAGE4	GAGE4	analyte probe
+6	5	1	GRWD1	GRWD1	analyte probe
+6	6	1	LIP1	LIP1	analyte probe
+6	7	1	p53	p53	analyte probe
+6	8	1	NY-ESO-1 ORF2	NY-ESO-1 ORF2	analyte probe
+6	1	2	SGY-1	SGY-1	analyte probe
+6	2	2	SPANXB1	SPANXB1	analyte probe
+6	3	2	SSX1	SSX1	analyte probe
+6	4	2	MAPK1	MAPK1	analyte probe
+6	5	2	SRC	SRC	analyte probe
+6	6	2	CTNNB1	CTNNB1	analyte probe
+6	7	2	P53 T18A	P53 T18A	analyte probe
+6	8	2	Buffer	Buffer	analyte probe
+6	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+6	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+6	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+6	4	3	GAGE4	GAGE4	analyte probe
+6	5	3	GRWD1	GRWD1	analyte probe
+6	6	3	LIP1	LIP1	analyte probe
+6	7	3	p53	p53	analyte probe
+6	8	3	NY-ESO-1 ORF2	NY-ESO-1 ORF2	analyte probe
+6	1	4	SGY-1	SGY-1	analyte probe
+6	2	4	SPANXB1	SPANXB1	analyte probe
+6	3	4	SSX1	SSX1	analyte probe
+6	4	4	MAPK1	MAPK1	analyte probe
+6	5	4	SRC	SRC	analyte probe
+6	6	4	CTNNB1	CTNNB1	analyte probe
+6	7	4	P53 T18A	P53 T18A	analyte probe
+6	8	4	Buffer	Buffer	analyte probe
+6	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+6	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+6	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+6	4	5	GAGE4	GAGE4	analyte probe
+6	5	5	GRWD1	GRWD1	analyte probe
+6	6	5	LIP1	LIP1	analyte probe
+6	7	5	p53	p53	analyte probe
+6	8	5	NY-ESO-1 ORF2	NY-ESO-1 ORF2	analyte probe
+6	1	6	SGY-1	SGY-1	analyte probe
+6	2	6	SPANXB1	SPANXB1	analyte probe
+6	3	6	SSX1	SSX1	analyte probe
+6	4	6	MAPK1	MAPK1	analyte probe
+6	5	6	SRC	SRC	analyte probe
+6	6	6	CTNNB1	CTNNB1	analyte probe
+6	7	6	biotin-ahIgG	biotin-ahIgG	removed probe
+6	8	6	Buffer	Buffer	analyte probe
+6	1	7	cytochrome P450 reductase	cytochrome P450 reductase	analyte probe
+6	2	7	P53 T18A	P53 T18A	analyte probe
+6	3	7	cytochrome P450 reductase	cytochrome P450 reductase	analyte probe
+6	4	7	biotin-ahIgG	biotin-ahIgG	removed probe
+6	5	7	cytochrome P450 reductase	cytochrome P450 reductase	analyte probe
+6	6	7	biotin-ahIgG	biotin-ahIgG	removed probe
+6	7	7	empty	empty	removed probe
+6	8	7	empty	empty	removed probe
+6	1	8	POU5F1/OCT3/OCT4A var. 1	POU5F1/OCT3/OCT4A var. 1	analyte probe
+6	2	8	DPPA3	DPPA3	analyte probe
+6	3	8	POU5F1/OCT3/OCT4A var. 1	POU5F1/OCT3/OCT4A var. 1	analyte probe
+6	4	8	DPPA3	DPPA3	analyte probe
+6	5	8	POU5F1/OCT3/OCT4A var. 1	POU5F1/OCT3/OCT4A var. 1	analyte probe
+6	6	8	DPPA3	DPPA3	analyte probe
+6	7	8	empty	empty	removed probe
+6	8	8	empty	empty	removed probe
+7	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+7	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+7	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+7	4	1	GAGE2A	GAGE2A	analyte probe
+7	5	1	GAGE7	GAGE7	analyte probe
+7	6	1	LEMD1	LEMD1	analyte probe
+7	7	1	OIP5	OIP5	analyte probe
+7	8	1	CAMEL	CAMEL	analyte probe
+7	1	2	ROPN1	ROPN1	analyte probe
+7	2	2	SPANXA1	SPANXA1	analyte probe
+7	3	2	SPO11	SPO11	analyte probe
+7	4	2	FGFR2	FGFR2	analyte probe
+7	5	2	RAF	RAF	analyte probe
+7	6	2	CREB1	CREB1	analyte probe
+7	7	2	p53 S15A	p53 S15A	analyte probe
+7	8	2	Buffer	Buffer	analyte probe
+7	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+7	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+7	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+7	4	3	GAGE2A	GAGE2A	analyte probe
+7	5	3	GAGE7	GAGE7	analyte probe
+7	6	3	LEMD1	LEMD1	analyte probe
+7	7	3	OIP5	OIP5	analyte probe
+7	8	3	CAMEL	CAMEL	analyte probe
+7	1	4	ROPN1	ROPN1	analyte probe
+7	2	4	SPANXA1	SPANXA1	analyte probe
+7	3	4	SPO11	SPO11	analyte probe
+7	4	4	FGFR2	FGFR2	analyte probe
+7	5	4	RAF	RAF	analyte probe
+7	6	4	CREB1	CREB1	analyte probe
+7	7	4	p53 S15A	p53 S15A	analyte probe
+7	8	4	Buffer	Buffer	analyte probe
+7	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+7	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+7	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+7	4	5	GAGE2A	GAGE2A	analyte probe
+7	5	5	GAGE7	GAGE7	analyte probe
+7	6	5	LEMD1	LEMD1	analyte probe
+7	7	5	OIP5	OIP5	analyte probe
+7	8	5	CAMEL	CAMEL	analyte probe
+7	1	6	ROPN1	ROPN1	analyte probe
+7	2	6	SPANXA1	SPANXA1	analyte probe
+7	3	6	SPO11	SPO11	analyte probe
+7	4	6	FGFR2	FGFR2	analyte probe
+7	5	6	RAF	RAF	analyte probe
+7	6	6	CREB1	CREB1	analyte probe
+7	7	6	Buffer	Buffer	analyte probe
+7	8	6	Buffer	Buffer	analyte probe
+7	1	7	cytochrome P450 3A4	cytochrome P450 3A4	analyte probe
+7	2	7	p53 S15A	p53 S15A	analyte probe
+7	3	7	cytochrome P450 3A4	cytochrome P450 3A4	analyte probe
+7	4	7	Buffer	Buffer	analyte probe
+7	5	7	cytochrome P450 3A4	cytochrome P450 3A4	analyte probe
+7	6	7	Buffer	Buffer	analyte probe
+7	7	7	empty	empty	removed probe
+7	8	7	empty	empty	removed probe
+7	1	8	CEACAM 1 isoform 1	CEACAM 1 isoform 1	analyte probe
+7	2	8	DPPA4	DPPA4	analyte probe
+7	3	8	CEACAM 1 isoform 1	CEACAM 1 isoform 1	analyte probe
+7	4	8	DPPA4	DPPA4	analyte probe
+7	5	8	CEACAM 1 isoform 1	CEACAM 1 isoform 1	analyte probe
+7	6	8	DPPA4	DPPA4	analyte probe
+7	7	8	empty	empty	removed probe
+7	8	8	empty	empty	removed probe
+8	1	1	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+8	2	1	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+8	3	1	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+8	4	1	GAGE1	GAGE1	analyte probe
+8	5	1	GAGE6	GAGE6	analyte probe
+8	6	1	LDHC	LDHC	analyte probe
+8	7	1	NY-ESO-1	NY-ESO-1	analyte probe
+8	8	1	CTAG2/LAGE-1b/LAGE-1L	CTAG2/LAGE-1b/LAGE-1L	analyte probe
+8	1	2	RELT	RELT	analyte probe
+8	2	2	SPAG9	SPAG9	analyte probe
+8	3	2	SPANXD	SPANXD	analyte probe
+8	4	2	FES	FES	analyte probe
+8	5	2	PRKCZ	PRKCZ	analyte probe
+8	6	2	CDC25A	CDC25A	analyte probe
+8	7	2	p53 C141Y	p53 C141Y	analyte probe
+8	8	2	Buffer	Buffer	analyte probe
+8	1	3	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+8	2	3	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+8	3	3	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+8	4	3	GAGE1	GAGE1	analyte probe
+8	5	3	GAGE6	GAGE6	analyte probe
+8	6	3	LDHC	LDHC	analyte probe
+8	7	3	NY-ESO-1	NY-ESO-1	analyte probe
+8	8	3	CTAG2/LAGE-1b/LAGE-1L	CTAG2/LAGE-1b/LAGE-1L	analyte probe
+8	1	4	RELT	RELT	analyte probe
+8	2	4	SPAG9	SPAG9	analyte probe
+8	3	4	SPANXD	SPANXD	analyte probe
+8	4	4	FES	FES	analyte probe
+8	5	4	PRKCZ	PRKCZ	analyte probe
+8	6	4	CDC25A	CDC25A	analyte probe
+8	7	4	p53 C141Y	p53 C141Y	analyte probe
+8	8	4	Buffer	Buffer	analyte probe
+8	1	5	Cy5 BSA 5ng/ul	Cy5 BSA 5ng/ul	control probe
+8	2	5	Cy5 BSA 10ng/ul	Cy5 BSA 10ng/ul	control probe
+8	3	5	Cy5 BSA 15ng/ul	Cy5 BSA 15ng/ul	control probe
+8	4	5	GAGE1	GAGE1	analyte probe
+8	5	5	GAGE6	GAGE6	analyte probe
+8	6	5	LDHC	LDHC	analyte probe
+8	7	5	NY-ESO-1	NY-ESO-1	analyte probe
+8	8	5	CTAG2/LAGE-1b/LAGE-1L	CTAG2/LAGE-1b/LAGE-1L	analyte probe
+8	1	6	RELT	RELT	analyte probe
+8	2	6	SPAG9	SPAG9	analyte probe
+8	3	6	SPANXD	SPANXD	analyte probe
+8	4	6	FES	FES	analyte probe
+8	5	6	PRKCZ	PRKCZ	analyte probe
+8	6	6	CDC25A	CDC25A	analyte probe
+8	7	6	FTHL17	FTHL17	analyte probe
+8	8	6	Buffer	Buffer	analyte probe
+8	1	7	p53 L344P	p53 L344P	analyte probe
+8	2	7	p53 C141Y	p53 C141Y	analyte probe
+8	3	7	p53 L344P	p53 L344P	analyte probe
+8	4	7	FTHL17	FTHL17	analyte probe
+8	5	7	p53 L344P	p53 L344P	analyte probe
+8	6	7	FTHL17	FTHL17	analyte probe
+8	7	7	empty	empty	removed probe
+8	8	7	empty	empty	removed probe
+8	1	8	ROPN1A	ROPN1A	analyte probe
+8	2	8	BORIS B0	BORIS B0	analyte probe
+8	3	8	ROPN1A	ROPN1A	analyte probe
+8	4	8	BORIS B0	BORIS B0	analyte probe
+8	5	8	ROPN1A	ROPN1A	analyte probe
+8	6	8	BORIS B0	BORIS B0	analyte probe
+8	7	8	empty	empty	removed probe
+8	8	8	empty	empty	removed probe
