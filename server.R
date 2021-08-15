@@ -276,7 +276,7 @@ shinyServer(function(session, input, output) {
     values$pvalue_select = input$pvalue_select
   })
   
-  observeEvent(input$cont_matrix_comp,{
+  observeEvent(input$cont_matrix_comp,{ 
     values$cont_matrix_comp = input$cont_matrix_comp
   })
 
@@ -913,7 +913,7 @@ shinyServer(function(session, input, output) {
     
     
     spot_upload = reactive({  withProgress(message = 'Upload Spots',{
-      req(spot_names()) 
+      req(spot_names())  
       input$reset_spots
       input$dataset
       input$gpr_files
@@ -923,17 +923,10 @@ shinyServer(function(session, input, output) {
       df$spot = spot_names()
       
       spot_names = spot_names()
-      # if(input$remove_spot_duplicates == T){
-      #   while(TRUE %in% duplicated(spot_names)){
-      #     print(paste('hit :',i))
-      #     print(length(spot_names[duplicated(spot_names) == TRUE]))
-      #     spot_names[duplicated(spot_names)] = paste0(spot_names[duplicated(spot_names)],'_',i)
-      #     i = i + 1
-      #   }
-      #   TRUE %in% duplicated(spot_names)
-      #   df$unique_spot = spot_names
-      # }
-
+   
+      error = NULL
+      warning = NULL
+      upload_df = NULL
       if(!is.null(values$spot_file)){
         if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt'))){
           spot_file_path = file.path(input$dataset,'spots.txt')
@@ -944,15 +937,38 @@ shinyServer(function(session, input, output) {
         if(!is.null(spot_file_path)){
           
           upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
-          df = df %>% 
-            left_join(upload_df)
+          if('spot' %in% colnames(upload_df)){
+            if('Category' %in% colnames(upload_df)){
+              upload_df_trim = upload_df %>% 
+                dplyr::select(spot,Category)
+            }else{
+              error = 'No Category column in uploaded spot file'
+            }
+          }else{
+            error = 'No spot column in uploaded spot file'
+            
+          }
+          
+          if(length(intersect(df$spot,upload_df$spot)) == 0){
+            error = 'There are no overlapping spots between the uploded spot file and the uploaded array files'
+          }else{
+            if(length(setdiff(df$spot,upload_df$spot)) > 0){
+              warning = 'Not all the spots in the array files are in the uploaded spot file.'
+            }
+          }
+          
+          
+          if(is.null(error)){
+            df = df %>% 
+              left_join(upload_df_trim)
+          }
         }
       }
       
       if(!'Category' %in% colnames(df)){
         df$Category = character(dim(df)[1])
       }
-      df
+      list(df = df, upload_df = upload_df,error = error, warning = warning)
     })})
     
     output$spot_remove_ui = renderUI({
@@ -960,7 +976,7 @@ shinyServer(function(session, input, output) {
       #req(input$reset_spots)
       #req(input$dataset)
       #req(input$gpr_files)
-      df = spot_upload()
+      df = spot_upload()$df
       as.tbl(df)
       proteins = df$spot
       control = df$spot[df$Category == 'removed probe' | df$spot == 'EMPTY']
@@ -972,7 +988,7 @@ shinyServer(function(session, input, output) {
       #req(input$reset_spots)
       #req(input$dataset)
       #input$gpr_files
-      df = spot_upload()
+      df = spot_upload()$df
       as.tbl(df)
       proteins = df$spot
       control = df$spot[df$Category == 'control']
@@ -981,7 +997,7 @@ shinyServer(function(session, input, output) {
     
     spots = reactive({
       req(spot_upload())
-      df = spot_upload()
+      df = spot_upload()$df
       df$Category = 'analyte'
       df$Category[df$spot %in% input$select_remove] = 'removed probe'
       df$Category[df$spot %in% input$select_control_spot] = 'control'
@@ -1006,6 +1022,27 @@ shinyServer(function(session, input, output) {
       values$probes = 'hit'
       spots()
     },rownames = FALSE)
+    
+    output$spot_table_ui = renderUI({
+      result_list = spot_upload()
+      
+      if(!is.null(result_list$error) | !is.null(result_list$warning)){
+        output$spot_upload_df = DT::renderDataTable({
+          result_list$upload_df
+        })
+        
+        lst = list(
+          span(tags$h4(result_list$error), style="color:red"),
+          span(tags$h4(result_list$warning), style="color:orange"),
+          tags$h3('Uploaded Spot Table'),
+          DT::dataTableOutput('spot_upload_df'),
+          tags$h3('Array Spot Table'),
+          DT::dataTableOutput('spot_table')
+        )
+      }else{
+        DT::dataTableOutput('spot_table')
+      }
+    })
     
  
     
@@ -1044,7 +1081,7 @@ shinyServer(function(session, input, output) {
     })
     
     observeEvent(input$reset_proteins,{
-      values$proteins_file = NULL
+      values$protein_file = NULL
     })
     
     
@@ -1053,9 +1090,9 @@ shinyServer(function(session, input, output) {
       values$protein_file = input$protein_file
     })
     
-    
+     
     protein_upload = reactive({ withProgress(message = 'Uploading Proteins',{
-      req(data_full())
+      req(data_full()) 
       input$reset_targets
       input$dataset
       input$gpr_files
@@ -1065,8 +1102,10 @@ shinyServer(function(session, input, output) {
       
       #df = data.frame(protein = data_full()$protein)
       error = NULL
+      warning = NULL
       upload_df = NULL
       protein_file_path = NULL
+      info = NULL
       
       if(!is.null(values$protein_file)){
         if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'proteins.txt'))){
@@ -1076,14 +1115,45 @@ shinyServer(function(session, input, output) {
             protein_file_path = input$protein_file$datapath
         }
         if(!is.null(protein_file_path)){
-            upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
-            if(!TRUE %in% duplicated(upload_df$Name)){
+          
+          
+          upload_df = read.csv(protein_file_path,sep ='\t',stringsAsFactors = F)
+          if('protein' %in% colnames(upload_df)){
+            if('Category' %in% colnames(upload_df)){
+              #upload_df_trim = upload_df %>% 
+              #  dplyr::select(spot,Category)
+              print('col_hit')
               df = df %>% 
-                left_join(upload_df)
+                dplyr::select(-'Category')
             }else{
-              error = 'There are duplicates in the Name column'
-              df = df
+              warning = 'No Category column in uploaded protein file'
             }
+          }else{
+            error = 'No protein column in uploaded protein file'
+            
+          }
+          
+          if(length(intersect(df$protein,upload_df$protein)) == 0){
+            error = 'There are no overlapping proteins between the uploded protein file and the uploaded array file proteins'
+          }else{
+            if(length(setdiff(df$protein,upload_df$protein)) > 0){
+              warning = 'Not all the proteins in the array files are in the uploaded protein file.'
+              diff_list = c(paste(setdiff(df$protein,upload_df$protein),collapse = ', '),paste(setdiff(upload_df$protein,df$protein),collapse = ', '))
+              diff_list
+              info = paste(diff_list,collapse = ' and ')
+              info
+            }
+          }
+          
+          if(TRUE %in% duplicated(upload_df$protein)){
+            error = 'There are duplicates in the protein column'
+          }
+          
+          if(is.null(error)){
+              df = df %>% 
+                left_join(upload_df,by = 'protein')
+          }
+          
         }
       }
       
@@ -1093,7 +1163,7 @@ shinyServer(function(session, input, output) {
 
       }
       
-      list(df = df, upload_df = upload_df,error = error)
+      list(df = df, upload_df = upload_df,error = error,warning = warning, info = info)
     })})
     
     output$protein_control_ui = renderUI({
@@ -1146,6 +1216,29 @@ shinyServer(function(session, input, output) {
       values$proteins = 'hit'
       proteins() 
     },rownames = FALSE)
+    
+    output$protein_table_ui = renderUI({
+      result_list = protein_upload()
+      
+      if(!is.null(result_list$error) | !is.null(result_list$warning)){
+        output$protein_upload_df = DT::renderDataTable({
+          result_list$upload_df
+        },rownames = FALSE)
+        
+        lst = list(
+          span(tags$h4(result_list$error), style="color:red"),
+          span(tags$h4(result_list$warning), style="color:orange"),
+          tags$h6(result_list$info),
+          
+          tags$h3('Uploaded Protein Table'),
+          DT::dataTableOutput('protein_upload_df'),
+          tags$h3('Array Protein Table'),
+          DT::dataTableOutput('proteins_table')
+        )
+      }else{
+        DT::dataTableOutput('proteins_table')
+      }
+    }) 
     
     output$download_proteins <- downloadHandler(
       filename = function(){"proteins.txt"}, 

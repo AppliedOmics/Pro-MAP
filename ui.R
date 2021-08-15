@@ -117,10 +117,12 @@ shinyUI(fluidPage(
                    #uiOutput('G_spot_control_ui'),
                    #uiOutput('spot_columns_ui'),
                    column(12,
-                   uiOutput('spot_control_ui'),
-                   uiOutput('spot_remove_ui'),
-                   #radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
-                   DT::dataTableOutput('spot_table'))
+                     uiOutput('spot_control_ui'),
+                     uiOutput('spot_remove_ui'),
+                     #radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
+                     #DT::dataTableOutput('spot_table'))
+                     uiOutput('spot_table_ui')
+                   )
                    
           ),
           
@@ -183,7 +185,8 @@ shinyUI(fluidPage(
                    column(9,uiOutput('drop_rows_ui')),
                    #column(12,uiOutput('protein_columns_ui')),
                    column(12,uiOutput('proteins_upload_error_ui')),
-                   column(12,DT::dataTableOutput('proteins_table'))
+                   #column(12,DT::dataTableOutput('proteins_table'))
+                   column(12,uiOutput('protein_table_ui'))
           ),
           
 
