@@ -291,23 +291,45 @@ shinyServer(function(session, input, output) {
   #### Inputs Options #####
     ##### _Select Datasets #####
     
-    output$select_datasets_ui = renderUI({
+    output$select_datasets_ui = renderUI({ 
       if(is.null(input$gpr_files$datapath)){
         if(values$app_version == 'pro'){
-          selectInput('dataset','Dataset',pro_data_list,pro_dataset)
+          selectInput('dataset','Dataset',c(pro_data_list),pro_dataset)
         }else{
-          selectInput('dataset','Dataset',basic_data_list,basic_dataset)
+          selectInput('dataset','Dataset',c(basic_data_list),basic_dataset)
         }
       }else{
         if(values$app_version == 'pro'){
-          selectInput('dataset','Dataset',pro_data_list,'Upload')
+          selectInput('dataset','Dataset',c('Upload',pro_data_list),'Upload')
         }else{
-          selectInput('dataset','Dataset',basic_data_list,'Upload')
+          selectInput('dataset','Dataset',c('Upload',basic_data_list),'Upload')
         }
         #selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }
       
     })
+  
+  observeEvent(input$dataset,{
+    hideTab('main','probes')
+    hideTab('main','proteins')
+    hideTab('main','data')
+    hideTab('main','pipeline')
+    hideTab('main','all')
+    hideTab('main','sig')
+  })
+  
+  observeEvent(input$gpr_files$datapath,{
+    values$spot_file = NULL 
+    values$proteins_file = NULL
+    values$target_file = NULL
+    hideTab('main','probes')
+    hideTab('main','proteins')
+    hideTab('main','data')
+    hideTab('main','pipeline')
+    hideTab('main','all')
+    hideTab('main','sig')
+    
+  })
     
     
     ##### _Test Files #####
@@ -661,18 +683,14 @@ shinyServer(function(session, input, output) {
      
 
     
-    observeEvent(input$gpr_files$datapath,{
-      values$spot_file = NULL 
-      values$proteins_file = NULL
-      values$target_file = NULL
-      
-    })
+
     
 
       
 
     
     E = reactive({withProgress(message = 'Generating EListRaw object',{
+      print('E')
       file_path_list = array_file_list()$path  
       file_path_list
           # if(input$spot_filtering == 'wtflags(0.1)'){
@@ -871,6 +889,9 @@ shinyServer(function(session, input, output) {
     })
     
     output$spot_file_upload_ui = renderUI({
+      input$gpr_files
+      input$dataset
+      input$reset_spots
         fileInput(
           inputId = "spot_file", 
           label = "Upload Spots File", 
@@ -879,7 +900,7 @@ shinyServer(function(session, input, output) {
     })
     
     output$spot_columns_ui = renderUI({
-      req(input$select_annotation)
+      req(input$select_annotation) 
       input$dataset 
       input$gpr_files
       input$reset_proteins
@@ -913,6 +934,7 @@ shinyServer(function(session, input, output) {
     
     
     spot_upload = reactive({  withProgress(message = 'Upload Spots',{
+      print('spot_upload')
       req(spot_names())  
       input$reset_spots
       input$dataset
@@ -939,8 +961,11 @@ shinyServer(function(session, input, output) {
           upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
           if('spot' %in% colnames(upload_df)){
             if('Category' %in% colnames(upload_df)){
-              upload_df_trim = upload_df %>% 
-                dplyr::select(spot,Category)
+              print('col hit')
+              
+              #upload_df_trim = upload_df %>% 
+              #  dplyr::select(spot,Category) %>% 
+              #  distinct()
             }else{
               error = 'No Category column in uploaded spot file'
             }
@@ -957,10 +982,15 @@ shinyServer(function(session, input, output) {
             }
           }
           
+          # if(TRUE %in% duplicated(upload_df$spot)){
+          #   warning = "There are duplicates in the spot column, the duplicates have been removed" 
+          #   upload_df_trim = upload_df_trim %>% 
+          #     filter(!duplicated(spot))
+          # }
           
           if(is.null(error)){
             df = df %>% 
-              left_join(upload_df_trim)
+              left_join(upload_df)
           }
         }
       }
@@ -971,49 +1001,58 @@ shinyServer(function(session, input, output) {
       list(df = df, upload_df = upload_df,error = error, warning = warning)
     })})
     
-    output$spot_remove_ui = renderUI({
+    output$spot_remove_ui = renderUI({withProgress(message = 'remove probes',{
+      print('spot_remove') 
       #req(spot_upload()) 
       #req(input$reset_spots)
       #req(input$dataset)
       #req(input$gpr_files)
       df = spot_upload()$df
-      as.tbl(df)
-      proteins = df$spot
-      control = df$spot[df$Category == 'removed probe' | df$spot == 'EMPTY']
+      #as.tbl(df)
+      proteins = unique(df$spot)
+      (empty_spots = grep('empty|EMPTY',df$spot,value = T))
+      
+      control = unique(c(empty_spots,df$spot[df$Category == 'remove']))
+      control
       selectInput('select_remove','Probes to Remove before Normalisation',proteins,control,multiple = T, width = 1200)
-    })
+    })})
     
-    output$spot_control_ui = renderUI({
+    output$spot_control_ui = renderUI({withProgress(message = 'control probes',{
+      print('spot control') 
       #req(spot_upload())
       #req(input$reset_spots)
       #req(input$dataset)
       #input$gpr_files
       df = spot_upload()$df
       as.tbl(df)
-      proteins = df$spot
-      control = df$spot[df$Category == 'control']
+      proteins = unique(df$spot)
+      control = unique(df$spot[df$Category == 'control'])
       selectInput('select_control_spot','Control Probes (labelled but not removed)',proteins,control,multiple = T, width = 1200)
-    })
+    })})
     
-    spots = reactive({
+    spots = reactive({withProgress (message = 'assigning labels to probes',{
+      print('spots')
       req(spot_upload())
       df = spot_upload()$df
       df$Category = 'analyte'
-      df$Category[df$spot %in% input$select_remove] = 'removed probe'
+      df$Category[df$spot == ''] = 'remove'
+      df$Category[df$spot %in% input$select_remove] = 'remove'
       df$Category[df$spot %in% input$select_control_spot] = 'control'
       #df$Category[df$Category == 'remove' & !df$spot %in% input$select_remove] = ''
       df
-    })
+    })})
     
     removed_spots = reactive({
+      print('removed_spots')
       req(spots())
       spots() %>% 
-        filter(!Category %in% c('removed probe')) %>% 
+        filter(!Category %in% c('remove')) %>% 
         pull(spot)
     })
     
     
     output$spot_table = DT::renderDataTable({
+      print('spot_table')
       req(spot_upload())
       req(spots())
       showTab('main','proteins')
@@ -1058,6 +1097,7 @@ shinyServer(function(session, input, output) {
     output$protein_file_upload_ui = renderUI({
       input$reset_proteins
       input$gpr_files
+      input$dataset
       fileInput(
         inputId = "protein_file", 
         label = "Upload Protein File", 
@@ -1146,7 +1186,9 @@ shinyServer(function(session, input, output) {
           }
           
           if(TRUE %in% duplicated(upload_df$protein)){
-            error = 'There are duplicates in the protein column'
+            warning = 'There are duplicates in the protein column, the duplicates have been removed'
+            upload_df = upload_df %>% 
+              filter(!duplicated(protein))
           }
           
           if(is.null(error)){
@@ -1172,8 +1214,8 @@ shinyServer(function(session, input, output) {
       input$reset_proteins
       df = protein_upload()$df
       as.tbl(df)
-      proteins = df$protein
-      control = df$protein[df$Category == 'other']
+      proteins = unique(df$protein)
+      control = unique(df$protein[df$Category == 'other'])
       selectInput('select_controls','Other',proteins,control,multiple = T, width = 1200)
       #}
     })
@@ -1407,15 +1449,24 @@ shinyServer(function(session, input, output) {
         gather(Name,value,-spot)
       as.tbl(df_l)
       
+      # df_cv_t = df_l %>% 
+      #   filter(Name == '10289345_06') %>% 
+      #   filter(spot == 'CT62')
+      # 
+      # as.tbl(df_cv_t)
+      
       df_cv = df_l %>% 
         group_by(spot,Name) %>%
-          summarise(mean = mean(value,na.rm = T),
+          summarise(count = n(),
+                    mean = mean(value,na.rm = T),
                     median = median(value,na.rm = T),
                     sd = sd(value,na.rm = T)) %>% 
         ungroup() %>% 
         mutate(CV = 100*(sd/mean),
                diff_mm = abs(mean-median)) 
         
+      as.tbl(df_cv)
+      
       df_cv_mean = df_cv %>% 
         group_by(spot) %>% 
           summarise(mean = mean(CV,na.rm = T),
@@ -1493,7 +1544,7 @@ shinyServer(function(session, input, output) {
       b
     })
       list(df_list = df_list,p = p, d = d, b = b)
-    }
+    } 
     
     output$foreground_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
       df = foreground_table()  
@@ -2303,7 +2354,7 @@ shinyServer(function(session, input, output) {
       log_rb = values$log_rb
       #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
       result_list = array_boxplot_function_2(data,
-                                             target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),
+                                             selected_target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),
                                              log_rb,input,values)
       
       
@@ -3900,21 +3951,22 @@ shinyServer(function(session, input, output) {
   })
   
   
-  output$stat_MA_plot = renderPlot({
-    
+  output$stat_MA_plot = renderPlotly({  
+     
     df = eBayes_test()$df %>%   
       rownames_to_column('protein')
     
-    plot_df = df #%>% 
+    plot_df = df %>% 
       
-      #left_join(proteins())
+      left_join(proteins())
     
     as.tbl(plot_df)
     
     
 
       MA_plot = ggplot(plot_df) + 
-        geom_point(aes(y = logFC, x = AveExpr,col = threshold))
+        geom_point(aes(y = logFC, x = AveExpr,col = threshold, shape = Category, group =), size = 3) + 
+        geom_hline(aes(yintercept = 0))
 
     
     MA_plot
@@ -3927,28 +3979,56 @@ shinyServer(function(session, input, output) {
   
   #### Panel Labels ####
   
+  next_tab_UI = function(id,name){
+      if(is.null(values[[id]])){
+        cmd = paste0(".tabbable > .nav > li > a[data-value='",id,"'] {background-color: #6b8eb7;   color:white}")
+        lst = list(
+          
+          tags$style(HTML(cmd)),
+          span(tags$h4('Next >>'), style="color:white")
+        )
+      }else{
+        lst = list(tags$h5(name))
+      }
+      lst
+  }
+  
   output$target_label = renderUI({
-    if(is.null(values$targets)){
-      span(tags$h4('Next >>'), style="color:#21b8cd")
-    }else{
-      tags$h5('Samples')
-    }
+    lst = next_tab_UI('targets','Samples')
+    # if(is.null(values$targets)){
+    #   lst = list(
+    #     tags$style(HTML("
+    #       .tabbable > .nav > li > a[data-value='targets'] {background-color: #6b8eb7;   color:white}
+    #     ")),
+    #     span(tags$h4('Next >>'), style="color:white")
+    #   )
+    # }else{
+    #   lst = list(tags$h5('Samples'))
+    # }
+    do.call(tagList,lst)
   })
   
   output$probe_label = renderUI({
-    if(is.null(values$probes)){
-      span(tags$h4('Next >>'), style="color:#21b8cd")
-    }else{
-      tags$h5('Probes')
-    }
+    lst = next_tab_UI('probes','Probes')
+    
+    # if(is.null(values$probes)){
+    #   span(tags$h4('Next >>'), style="color:#21b8cd")
+    # }else{
+    #   tags$h5('Probes')
+    # }
+    do.call(tagList,lst)
+    
   })
   
   output$protein_label = renderUI({
-    if(is.null(values$proteins)){
-      span(tags$h4('Next >>'), style="color:#21b8cd")
-    }else{
-      tags$h5('Proteins')
-    }
+    lst = next_tab_UI('proteins','Proteins')
+    # if(is.null(values$proteins)){
+    #   span(tags$h4('Next >>'), style="color:#21b8cd")
+    # }else{
+    #   tags$h5('Proteins')
+    # }
+    do.call(tagList,lst)
+    
   })
   
 })

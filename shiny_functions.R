@@ -127,7 +127,7 @@ volcano_plot_Server <- function(id,name,p,type,plot_height = 400) {
 			}else{
 				output[[name]] = renderPlotly({
 					p
-				})
+				}, height = 500, inline = T)
 			}
 			
 			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
@@ -145,7 +145,7 @@ plotly_UI = function(id,name,title = NULL){
 	list(
 		column(11,tags$h4(title)),
 		column(1,downloadButton(ns(paste0(name,'_downloadPlot')), 'png')),
-		column(12,plotlyOutput(ns(name)))
+		column(12,plotlyOutput(ns(name), height = 500, inline = T))
 	)
 }
 

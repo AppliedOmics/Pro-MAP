@@ -3,6 +3,8 @@ library(shiny)
 
 
 shinyUI(fluidPage(
+ 
+  
     uiOutput('header_version'),
     
  
@@ -36,7 +38,7 @@ shinyUI(fluidPage(
         uiOutput('annotation_columns_ui')),
         
         tags$hr(),
-        span(tags$h3('Graph Properties'),style="color:#6b8eb7"),
+        span(tags$h3('Plot Properties'),style="color:#6b8eb7"),
         column(12,
           selectInput('gg_theme','Plot Themes',c('theme_grey','theme_gray','theme_bw','theme_linedraw',
                                                  'theme_light','theme_dark','theme_minimal','theme_classic','theme_void'),'theme_bw'),
@@ -275,9 +277,9 @@ shinyUI(fluidPage(
         tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
                  column(3,uiOutput('cont_matrix_comp_ui')),
                  #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
-                 column(3,radioButtons('pvalue_select','p-value',c(0.05,0.01,0.001),0.05,inline = T)),
+                 column(3,numericInput('pvalue_select','p-value',0.05)),
                  column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
-                 column(3,numericInput('fc_cutoff','Fold Change',1.5,step = -0.5)),
+                 column(3,numericInput('fc_cutoff','Fold Change',1.5,step = 0.5)),
                  
                  column(12,tabsetPanel(
                    tabPanel('eBayes',
@@ -293,8 +295,10 @@ shinyUI(fluidPage(
                                                   #radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
                                                   uiOutput('volcano_plot_ui')
                                          ),
+                                         
                                          tabPanel('MA plot',
-                                                  plotOutput('stat_MA_plot')
+                                                  plotlyOutput('stat_MA_plot', height = 500, inline = T)
+                                                  #htmltools::div(style = "display:inline-block", plotlyOutput("stat_MA_plot",height = 600, width = '100%'))
                                                   ),
                                                   #plotlyOutput('volcano_plots')),
                                          tabPanel('Heatmap',

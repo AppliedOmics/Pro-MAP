@@ -42,7 +42,7 @@ if(grepl('metaomics',node)){
 	}
 }
 
-#app_version = 'basic'
+app_version = 'basic'
 
 
 #### Defaults #####
@@ -69,12 +69,9 @@ cont_matrix_comp = 'All'
 ##### Files #####
 
 
-data_dir = 'www/'
+data_dir = '/mnt/MetaOmics/SharePoint/Antibody Arrays - Documents/SCaMP/Data'
 if(node == 'WoW.local'){
-	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/Hazel/Data/Raw Data/'
-	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/SCaMP/Data/Prostate cancer EUR/'
-	data_dir = 'www/'
-	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/Hazel/Data/HCW data files_06072021_HRM/'
+	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/SCaMP/Data/'
 }
 
 pro_data_list = list(
@@ -82,10 +79,8 @@ pro_data_list = list(
 	'TR cohort' = 'www/TR cohort/',
 	'GSH cohort' = 'www/GSH Cohort/',
 	'JHB cohort' = 'www/JHB cohort/',
-	'PC cohort' = 'www/PC cohort/',
-	#'TR cohort' = 'www/TR cohort/',
-	'COVID HWC' = 'www/HWC',
-	#'EUR cohort' = 'www/EUR cohort/',
+	'PC cohort' = file.path(data_dir,'PC cohort/'),
+	'COVID HWC' = file.path(data_dir,'HWC'),
 	'EUR cohort' = 'www/EUR cohort shorts/'
 )
 
@@ -96,8 +91,8 @@ if(!node == 'WoW.local'){
 basic_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort')]
 
 
-pro_dataset = 'www/TR Cohort/'
-basic_dataset = 'www/TR Cohort/'
+pro_dataset = 'www/TR cohort/'
+basic_dataset = 'www/TR cohort/'
 
 
 
