@@ -1337,7 +1337,7 @@ shinyServer(function(session, input, output) {
           }
           plot_height = 300+(dim(m)[1]*10)
           plot_width = 600 + (dim(m)[2]*5) 
-          if(devel == F){
+          if(values$app_version == 'basic'){
             if(dim(m)[1] > max_heatmap_rows){
               cluster = 'dend'
             }
