@@ -39,7 +39,7 @@ header_UI = function(app_version){
 			tags$h6('Mowoe MO., Garnett S., Lennard K., Talbot J., Jonas E., Blackburn J, (',
 							tagList(a("doi link - not available yet", href="doi link")),')'),
 			tags$h6('R script for pipeline available on Github (',
-							tagList(a("github link - not available yet", href="github link")),')')
+							tagList(a("github link", href="https://github.com/AppliedOmics/SCaMP")),')')
 			)
 	}
 	#titlePanel("SPOT-Pro Full")
@@ -376,23 +376,25 @@ Pipeline_UI = function(values){
 Main_header_UI = function(values){
 	if(values$app_version == 'pro'){
 		lst = list(
+			# column(12,
+			# 			 column(4,uiOutput('select_conditions_column_ui')),
+			# 			 column(4,uiOutput('condition_select_ui'))
+			# 			 
+			# ),
 			column(12,
-						 column(4,uiOutput('select_conditions_column_ui')),
-						 column(4,uiOutput('condition_select_ui'))
-						 
-			),
-			column(12,
-						 column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
+						 #column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
 						 column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
-						 column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
+						 column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess')),
+						 column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
+						 
 			)
 		)
 	}else{
 		lst = list(
-			column(12,
-						 column(4,uiOutput('select_conditions_column_ui')),
-						 column(4,uiOutput('condition_select_ui'))
-			),
+			#column(12,
+			#			 column(4,uiOutput('select_conditions_column_ui')),
+			#			 column(4,uiOutput('condition_select_ui'))
+			#),
 			column(12,
 						 column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
 						 column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
