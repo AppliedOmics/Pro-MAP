@@ -95,19 +95,27 @@ plot_Server <- function(id,name,p,plot_height = 400) {
 	)
 }
 
-ht_plot_Server <- function(id,name,p,plot_height,plot_width) { 
+ht_plot_Server <- function(id,name,ht_list) { 
 	moduleServer(
 		id,
 		function(input, output, session) {
 			
-			output[[name]] = renderPlot({
-				p
-			},height = plot_height)
+			if(ht_list$type == 'dend'){
+				output[[name]] = renderPlot({
+						plot(ht_list$p)
+				})
+
+			}else{
+				output[[name]] = renderPlot({
+						ht_list$p
+				},height = ht_list$plot_height)
+			}
+		
 			
 			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
 				filename = function() { paste0(id,'_',name,'.png') },
 				content = function(file) {
-					png(file, height = plot_height, width = plot_width)
+					png(file, height = ht_list$plot_height, width = ht_list$plot_width)
 					print(p)
 					dev.off()
 				}

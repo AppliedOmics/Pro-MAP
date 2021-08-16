@@ -48,7 +48,7 @@ if(grepl('metaomics',node)){
 #### Defaults #####
 
 single_plot_height = 300
-max_heatmap_rows = 1000
+max_heatmap_rows = 3000
 multi_plot_height = 600
 
 sep_categories = FALSE
@@ -67,11 +67,16 @@ spot_collapse_digits = FALSE
 cont_matrix_comp = 'All'
 
 ##### Files #####
-
+devel = F
 
 data_dir = '/mnt/MetaOmics/SharePoint/Antibody Arrays - Documents/SCaMP/Data'
 if(node == 'WoW.local'){
 	data_dir = '/Users/sgarnett/University of Cape Town/Antibody Arrays - Documents/SCaMP/Data/'
+	devel = T
+}
+
+if(grepl('devel',getwd())){
+	devel = T
 }
 
 pro_data_list = list(
@@ -95,9 +100,4 @@ pro_dataset = 'www/TR cohort/'
 basic_dataset = 'www/TR cohort/'
 
 
-
-# 
-# if(grepl('srvubushi',node)){
-# 	data_dir = '/mnt/MetaOmics/SharePoint/Antibody\ Arrays\ -\ Documents/Hazel/Data/Raw\ Data/'
-# }
 

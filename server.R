@@ -227,7 +227,7 @@ shinyServer(function(session, input, output) {
     values$heatmap_order = input$heatmap_order
   })
 
-  output$heatmap_order_ui = renderUI({ 
+  output$min_corr_ui = renderUI({ 
     if(values$app_version == 'pro'){
       radioButtons('min_corr','Correct Negatives',c(FALSE,TRUE),min_corr,inline = T)
     }
@@ -1134,13 +1134,13 @@ shinyServer(function(session, input, output) {
       input$gpr_files
       input$reset_proteins
       selected = 'Annotation'
-      if("Name" %in% colnames(spots())){
+      if("Name" %in% colnames(spots())){ 
         selected = 'Name'
       }
       if("ID" %in% colnames(spots())){
         selected = 'ID'
       }
-      selectInput('protein_column','Protein Column',colnames(spots()),selected)
+      selectInput('protein_column','Protein Column',colnames(spots()),input$spot_column)
     })
     
     observeEvent(input$reset_proteins,{
@@ -1316,7 +1316,7 @@ shinyServer(function(session, input, output) {
     #### Data Table Heatmaps #####
     
     array_HeatMap_function <- function(m,target_names,selected_targets,spot_names,pallete,cluster) {
-    
+          
           colnames(m) = target_names$Name
           m = m[,selected_targets$Name]
           
@@ -1337,14 +1337,19 @@ shinyServer(function(session, input, output) {
           }
           plot_height = 300+(dim(m)[1]*10)
           plot_width = 600 + (dim(m)[2]*5) 
+          if(devel == F){
+            if(dim(m)[1] > max_heatmap_rows){
+              cluster = 'dend'
+            }
+          }
           if(cluster == 'dend'){
             plot_height = 300
-            ht = dend_function(m,target_names)
+            ht = dend_function(m,target_names,pallete)
           }else{
             plot_height = 300+(dim(m)[1]*10)
             ht = Heatmap_function(m,selected_targets,spot_names,pallete,cluster)
           }
-     list(p = ht,plot_height = plot_height, plot_width = plot_width, warning = title)  
+     list(p = ht,plot_height = plot_height, plot_width = plot_width, warning = title,type = cluster)  
     }
     
     Heatmap_function = function(m, targets,spots,pallete,cluster = 'Cluster'){ 
@@ -1405,7 +1410,47 @@ shinyServer(function(session, input, output) {
       
     }
     
-    dend_function = function(m,targets){
+    
+
+    
+    dend_function = function(m,targets,pallete){
+      ## stupid toy example
+      groupCodes = targets$Condition
+      groupCodes
+      palette
+      conditions = unique(targets$Condition)
+      colorCodes = brewer.pal(n = length(conditions), name = pallete)[1:length(conditions)]
+      #colorCodes = rainbow(length(conditions))
+      names(colorCodes) = conditions
+      colorCodes
+      
+      tm = t(m)
+      rownames(tm) = groupCodes
+      #as.tbl(tm)
+      
+      distSamples <- dist(tm)
+      hc <- hclust(distSamples)
+      
+      
+      labelCol <- function(x) {
+        if (is.leaf(x)) {
+          ## fetch label
+          label <- attr(x, "label")
+          #code <- substr(label, 1, 1)
+          ## use the following line to reset the label to one letter code
+          # attr(x, "label") <- code
+          attr(x, "nodePar") <- list(lab.col=colorCodes[label])
+        }
+        return(x)
+      }
+      
+      d <- dendrapply(as.dendrogram(hc), labelCol)
+      
+      d
+      
+    }
+    
+    dend_function_old = function(m,targets){
       m
       
       
@@ -1456,11 +1501,11 @@ shinyServer(function(session, input, output) {
     })
     
     output$foreground_heatmap_ui = renderUI({ 
-      m = E()$E 
+      m = E()$E   
       id = 'foreground'
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
     })
     
@@ -1607,7 +1652,7 @@ shinyServer(function(session, input, output) {
       id = 'backhground'
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
 
     })
@@ -1681,7 +1726,7 @@ shinyServer(function(session, input, output) {
           id = 'spot_filtering'
           name = 'Hcluster'
           ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
-          ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+          ht_plot_Server(id,name,ht_list)
           do.call(tagList,plot_UI(id,name,ht_list$warning))
           
           #plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
@@ -2055,7 +2100,7 @@ shinyServer(function(session, input, output) {
 
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width) 
+      ht_plot_Server(id,name,ht_list) 
       #title = paste('removed ',paste(ht_list$removed,collapse = ' and '), 'values')
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
@@ -2180,7 +2225,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
@@ -2293,7 +2338,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
@@ -2443,7 +2488,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),E_norm()$spot,input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
@@ -2698,7 +2743,7 @@ shinyServer(function(session, input, output) {
 
       ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
     })
@@ -3024,7 +3069,7 @@ shinyServer(function(session, input, output) {
         name = 'Hcluster'
         ht_list = array_HeatMap_function(m,targets(),samples,features$protein,input$r_col,values$heatmap_order)
         ht_list$p
-        ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+        ht_plot_Server(id,name,ht_list)
         do.call(tagList,plot_UI(id,name,ht_list$warning))
       }
       # df = E_norm() %>% 
@@ -3876,7 +3921,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
       ht_list$p
-      ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
+      ht_plot_Server(id,name,ht_list)
       #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
