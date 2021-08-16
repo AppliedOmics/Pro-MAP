@@ -106,7 +106,8 @@ shinyUI(fluidPage(
                    column(2,downloadButton('download_targets',"Download")),
                    column(1,actionButton('reset_targets','Reset')),  
                    column(12,uiOutput('target_upload_error_ui')),
-                   column(12,DT::dataTableOutput('target_table'))
+                   #column(12,DT::dataTableOutput('target_table'))
+                   column(12,uiOutput('target_table_ui'))
           ),
           #### _spots ####
           tabPanel(title = uiOutput('probe_label'),value = 'probes',

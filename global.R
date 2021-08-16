@@ -42,7 +42,7 @@ if(grepl('metaomics',node)){
 	}
 }
 
-app_version = 'basic'
+#app_version = 'basic'
 
 
 #### Defaults #####
@@ -81,7 +81,7 @@ pro_data_list = list(
 	'JHB cohort' = 'www/JHB cohort/',
 	'PC cohort' = file.path(data_dir,'PC cohort/'),
 	'COVID HWC' = file.path(data_dir,'HWC'),
-	'EUR cohort' = 'www/EUR cohort shorts/'
+	'EUR cohort' = 'www/EUR cohort/'
 )
 
 if(!node == 'WoW.local'){

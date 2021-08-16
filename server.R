@@ -759,7 +759,7 @@ shinyServer(function(session, input, output) {
     
     # reactive object that decided which targets file to upload. 
     targets_upload = reactive({ withProgress(message = 'uploding targets',{  
-      input$reset_targets    
+      input$reset_targets     
       input$dataset
       input$gpr_files
       target_file_path = NULL
@@ -772,6 +772,7 @@ shinyServer(function(session, input, output) {
       dim(df_files)
       as.tbl(df_files)
       error = NULL
+      warning = NULL
       df_upload = NULL
       if(is.null(values$target_file)){
         df = df_files
@@ -784,24 +785,28 @@ shinyServer(function(session, input, output) {
         }
           df_upload = read.csv(target_file_path,sep ='\t',stringsAsFactors = F)
           if('FileName' %in% colnames(df_upload)){
-            if(!TRUE %in% duplicated(df_upload$Name)){
+            if(TRUE %in% duplicated(df_upload$Name)){
+              warning = 'There were duplicates in the Name column of the uploaded sample file'
+              df_upload = df_upload %>% 
+                filter(!duplicated(df_upload$Name))
+            }
               df = df_files %>% 
                 dplyr::select(-Name) %>% 
                 left_join(df_upload %>% 
                             filter(!duplicated(FileName))) %>%
                 filter(FileName %in% file_names)
-              df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
+              if(TRUE %in% is.na(df$Name)){
+                warning = 'Some arrays files were missing in the uploaded sample file'
+                df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
+              }
+              
               
               if(length(intersect(df_files$FileName,df_upload$FileName)) == 0){
-                
                 error = "There is no intersect between the uploaded target file and the array files"
                 df = df_files
               }
               
-            }else{
-              error = "There are duplicates in Name column of the uploaded targets file."
-              df = df_files
-            }
+          
           }else{
             error = 'There is no FileName column in the uploaded targets file.'
             df = df_files
@@ -814,10 +819,12 @@ shinyServer(function(session, input, output) {
         if(!'Name' %in% colnames(df)){
           df$Name = df$File
         }
+      
+      df$Condition[is.na(df$Condition)] = 'Unknown'
 
    
       df$Name = as.character(df$Name)
-      list(df = df, df_upload = df_upload, error = error)
+      list(df = df, upload_df = df_upload, error = error, warning = warning)
     }) })
     
     output$target_upload_error_ui = renderUI({
@@ -857,14 +864,30 @@ shinyServer(function(session, input, output) {
     
     output$target_table = DT::renderDataTable({
       showTab('main','probes')
-      
- 
-      
-      #show(selector = '#main li a[data-value="probes"]')
- 
       values$targets = 'hit'
-      selected_targets()
+      targets()
     },rownames = FALSE)
+    
+    output$target_table_ui = renderUI({
+      result_list = targets_upload()  
+      
+      if(!is.null(result_list$error) | !is.null(result_list$warning)){
+        output$target_upload_df = DT::renderDataTable({
+          result_list$upload_df
+        })
+        
+        lst = list(
+          span(tags$h4(result_list$error), style="color:red"),
+          span(tags$h4(result_list$warning), style="color:orange"),
+          tags$h3('Uploaded Sample Table'),
+          DT::dataTableOutput('target_upload_df'),
+          tags$h3('Array Sample Table'),
+          DT::dataTableOutput('target_table')
+        )
+      }else{
+        DT::dataTableOutput('target_table')
+      }
+    }) 
     
     output$download_targets <- downloadHandler(
       filename = function(){"targets.txt"}, 
