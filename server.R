@@ -140,7 +140,10 @@ shinyServer(function(session, input, output) {
     values$spot_collapse_digits = spot_collapse_digits
     values$cont_matrix_comp = cont_matrix_comp 
     print('readme_markdown_ui')
-    includeMarkdown("Instructions.md")
+    includeHTML('Instructions.html')
+    #includeMarkdown("Instructions.md")
+    #HTML(markdown::markdownToHTML(knit('Instructions.md', quiet = TRUE)))
+    #HTML(markdown::markdownToHTML("Instructions.md"))
   })
   
   
@@ -294,15 +297,15 @@ shinyServer(function(session, input, output) {
     output$select_datasets_ui = renderUI({ 
       if(is.null(input$gpr_files$datapath)){
         if(values$app_version == 'pro'){
-          selectInput('dataset','Dataset',c(pro_data_list),pro_dataset)
+          selectInput('dataset','Example Datasets',c(pro_data_list),pro_dataset)
         }else{
-          selectInput('dataset','Dataset',c(basic_data_list),basic_dataset)
+          selectInput('dataset','Example Datasets',c(basic_data_list),basic_dataset)
         }
       }else{
         if(values$app_version == 'pro'){
-          selectInput('dataset','Dataset',c('Upload',pro_data_list),'Upload')
+          selectInput('dataset','Example Datasets',c('Upload',pro_data_list),'Upload')
         }else{
-          selectInput('dataset','Dataset',c('Upload',basic_data_list),'Upload')
+          selectInput('dataset','Example Datasets',c('Upload',basic_data_list),'Upload')
         }
         #selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }

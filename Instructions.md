@@ -1,22 +1,27 @@
-The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data from various file formats. It then allows users to view the raw data, perform spot filtering, background correction, normalisation and significance testing. The app follows a series of steps, these instructions are arranged in the same manner. Each section in the instructions corresponds to a tab in the app.
+The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data from various file formats. It then allows users to view the raw data, perform spot filtering, background correction, normalisation and significance testing. The app follows a series of steps, these instructions are arranged in the same sequential manner. Each section in the instructions corresponds to a tab in the app.
 
 # SidePanel
 
-Settings to adjust the file inputs and the display properties of the plots generated.
+<img align="right" height=300 src="images/SidePanel.png">
+
+The greyed out section on the left side of the app, contains settings to adjust the file inputs and the display properties of the plots generated. 
+
+
+
 ### Data Upload
 
 This section allows users to upload new data. Array files can be dragged into the browse window or selected from the file system.
 
-- **Dataset**: switched between example datasets already uploaded. The example datasets can be used to explore the app functionality
+- **Example Datasets**: switched between example datasets already uploaded. The example datasets can be used to explore the app functionality.
 - **Upload array files** upload new array data. The app will accept .gpr and .txt files. 
 
 ### Array Properties
 
-Here the foreground and background columns extracted from the array data can be assigned. These fields will are populated by default values extracted from the uploaded array data. 
+Once array files are upload the foreground and background columns information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus. 
 
-- **Array Chanel**: the fluorophore wavelength used the read the probes
-- **Array Column**: The measurement column used for foreground and background (usually median)
-- **Foreground** and **Background** :  columns to use in the analysis. 
+- **Array Chanel**: the fluorophore wavelength used to the read the probes.
+- **Array Column**: The measurement column used for foreground and background (usually median), determined by the array processing software.
+- **Foreground** and **Background** :  columns to use in the pre-processing pipeline.  
 - **Spot Filtering**: 'TRUE" removes all probes that have an intensity value less than two standard deviations of the background
 - **Annotation Columns** : Additional annotation columns used in the Probes Tab. 
 
@@ -30,7 +35,12 @@ Alter the colour palletes and themes of the plots generated in the app.
 
 # MainPanel
 
-The Main Panel displays the array processing outputs. The Main Panel is arranged as a  series of tabs. The tabs will appear sequentially as sections of the analysis are completed. Click on the **Next >>** tab to continue with the processing steps. 
+![](images/MainPanel.png){height=100}
+
+
+The MainPanel to the right of the SidePanel, displays the array processing outputs. The Main Panel is arranged as a  series of tabs. The tabs will appear sequentially as sections of the analysis are completed. Click on the ![**Next >>** ><](images/Next.png){height=30} tab to continue with the processing steps. 
+
+
 
 
 ## File Details
@@ -39,11 +49,17 @@ When array files are uploaded into the app, the files are first checked for cons
 Errors will prevent further processing, while warnings should be taken note of, as some data may be missing from the final analysis due to the inconsistency in the data upload. 
 
 # Samples
-A sample template is extracted from the uploaded array files. This sample template can be downloaded (**Download**) as a tab-delimited file (targets.txt) and edited in Excel. The file can then be uploaded again (**Upload Sample File**). Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (**Select Condition Column**). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by only selecting some of the assigned conditions (**Select Conditions**). This can be useful in assessing the reproducibility of replicates.
+A sample template is extracted from the uploaded array files. This sample template can be downloaded (**Download**) as a tab-delimited file (targets.txt) and edited in Excel. The file can then be uploaded again (**Upload Sample File**). Keep this file safe if you are intending to use the app again. 
+
+An uploaded sample file needs to be a tab-delimted file with extension .txt. It needs a FileName column that corresponds to the array file names. It needs a Name column that will be used to label samples throughtout the app. Entries in the Name column need to be unique.
+
+Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (**Select Condition Column**). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by selecting some of the assigned conditions (**Select Conditions**). This can be useful in assessing the reproducibility of replicates. When sample annotaion is complete click ![**Next >>** ><](images/Next.png){height=30} to view the probes tab.
 
 # Probes
 
-A probes template is extracted from the uploaded array files. Array files use different annotation columns, a default probe identification column will be assigned, but can be altered using **Probe Column**. In addition, a 'Category' column is added to the probe template. This is used to group probes and annotate the subsequent plots. Dropdown menu's allow easy annotation of the probes using the **Control Probes** and **Probes to Remove** menus, which will will assign "control" and "remove" to the Category column respectively. Probes annotated as remove will be removed before the normalisation step, so that they do not interfere with normalisation. Probes annotated as 'control' will be labelled in plots, and can be selected to be removed in the "Proteins Tab".
+A probes template is extracted from the uploaded array files. Array files assign annotation columns to probes, a default probe identification column will be assigned, but can be altered using the **Probe Column** dropdown menu. The app adds a 'Category' column to the probe template. This is used to group the probes and annotate the subsequent plots. 
+
+Dropdown menu's allow easy annotation of the probes using the **Control Probes** and **Probes to Remove** dropdown menus, which will will assign "control" and "remove" to the Category column respectively. Probes annotated as remove will be removed before the normalisation step, so that they do not interfere with normalisation. Probes annotated as 'control' will be labelled in plots, and can be selected to be removed in the "Proteins Tab".
 
 This probe template can be downloaded (**Download**) as a tab-delimited file (spots.txt) and edited in Excel. The file can then be Uploaded again (**Upload Probe File**). Additional annotations can be added to the Category column; these will be labelled in the plots and can also be selected for removal. 
 
@@ -94,11 +110,11 @@ Samples are weighted using the limma function 'arrayWeights'. The result are dis
 
 Post normalisation the the selected proteins are removed. 
 
-The results are diplayes as
+The results are diplayed as
 
 - **Table**
 	- the data table can be downloaded as tab-delimted file (data.txt) 
-	- the data table can also be saved as R expressionSet object, which incorporates sample and protein annotation information. 
+	- the data table can also be saved as an R expressionSet object, which incorporates sample and protein annotation information. 
 		- this would allow subsequence custom analysis to be performed in R. 
 - **boxplot**: of expression intensities per sample
 - **CV plot**:  by condition
@@ -107,7 +123,9 @@ The results are diplayes as
 
 
 
+## Differential Expression Significance Testing
 
+### eBayes
 
 
 

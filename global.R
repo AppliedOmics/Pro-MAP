@@ -19,6 +19,8 @@ library(foreach)
 library(shinydashboard)
 
 library(EnhancedVolcano)
+
+library(knitr)
 #library(shinyjs)
 
 
@@ -90,7 +92,7 @@ pro_data_list = list(
 )
 
 if(!node == 'WoW.local'){
-	pro_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort')]
+	pro_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort','COVID HWC')]
 }
 
 basic_data_list = pro_data_list[c('TR cohort','GSH cohort','JHB cohort','EUR cohort')]
