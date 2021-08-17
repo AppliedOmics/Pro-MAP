@@ -20,7 +20,7 @@ library(shinydashboard)
 
 library(EnhancedVolcano)
 
-library(knitr)
+#library(knitr)
 #library(shinyjs)
 
 
