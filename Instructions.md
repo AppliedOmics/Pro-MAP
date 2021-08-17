@@ -68,24 +68,46 @@ The protein template can be downloaded (**Download**) as a tab-delimited file (p
 #### Proteins removed from final data
 Probes labelled 'remove' are removed before normalisation. Additional proteins can be removed from the Final Data table, this occurs post normalisation. These proteins are selected using the protein template annotation columns. The column used is selected by **Drop by**. The annotations to be removed are then selected by **Category to drop**. 'Control' is usually selected by default. 
 
-###
 
-#### Plots
 
-Shows boxplots of the Expression intensity for the 
-- Raw Data
-		- Foreground Data 
-- Background Corrected and Normalised
-	- Data after log2 transformation, background corrected and normalisised
-		- the data can be log2 transformed before normalisation using the **log2 transformation** radio button.
-		- **Background Correction Method** and **Normalisation Method** can be selected using the top menus
-- Array Weights
-- Condensed Data
-	- spots are condensed into proteins using the mean value for the replicae spots
-	
-#### Data
+## Pre-Processing Pipeline
 
-Array Weights and the final data table can be downloaded for futher use. 
+This the sequential pre-processing of array data in the EListRaw object. 
+
+### Raw Data 
+
+Data is displayed as boxplot of heatmap of the expression intensity values, before any processing. 
+
+### Background Correction. 
+
+Expression intensity values after spot filtering and background correction are diplayed as boxplots or a heatmap. The background correction method used is selected using **Background Correction Method** on the top of the main panel. 
+
+### Normalisation
+
+Expression intensity values are normalised using the method selected by **Normalisation Method**. The values are then log2 transformed and displayed as boxplots or a heatmap. 
+
+### Array Weight
+
+Samples are weighted using the limma function 'arrayWeights'. The result are displayes as a downloadable table or barplot. These weight are applied when performing eBayes differential expression significance testing. 
+
+### Final Data
+
+Post normalisation the the selected proteins are removed. 
+
+The results are diplayes as
+
+- **Table**
+	- the data table can be downloaded as tab-delimted file (data.txt) 
+	- the data table can also be saved as R expressionSet object, which incorporates sample and protein annotation information. 
+		- this would allow subsequence custom analysis to be performed in R. 
+- **boxplot**: of expression intensities per sample
+- **CV plot**:  by condition
+- **MA plot**
+- **Heatmap**
+
+
+
+
 
 
 
