@@ -746,7 +746,7 @@ shinyServer(function(session, input, output) {
       
       fileInput(
         inputId = "target_file", 
-        label = "Upload Targets File", 
+        label = "Upload Sample File", 
         accept = c(".txt")
       )
     })
