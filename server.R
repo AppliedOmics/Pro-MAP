@@ -140,10 +140,11 @@ shinyServer(function(session, input, output) {
     values$spot_collapse_digits = spot_collapse_digits
     values$cont_matrix_comp = cont_matrix_comp 
     print('readme_markdown_ui')
-    includeHTML('Instructions.html')
-    #includeMarkdown("Instructions.md")
+    includeMarkdown('Instructions.md')
+    #includeHTML('info.html')
+    #HTML(markdown::markdownToHTML(includeMarkdown("Instructions.md")))
     #HTML(markdown::markdownToHTML(knit('Instructions.md', quiet = TRUE)))
-    #HTML(markdown::markdownToHTML("Instructions.md"))
+    #markdown::markdownToHTML("Instructions.md")
   })
   
   
@@ -2845,6 +2846,7 @@ shinyServer(function(session, input, output) {
       features$feature_name = rownames(features)
       features = features %>% 
         dplyr::select(feature_name,everything())
+      rownames(features) = features$feature_name
       
       #features$features = rownames(features)
       featureData =  new('AnnotatedDataFrame',data = features)
@@ -2857,7 +2859,7 @@ shinyServer(function(session, input, output) {
     }
     
     data_MSnSet = reactive({  
-      data = data() %>%   
+      data = data() %>%    
         column_to_rownames('protein')
       colnames(data)
       rownames(data)
@@ -2883,6 +2885,7 @@ shinyServer(function(session, input, output) {
       #samples$array_weight = arrayw_df()[1,]
       dim(samples)
       dim(data)
+      rownames(features) = features$protein
       expression_set_function(data,samples,features)
        
     })
@@ -3902,7 +3905,7 @@ shinyServer(function(session, input, output) {
   })
   
   output$eBayes_Heatmap_ui = renderUI({  
-    df = eBayes_sig_data() %>%   
+    df = eBayes_sig_data() %>%    
       column_to_rownames('protein')
     colnames(df)  
     #colnames(df) = target_names()
@@ -3922,7 +3925,7 @@ shinyServer(function(session, input, output) {
     }else{
       id = 'EBayes'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,target_conditions(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
@@ -4036,7 +4039,7 @@ shinyServer(function(session, input, output) {
     
 
       MA_plot = ggplot(plot_df) + 
-        geom_point(aes(y = logFC, x = AveExpr,col = threshold, shape = Category, group =), size = 3) + 
+        geom_point(aes(y = logFC, x = AveExpr,col = threshold, shape = Category, group = protein), size = 3) + 
         geom_hline(aes(yintercept = 0))
 
     

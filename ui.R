@@ -2,8 +2,10 @@
 library(shiny)
 
 
-shinyUI(fluidPage(
- 
+shinyUI(
+
+  fluidPage(
+    
   
     uiOutput('header_version'),
     
@@ -83,7 +85,7 @@ shinyUI(fluidPage(
         column(12,tabsetPanel(id = 'main',
           #### _Instructions ####
           tabPanel(title = tags$h5("Instructions"), value = 'instructions',
-                   uiOutput("instructions_markdown_ui")
+                  uiOutput("instructions_markdown_ui")
           ),
           #### _File Details #####
           tabPanel(title = tags$h5('File Details'), value = 'files',

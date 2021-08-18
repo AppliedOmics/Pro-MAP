@@ -1,11 +1,10 @@
-The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data from various file formats. It then allows users to view the raw data, perform spot filtering, background correction, normalisation and significance testing. The app follows a series of steps, these instructions are arranged in the same sequential manner. Each section in the instructions corresponds to a tab in the app.
+# Header
 
-# SidePanel
+The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool needs to be used in the sequential order by which the following instructions below are ordered.
 
-<img align="right" height=300 src="images/SidePanel.png">
+# Side Panel
 
-The greyed out section on the left side of the app, contains settings to adjust the file inputs and the display properties of the plots generated. 
-
+This section refers to the grey panel to the left, which contains file input settings and plot display properties. 
 
 
 ### Data Upload
@@ -35,10 +34,9 @@ Alter the colour palletes and themes of the plots generated in the app.
 
 # MainPanel
 
-![](images/MainPanel.png){height=100}
 
 
-The MainPanel to the right of the SidePanel, displays the array processing outputs. The Main Panel is arranged as a  series of tabs. The tabs will appear sequentially as sections of the analysis are completed. Click on the ![**Next >>** ><](images/Next.png){height=30} tab to continue with the processing steps. 
+The MainPanel to the right of the SidePanel, displays the array processing outputs. The Main Panel is arranged as a  series of tabs. The tabs will appear sequentially as sections of the analysis are completed. Click on the **Next >>** tab to continue with the processing steps. 
 
 
 
@@ -53,7 +51,7 @@ A sample template is extracted from the uploaded array files. This sample templa
 
 An uploaded sample file needs to be a tab-delimted file with extension .txt. It needs a FileName column that corresponds to the array file names. It needs a Name column that will be used to label samples throughtout the app. Entries in the Name column need to be unique.
 
-Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (**Select Condition Column**). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by selecting some of the assigned conditions (**Select Conditions**). This can be useful in assessing the reproducibility of replicates. When sample annotaion is complete click ![**Next >>** ><](images/Next.png){height=30} to view the probes tab.
+Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (**Select Condition Column**). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by selecting some of the assigned conditions (**Select Conditions**). This can be useful in assessing the reproducibility of replicates. When sample annotaion is complete click **Next >>** to view the probes tab.
 
 # Probes
 
