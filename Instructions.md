@@ -1,5 +1,3 @@
-# Header
-
 The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool needs to be used in the sequential order by which the following instructions below are ordered.
 
 # Side Panel

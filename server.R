@@ -87,13 +87,11 @@ shinyServer(function(session, input, output) {
   
   
   output$update_ui = renderUI({
-    if(grepl('devel',getwd())){
-      actionButton('update','Update')
-    }else{
+
       if(!grepl('public',getwd())){
-        actionButton('push','git push')
+        actionButton('update','Update')
       }
-    }
+    
   })
   observeEvent(input$update,{
     cmd = 'bash update.sh'
