@@ -198,52 +198,8 @@ shinyUI(
           
 
         #### Pipeline ####
-        tabPanel(title = tags$h5('Pre-Processing Pipeline'),value = 'pipeline',
+        tabPanel(title = tags$h5('Pre-Processing'),value = 'pipeline',
             uiOutput('pipeline_ui')
-            # tabsetPanel(
-            # 
-            #   tabPanel('Raw Data',
-            #            uiOutput('Raw_tabs_ui')
-            #            ),
-            #   
-            #   tabPanel('Spot Filtering',
-            #            uiOutput('Raw_filter_tabs_ui')),
-            #   
-            #   tabPanel('Background Correction',
-            #            uiOutput('Raw_corr_tabs_ui'),
-            #   ),
-            # 
-            #   tabPanel('Normalisation',
-            #            uiOutput('Raw_norm_tabs_ui')
-            #   ),
-            #   tabPanel('Array Weights',
-            #           
-            #            column(4,numericInput('array_weight_threshold','Array Weight Threshold','0.5')),
-            #            column(1),
-            #            column(4,radioButtons('drop_by_weight','Drop arrays below array weight threshold',c(FALSE,TRUE),inline = T)),
-            #            column(1),
-            #            column(2,downloadButton('download_arrayw',"Download")),
-            #            column(12,DT::dataTableOutput('arrayw_table')),
-            #            
-            #            column(12,uiOutput('arrayw_barplot_ui'))
-            #          
-            #            ),
-            #   tabPanel('Final Data',
-            #            uiOutput('Data_tabs_ui')
-            #            
-            # 
-            #   ),
-            #   tabPanel('Optimal Cutpoints',
-            #            tags$h5('Calculates optimal cutpoints, as a minimum value set for specificity'),
-            #            uiOutput('threshold_control_col_ui'),
-            #          
-            #            uiOutput('threshold_ui'),
-            #            #tags$h6('3'),
-            #            uiOutput('threshold_output_ui'),
-            #            #tags$h6('4'),
-            #            uiOutput('threshold_Heatmap_ui')
-            #            )
-            # )
         ),
         
         ### ALL METHODS PLOTS ####
@@ -252,11 +208,9 @@ shinyUI(
                  column(3,uiOutput('MA_normalisation_ui')),
                  column(3,radioButtons('log_rb_M','log(M)',c(F,T),inline = T),
                         radioButtons('flip_facets','Flip Facets',c(F,T),inline = T)),
-                 #column(3,radioButtons('MA_quantile','Limit axes plots to Quantitles',c(T,F))),
+                
                  column(3,radioButtons('multi_DE','Differential Expression',c(F,T),inline = T)),
-                 #column(12,radioButtons('multi_top','topTable',c(F,T),inline = T)),
-                 #tabsetPanel(
-                #   tabPanel('Single',
+          
                 column(12),
                   tabsetPanel(
                        tabPanel('MA plot',
@@ -277,20 +231,15 @@ shinyUI(
                           uiOutput('precision_plot_ui')
                        )
                     )
-                 #  ),
-                #   tabPanel('Differential Expression')
-                # )
-                 
-                 
+  
         ),
         
         ### Significance Testing ####
-        tabPanel(title = tags$h5('Significance Testing'),value = 'sig',
+        tabPanel(title = tags$h5('Differential Expression'),value = 'sig',
                  column(3,uiOutput('cont_matrix_comp_ui')),
-                 #column(4,selectInput('cont_matrix_comp','Contingency Matric Comparison',c('All','Control'),'All')),
-                 column(3,numericInput('pvalue_select','p-value',0.05)),
+                 column(3,numericInput('pvalue_select','p-value',0.05,max = 0.05,min = 0, step = 0.01)),
                  column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
-                 column(3,numericInput('fc_cutoff','Fold Change',1.5,step = 0.5)),
+                 column(3,numericInput('fc_cutoff','Fold Change',0,step = 0.5)),
                  
                  column(12,tabsetPanel(
                    tabPanel('eBayes',

@@ -126,7 +126,7 @@ shinyServer(function(session, input, output) {
   output$instructions_markdown_ui = renderUI({
     #hideTab('main','Plots')
     #hideTab('main','Data')
-    values$app_version = app_version
+    values$app_version = 'basic'
     values$sep_categories = sep_categories
     values$plot_lim = plot_lim
     values$collapse_boxplots = collapse_boxplots
@@ -174,7 +174,7 @@ shinyServer(function(session, input, output) {
   
   output$app_version_ui = renderUI({
     if(app_version == 'pro'){
-      radioButtons('app_version','App Version',c('basic','pro'),app_version,inline = T)
+      radioButtons('app_version','App Version',c('basic','pro'),'basic',inline = T)
     }
   })
   
@@ -4031,8 +4031,8 @@ shinyServer(function(session, input, output) {
     Sig_Proteins <- topTable(fit2, adjust.method = input$mtc,number = dim(df)[1])
     threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
     length(which(threshold))
-    Sig_Proteins <- cbind(Sig_Proteins, threshold)
-    Sig_Proteins
+    Sig_Proteins <- cbind(Sig_Proteins, threshold) %>% 
+      rownames_to_column('proteins')
     
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
     })})

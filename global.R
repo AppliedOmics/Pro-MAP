@@ -51,7 +51,7 @@ if(grepl('metaomics',node)){
 #### Defaults #####
 
 single_plot_height = 300
-max_heatmap_rows = 3000
+max_heatmap_rows = 1500
 multi_plot_height = 600
 
 sep_categories = FALSE
