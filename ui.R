@@ -6,7 +6,7 @@ shinyUI(
 
   fluidPage(
     disconnectMessage(
-      text = "Your session timed out, reload the application.",
+      text = "Your session timed out, reload the application. If this continues to happen notify the admin (shaun.garnett.uct.ac.za)",
       refresh = "Reload now",
       background = "#f89f43",
       colour = "white",

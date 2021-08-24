@@ -76,15 +76,6 @@ plot_UI = function(id,name,title = NULL,plot_height = 400){
 	)
 }
 
-ht_plot_UI = function(id,name,title = NULL,plot_height = 400){
-	ns <- NS(id)
-	list(
-		column(11,tags$h4(title)),
-		column(1,downloadButton(ns(paste0(name,'_downloadPlot')), 'png')),
-		column(12,plotOutput(ns(name),height = plot_height,inline = F))
-	)
-}
-
 plot_Server <- function(id,name,p,plot_height = 400) { 
 	moduleServer(
 		id,

@@ -1,4 +1,6 @@
-The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool needs to be used in the sequential order by which the following instructions below are ordered.
+The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool is used in order by which the following instructions are arranged.
+
+If you have any trouble using app or would like additional features please email Shaun Garnett (shaun.garnett@uct.ac.za)
 
 # Side Panel
 
@@ -121,47 +123,6 @@ The results are diplayed as
 
 ## Differential Expression Significance Testing
 
-### eBayes
 
-
-
-
-
-# Recent additions 
-
-- Spot filter Tab under PreProcessing Pipeline
-- CV plots 
-	- add categories separate CV's
-- MA plots
-	- using plotly
-- Significance Testing
-	- generetate contigency matrix for all conditions
-- plots are now downloadable as png
-- CV of triplicates for foreground and background 
-
-	
-	
-#	Bugs to fix
-	
-- check annotation column assignment for difference file types. 
-- Expression Set Downloads
-- plots and heatmaps after arrays weight filtering
-- check the requirements on the significance testing table
-
-
-# Additions
-
-- Error messages for all uploaded files
-	
-- Contingency Matrix
-	- all vs control
-	- manual contingency matrix ??
-	
-- All Methods
-	- add tabs for plots. 
-	
-- Batch Normalise
-	
-	# Questions
 
 	

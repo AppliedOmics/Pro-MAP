@@ -378,13 +378,10 @@ summary {
 </div>
 
 
-<div id="header" class="section level1">
-<h1>Header</h1>
-<p>The <strong>Single Channel Microarray Preprocessing pipeline (SCaMP)</strong> enables the easy upload of antibody array data from various file formats. It then allows users to view the raw data, perform spot filtering, background correction, normalisation and significance testing. The app follows a series of steps, these instructions are arranged in the same sequential manner. Each section in the instructions corresponds to a tab in the app.</p>
-</div>
-<div id="sidepanel" class="section level1">
-<h1>SidePanel</h1>
-<p>The greyed out section on the left side of the app, contains settings to adjust the file inputs and the display properties of the plots generated.</p>
+<p>The <strong>Single Channel Microarray Preprocessing pipeline (SCaMP)</strong> enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool is used in order by which the following instructions are arranged.</p>
+<div id="side-panel" class="section level1">
+<h1>Side Panel</h1>
+<p>This section refers to the grey panel to the left, which contains file input settings and plot display properties.</p>
 <div id="data-upload" class="section level3">
 <h3>Data Upload</h3>
 <p>This section allows users to upload new data. Array files can be dragged into the browse window or selected from the file system.</p>
@@ -395,7 +392,7 @@ summary {
 </div>
 <div id="array-properties" class="section level3">
 <h3>Array Properties</h3>
-<p>Once array files are upload the foreground and background columns information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus.</p>
+<p>Once array files are upload the foreground and background column information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus.</p>
 <ul>
 <li><strong>Array Chanel</strong>: the fluorophore wavelength used to the read the probes.</li>
 <li><strong>Array Column</strong>: The measurement column used for foreground and background (usually median), determined by the array processing software.</li>
@@ -423,8 +420,8 @@ summary {
 <p>When array files are uploaded into the app, the files are first checked for consistency. Information on the number of array files uploaded, the number of probes and annotation columns are dispayed. If there are any errors or inconsistencies in the uploaded file, warnings (orange) or errors (red) are displayed. Errors will prevent further processing, while warnings should be taken note of, as some data may be missing from the final analysis due to the inconsistency in the data upload.</p>
 </div>
 </div>
-<div id="samples" class="section level1">
-<h1>Samples</h1>
+<div id="metadata" class="section level1">
+<h1>MetaData</h1>
 <p>A sample template is extracted from the uploaded array files. This sample template can be downloaded (<strong>Download</strong>) as a tab-delimited file (targets.txt) and edited in Excel. The file can then be uploaded again (<strong>Upload Sample File</strong>). Keep this file safe if you are intending to use the app again.</p>
 <p>An uploaded sample file needs to be a tab-delimted file with extension .txt. It needs a FileName column that corresponds to the array file names. It needs a Name column that will be used to label samples throughtout the app. Entries in the Name column need to be unique.</p>
 <p>Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (<strong>Select Condition Column</strong>). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by selecting some of the assigned conditions (<strong>Select Conditions</strong>). This can be useful in assessing the reproducibility of replicates. When sample annotaion is complete click <strong>Next &gt;&gt;</strong> to view the probes tab.</p>
@@ -497,56 +494,7 @@ summary {
 </div>
 <div id="differential-expression-significance-testing" class="section level2">
 <h2>Differential Expression Significance Testing</h2>
-<div id="ebayes" class="section level3">
-<h3>eBayes</h3>
 </div>
-</div>
-</div>
-<div id="recent-additions" class="section level1">
-<h1>Recent additions</h1>
-<ul>
-<li>Spot filter Tab under PreProcessing Pipeline</li>
-<li>CV plots
-<ul>
-<li>add categories separate CV’s</li>
-</ul></li>
-<li>MA plots
-<ul>
-<li>using plotly</li>
-</ul></li>
-<li>Significance Testing
-<ul>
-<li>generetate contigency matrix for all conditions</li>
-</ul></li>
-<li>plots are now downloadable as png</li>
-<li>CV of triplicates for foreground and background</li>
-</ul>
-</div>
-<div id="bugs-to-fix" class="section level1">
-<h1>Bugs to fix</h1>
-<ul>
-<li>check annotation column assignment for difference file types.</li>
-<li>Expression Set Downloads</li>
-<li>plots and heatmaps after arrays weight filtering</li>
-<li>check the requirements on the significance testing table</li>
-</ul>
-</div>
-<div id="additions" class="section level1">
-<h1>Additions</h1>
-<ul>
-<li><p>Error messages for all uploaded files</p></li>
-<li><p>Contingency Matrix</p>
-<ul>
-<li>all vs control</li>
-<li>manual contingency matrix ??</li>
-</ul></li>
-<li><p>All Methods</p>
-<ul>
-<li>add tabs for plots.</li>
-</ul></li>
-<li><p>Batch Normalise</p>
-<p># Questions</p></li>
-</ul>
 </div>
 
 
