@@ -88,8 +88,8 @@ shinyServer(function(session, input, output) {
   
   output$update_ui = renderUI({
 
-      if(!grepl('public',getwd())){
-        actionButton('update','Update')
+      if(node == 'WoW.local'){
+        actionButton('update','Update (ssh)')
       }
     
   })
