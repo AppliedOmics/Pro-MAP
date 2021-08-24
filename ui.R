@@ -48,7 +48,7 @@ shinyUI(
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,T),T,inline = T)),
+        column(12,radioButtons('probe_filtering','Spot Filtering',c(F,T),T,inline = T)),
         column(12,
         uiOutput('annotation_columns_ui')),
         
@@ -100,28 +100,28 @@ shinyUI(
                    tags$hr(),
                    DT::dataTableOutput('test_files_table')
           ),
-          #### _targets ####
-          tabPanel(title = uiOutput('target_label'),value = 'targets',
-                   column(4,uiOutput('target_file_upload_ui')),
+          #### _metadata ####
+          tabPanel(title = uiOutput('metadata_label'),value = 'metadata',
+                   column(4,uiOutput('metadata_file_upload_ui')),
                    column(5,uiOutput('select_conditions_column_ui')),
-                   column(2,downloadButton('download_targets',"Download")),
-                   column(1,actionButton('reset_targets','Reset')), 
+                   column(2,downloadButton('download_metadata',"Download")),
+                   column(1,actionButton('reset_metadata','Reset')), 
                    
                    column(12,uiOutput('condition_select_ui')),
-                   column(12,uiOutput('target_upload_error_ui')),
-                   column(12,uiOutput('target_table_ui'))
+                   column(12,uiOutput('metadata_upload_error_ui')),
+                   column(12,uiOutput('metadata_table_ui'))
           ),
-          #### _spots ####
+          #### _probes ####
           tabPanel(title = uiOutput('probe_label'),value = 'probes',
-                   column(4,uiOutput('spot_file_upload_ui'),),
-                   column(5,uiOutput('spot_columns_ui')),
-                   column(2,downloadButton('download_spots',"Download")),
-                   column(1,actionButton('reset_spots','Reset')), 
+                   column(4,uiOutput('probe_file_upload_ui'),),
+                   column(5,uiOutput('probe_columns_ui')),
+                   column(2,downloadButton('download_probes',"Download")),
+                   column(1,actionButton('reset_probes','Reset')), 
             
                    column(12,
-                     uiOutput('spot_control_ui'),
-                     uiOutput('spot_remove_ui'),
-                     uiOutput('spot_table_ui')
+                     uiOutput('probe_control_ui'),
+                     uiOutput('probe_remove_ui'),
+                     uiOutput('probe_table_ui')
                    )
                    
           ),
@@ -176,10 +176,10 @@ shinyUI(
                      tabPanel('Spot Filtering Elist',
                               tabsetPanel(selected = 'Plot',
                                           tabPanel('Table',
-                                                   uiOutput('spot_filtering_table_ui')
+                                                   uiOutput('probe_filtering_table_ui')
                                           ),
                                           tabPanel('Plot',
-                                                   uiOutput('spot_filtering_E_heatmap_ui')
+                                                   uiOutput('probe_filtering_E_heatmap_ui')
                                           )
                               )
                      )
@@ -217,7 +217,7 @@ shinyUI(
                        tabPanel('Missingness Plots',
                                 uiOutput('multi_missing_plot_ui')),
                        tabPanel("CV's",
-                                uiOutput('spot_categories_select_ui'),
+                                uiOutput('probe_categories_select_ui'),
                                 uiOutput('multi_CV_plot_ui')),
                        tabPanel('Precision Plots',
                           uiOutput('precision_plot_ui')

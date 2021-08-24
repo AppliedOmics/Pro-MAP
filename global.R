@@ -66,7 +66,7 @@ array_weight_threshold = 0.5
 pvalue_select = 0.05
 mtc = 'BH'
 fc_cutoff = 1.5
-spot_collapse_digits = FALSE
+probe_collapse_digits = FALSE
 cont_matrix_comp = 'All'
 
 ##### Files #####

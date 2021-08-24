@@ -19,10 +19,10 @@ shinyServer(function(session, input, output) {
   })
   
   values = reactiveValues(
-    target_file = NULL,
-    spot_file = NULL,
+    metadata_file = NULL,
+    probe_file = NULL,
     protein_file = NULL,
-    targets = NULL,
+    metadata = NULL,
     probes = NULL,
     proteins = NULL
     
@@ -138,7 +138,7 @@ shinyServer(function(session, input, output) {
     values$pvalue_select = pvalue_select
     values$mtc = mtc
     values$fc_cutoff = fc_cutoff
-    values$spot_collapse_digits = spot_collapse_digits
+    values$probe_collapse_digits = probe_collapse_digits
     values$cont_matrix_comp = cont_matrix_comp 
     values$protein_column = NULL
     values$drop_col = 'Category'
@@ -279,8 +279,8 @@ shinyServer(function(session, input, output) {
     values$protein_column = input$protein_column
   })
   
-  observeEvent(input$spot_column,{ 
-    values$protein_column = input$spot_column
+  observeEvent(input$probe_column,{ 
+    values$protein_column = input$probe_column
   })
 
   
@@ -321,9 +321,9 @@ shinyServer(function(session, input, output) {
   })
   
   observeEvent(input$gpr_files$datapath,{
-    values$spot_file = NULL 
+    values$probe_file = NULL 
     values$proteins_file = NULL
-    values$target_file = NULL
+    values$metadata_file = NULL
     hideTab('main','probes')
     hideTab('main','proteins')
     hideTab('main','data')
@@ -348,13 +348,13 @@ shinyServer(function(session, input, output) {
           file_path_list = input$gpr_files$datapath
         }
       }else{
-        values$target_file = 'dataset'
-        values$spot_file = 'dataset'
+        values$metadata_file = 'dataset'
+        values$probe_file = 'dataset'
         values$protein_file = 'dataset'
         getwd()
         (path = input$dataset)
         file_list = list.files(path)
-        file_list = file_list[!file_list %in% c('targets.txt','spots.txt','proteins.txt')]
+        file_list = file_list[!file_list %in% c('metadata.txt','probes.txt','proteins.txt')]
         file_list
         file_path_list = file.path(path,file_list)
      
@@ -366,8 +366,8 @@ shinyServer(function(session, input, output) {
     test_files = reactive({#withProgress(message = 'testing array files',{ 
       req(array_file_list())  
    
-    #Tab('main','targets')
-      values$targets = NULL
+    #Tab('main','metadata')
+      values$metadata = NULL
       values$probes = NULL
       values$proteins = NULL
       
@@ -380,7 +380,7 @@ shinyServer(function(session, input, output) {
       hideTab('main','pipeline')
       hideTab('main','all')
       hideTab('main','sig')
-      showTab('main','targets')
+      showTab('main','metadata')
       # Create a Progress object
       progress <- shiny::Progress$new()
       on.exit(progress$close())
@@ -434,7 +434,7 @@ shinyServer(function(session, input, output) {
       
       file_error_list = list()
       if(length(unique(row_list)) != 1){
-        file_error = 'There are differing number of spots on the arrays, only the intersection spots will be used'
+        file_error = 'There are differing number of probes on the arrays, only the intersection probes will be used'
         file_error_list[['rows']] = file_error
         
       } 
@@ -466,7 +466,7 @@ shinyServer(function(session, input, output) {
         
         cmd = paste(dim(df)[1],'Files with',
                     paste(unique(df$Number.of.Spots),collapse=', '),
-                    'spots and ',
+                    'probes and ',
                     paste(unique(df$Number.of.Metric.Columns),collapse =', '),'columns')
    
       
@@ -488,7 +488,7 @@ shinyServer(function(session, input, output) {
       
       if(length(test_files()$file_error) > 0){
         if('cols' %in% names(test_files()$file_error)){
-          hideTab('main','targets')
+          hideTab('main','metadata')
           
           span(tags$h4(test_files()$file_error$cols), style="color:red")
         }
@@ -535,7 +535,7 @@ shinyServer(function(session, input, output) {
       
       cat(dim(df)[1],'Files with',
       paste(unique(df$Number.of.Spots),collapse=', '),
-      'spots and ',
+      'probes and ',
       paste(unique(df$Number.of.Metric.Columns),collapse =', '),'columns')
       
     })
@@ -647,7 +647,7 @@ shinyServer(function(session, input, output) {
     
     
     
-  #---------------------------Read in data and filter spots----------------------------------------------------
+  #---------------------------Read in data and filter probes----------------------------------------------------
     
     
     #### _EListRaw ####
@@ -665,13 +665,13 @@ shinyServer(function(session, input, output) {
       file_path_list = array_file_list()$path  
       file_path_list
  
-          if(input$spot_filtering == TRUE){
+          if(input$probe_filtering == TRUE){
             E <- read.maimages(file_path_list,
                                columns=list(E=input$foreground_column, Eb=input$background_column),
                                annotation=c(input$select_annotation), 
                                wt.fun=sd_filter)
           }
-          if(input$spot_filtering == FALSE){
+          if(input$probe_filtering == FALSE){
             E <- read.maimages(file_path_list,
                                columns=list(E=input$foreground_column, Eb=input$background_column),
                                annotation=c(input$select_annotation))
@@ -683,46 +683,46 @@ shinyServer(function(session, input, output) {
     
 
 
-    #### _targets #####
+    #### _metadata #####
     
-    #values$target_file is a reactive value, that serves as a global variabe, which can be affected by different reactive elements
+    #values$metadata_file is a reactive value, that serves as a global variabe, which can be affected by different reactive elements
     
-    # inputs that reset values$target file
-    observeEvent(c(input$reset_targets,
+    # inputs that reset values$metadata file
+    observeEvent(c(input$reset_metadata,
                    input$gpr_files),{
-                   values$target_file = NULL
+                   values$metadata_file = NULL
                    })
     
     
-    # assigns input$target file to values$target file
-    observeEvent(input$target_file,{
-      values$target_file = input$target_file
+    # assigns input$metadata file to values$metadata file
+    observeEvent(input$metadata_file,{
+      values$metadata_file = input$metadata_file
     })
     
-    output$target_file_upload_ui = renderUI({
+    output$metadata_file_upload_ui = renderUI({
       input$dataset
-      input$reset_targets
+      input$reset_metadata
       input$gpr_files
       
       fileInput(
-        inputId = "target_file", 
+        inputId = "metadata_file", 
         label = "Upload Sample File", 
         accept = c(".txt")
       )
     })
     
-    target_names = reactive({ 
-      target_names = targets()$Name
-      target_names
+    metadata_names = reactive({ 
+      metadata_names = metadata()$Name
+      metadata_names
     })
     
     
-    # reactive object that decided which targets file to upload. 
-    targets_upload = reactive({ withProgress(message = 'uploding targets',{  
-      input$reset_targets     
+    # reactive object that decided which metadata file to upload. 
+    metadata_upload = reactive({ withProgress(message = 'uploding metadata',{  
+      input$reset_metadata     
       input$dataset
       input$gpr_files
-      target_file_path = NULL
+      metadata_file_path = NULL
       
       file_names = array_file_list()$name
       (n = length(file_names))
@@ -734,16 +734,16 @@ shinyServer(function(session, input, output) {
       error = NULL
       warning = NULL
       df_upload = NULL
-      if(is.null(values$target_file)){
+      if(is.null(values$metadata_file)){
         df = df_files
         
       }else{
-        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'targets.txt')) & values$target_file == 'dataset'){
-          target_file_path = file.path(input$dataset,'targets.txt')
+        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'metadata.txt')) & values$metadata_file == 'dataset'){
+          metadata_file_path = file.path(input$dataset,'metadata.txt')
         }else{
-          target_file_path = values$target_file$datapath
+          metadata_file_path = values$metadata_file$datapath
         }
-          df_upload = read.csv(target_file_path,sep ='\t',stringsAsFactors = F)
+          df_upload = read.csv(metadata_file_path,sep ='\t',stringsAsFactors = F)
           if('FileName' %in% colnames(df_upload)){
             if(TRUE %in% duplicated(df_upload$Name)){
               warning = 'There were duplicates in the Name column of the uploaded sample file'
@@ -762,13 +762,13 @@ shinyServer(function(session, input, output) {
               
               
               if(length(intersect(df_files$FileName,df_upload$FileName)) == 0){
-                error = "There is no intersect between the uploaded target file and the array files"
+                error = "There is no intersect between the uploaded metadata file and the array files"
                 df = df_files
               }
               
           
           }else{
-            error = 'There is no FileName column in the uploaded targets file.'
+            error = 'There is no FileName column in the uploaded metadata file.'
             df = df_files
           }
       }
@@ -787,54 +787,54 @@ shinyServer(function(session, input, output) {
       list(df = df, upload_df = df_upload, error = error, warning = warning)
     }) })
     
-    output$target_upload_error_ui = renderUI({
-      if(!is.null(targets_upload()$error)){
-        output$target_upload_error_text = renderPrint(cat(targets_upload()$error))
-        output$target_upload_df = DT::renderDataTable(targets_upload()$df_upload,rownames = FALSE)
+    output$metadata_upload_error_ui = renderUI({
+      if(!is.null(metadata_upload()$error)){
+        output$metadata_upload_error_text = renderPrint(cat(metadata_upload()$error))
+        output$metadata_upload_df = DT::renderDataTable(metadata_upload()$df_upload,rownames = FALSE)
         
-        lst = list(span(tags$h4(htmlOutput('target_upload_error_text')), style="color:red"),
+        lst = list(span(tags$h4(htmlOutput('metadata_upload_error_text')), style="color:red"),
                    tags$h2('Uploaded Targets Table'),
-                   DT::dataTableOutput('target_upload_df'),
+                   DT::dataTableOutput('metadata_upload_df'),
                    tags$h2('Targets Table'))
         do.call(tagList,lst)
       }
     })
     
-    targets = reactive(targets_upload()$df)
+    metadata = reactive(metadata_upload()$df)
     
     output$select_conditions_column_ui = renderUI({
-      req(targets())
-      selectInput('select_conditions_column','Select Condition Column',colnames(targets()),colnames(targets()))
+      req(metadata())
+      selectInput('select_conditions_column','Select Condition Column',colnames(metadata()),colnames(metadata()))
     })
     
-    target_conditions = reactive({
-      df = targets()
+    metadata_conditions = reactive({
+      df = metadata()
       df$Condition = df[,input$select_conditions_column]
       df
     })
     
     
     
-    selected_targets = reactive({
-      target_conditions() %>% filter(Condition %in% input$condition_select)
+    selected_metadata = reactive({
+      metadata_conditions() %>% filter(Condition %in% input$condition_select)
     })
     
-    selected_target_names = reactive({
-      target_names = selected_targets()$Name
-      target_names
+    selected_metadata_names = reactive({
+      metadata_names = selected_metadata()$Name
+      metadata_names
     })
     
-    output$target_table = DT::renderDataTable({
+    output$metadata_table = DT::renderDataTable({
       showTab('main','probes')
-      values$targets = 'hit'
-      targets()
+      values$metadata = 'hit'
+      metadata()
     },rownames = FALSE)
     
-    output$target_table_ui = renderUI({
-      result_list = targets_upload()  
+    output$metadata_table_ui = renderUI({
+      result_list = metadata_upload()  
       
       if(!is.null(result_list$error) | !is.null(result_list$warning)){
-        output$target_upload_df = DT::renderDataTable({
+        output$metadata_upload_df = DT::renderDataTable({
           result_list$upload_df
         })
         
@@ -842,49 +842,49 @@ shinyServer(function(session, input, output) {
           span(tags$h4(result_list$error), style="color:red"),
           span(tags$h4(result_list$warning), style="color:orange"),
           tags$h3('Uploaded Sample Table'),
-          DT::dataTableOutput('target_upload_df'),
+          DT::dataTableOutput('metadata_upload_df'),
           tags$h3('Array Sample Table'),
-          DT::dataTableOutput('target_table')
+          DT::dataTableOutput('metadata_table')
         )
       }else{
-        DT::dataTableOutput('target_table')
+        DT::dataTableOutput('metadata_table')
       }
     }) 
     
-    output$download_targets <- downloadHandler(
-      filename = function(){"targets.txt"}, 
+    output$download_metadata <- downloadHandler(
+      filename = function(){"metadata.txt"}, 
       content = function(fname){
-        write.table(target_conditions(), fname,sep = '\t', row.names = FALSE)
+        write.table(metadata_conditions(), fname,sep = '\t', row.names = FALSE)
       }
     ) 
     
     output$condition_select_ui = renderUI({
-      req(target_conditions())
-      df = target_conditions()
+      req(metadata_conditions())
+      df = metadata_conditions()
       selectInput('condition_select','Select Conditions',unique(df$Condition),unique(df$Condition),multiple = T,width = 1200)
     })
-    #### _spots ####
+    #### _probes ####
     
-    observeEvent(input$reset_spots,{
-      values$spot_file = NULL
+    observeEvent(input$reset_probes,{
+      values$probe_file = NULL
     })
     
-    observeEvent(input$spot_file,{
-      values$spot_file = input$spot_file
+    observeEvent(input$probe_file,{
+      values$probe_file = input$probe_file
     })
     
-    output$spot_file_upload_ui = renderUI({
+    output$probe_file_upload_ui = renderUI({
       input$gpr_files
       input$dataset
-      input$reset_spots
+      input$reset_probes
         fileInput(
-          inputId = "spot_file", 
+          inputId = "probe_file", 
           label = "Upload Spots File", 
           accept = c(".txt")
         )
     })
     
-    output$spot_columns_ui = renderUI({
+    output$probe_columns_ui = renderUI({
       req(input$select_annotation) 
       input$dataset 
       input$gpr_files
@@ -903,74 +903,74 @@ shinyServer(function(session, input, output) {
         selected = 'Gene_symbol'
       }
       selected
-      selectInput('spot_column','Spot Column',columns,selected)
+      selectInput('probe_column','Spot Column',columns,selected)
     })
     
 
     
-    spot_names = reactive({
-      input$reset_spots
-      req(input$spot_column)
+    probe_names = reactive({
+      input$reset_probes
+      req(input$probe_column)
       req(E())
-      spot_names = E()$genes[[input$spot_column]]
+      probe_names = E()$genes[[input$probe_column]]
 
-      spot_names
+      probe_names
     })
     
     
-    spot_upload = reactive({  withProgress(message = 'Upload Spots',{
-      print('spot_upload')
-      req(spot_names())  
-      input$reset_spots
+    probe_upload = reactive({  withProgress(message = 'Upload Spots',{
+      print('probe_upload')
+      req(probe_names())  
+      input$reset_probes
       input$dataset
       input$gpr_files
-      spot_file_path = NULL
+      probe_file_path = NULL
       
       df = E()$genes
-      df$spot = spot_names()
+      df$probe = probe_names()
       
-      spot_names = spot_names()
+      probe_names = probe_names()
    
       error = NULL
       warning = NULL
       upload_df = NULL
-      if(!is.null(values$spot_file)){
-        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'spots.txt'))){
-          spot_file_path = file.path(input$dataset,'spots.txt')
+      if(!is.null(values$probe_file)){
+        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'probes.txt'))){
+          probe_file_path = file.path(input$dataset,'probes.txt')
         }
-        if(!is.null(input$spot_file$datapath)){
-            spot_file_path = input$spot_file$datapath
+        if(!is.null(input$probe_file$datapath)){
+            probe_file_path = input$probe_file$datapath
         }
-        if(!is.null(spot_file_path)){
+        if(!is.null(probe_file_path)){
           
-          upload_df = read.csv(spot_file_path,sep ='\t',stringsAsFactors = F)
-          if('spot' %in% colnames(upload_df)){
+          upload_df = read.csv(probe_file_path,sep ='\t',stringsAsFactors = F)
+          if('probe' %in% colnames(upload_df)){
             if('Category' %in% colnames(upload_df)){
               print('col hit')
               
               #upload_df_trim = upload_df %>% 
-              #  dplyr::select(spot,Category) %>% 
+              #  dplyr::select(probe,Category) %>% 
               #  distinct()
             }else{
-              error = 'No Category column in uploaded spot file'
+              error = 'No Category column in uploaded probe file'
             }
           }else{
-            error = 'No spot column in uploaded spot file'
+            error = 'No probe column in uploaded probe file'
             
           }
           
-          if(length(intersect(df$spot,upload_df$spot)) == 0){
-            error = 'There are no overlapping spots between the uploded spot file and the uploaded array files'
+          if(length(intersect(df$probe,upload_df$probe)) == 0){
+            error = 'There are no overlapping probes between the uploded probe file and the uploaded array files'
           }else{
-            if(length(setdiff(df$spot,upload_df$spot)) > 0){
-              warning = 'Not all the spots in the array files are in the uploaded spot file.'
+            if(length(setdiff(df$probe,upload_df$probe)) > 0){
+              warning = 'Not all the probes in the array files are in the uploaded probe file.'
             }
           }
           
-          # if(TRUE %in% duplicated(upload_df$spot)){
-          #   warning = "There are duplicates in the spot column, the duplicates have been removed" 
+          # if(TRUE %in% duplicated(upload_df$probe)){
+          #   warning = "There are duplicates in the probe column, the duplicates have been removed" 
           #   upload_df_trim = upload_df_trim %>% 
-          #     filter(!duplicated(spot))
+          #     filter(!duplicated(probe))
           # }
           
           if(is.null(error)){
@@ -986,60 +986,60 @@ shinyServer(function(session, input, output) {
       list(df = df, upload_df = upload_df,error = error, warning = warning)
     })})
     
-    output$spot_remove_ui = renderUI({withProgress(message = 'remove probes',{
-      print('spot_remove') 
-      #req(spot_upload()) 
-      #req(input$reset_spots)
+    output$probe_remove_ui = renderUI({withProgress(message = 'remove probes',{
+      print('probe_remove') 
+      #req(probe_upload()) 
+      #req(input$reset_probes)
       #req(input$dataset)
       #req(input$gpr_files)
-      df = spot_upload()$df
+      df = probe_upload()$df
       #as.tbl(df)
-      proteins = unique(df$spot)
-      (empty_spots = grep('empty|EMPTY',df$spot,value = T))
+      proteins = unique(df$probe)
+      (empty_probes = grep('empty|EMPTY',df$probe,value = T))
       
-      control = unique(c(empty_spots,df$spot[df$Category == 'remove']))
+      control = unique(c(empty_probes,df$probe[df$Category == 'remove']))
       control
       selectInput('select_remove','Probes to Remove before Normalisation',proteins,control,multiple = T, width = 1200)
     })})
     
-    output$spot_control_ui = renderUI({withProgress(message = 'control probes',{
-      print('spot control') 
-      #req(spot_upload())
-      #req(input$reset_spots)
+    output$probe_control_ui = renderUI({withProgress(message = 'control probes',{
+      print('probe control') 
+      #req(probe_upload())
+      #req(input$reset_probes)
       #req(input$dataset)
       #input$gpr_files
-      df = spot_upload()$df
+      df = probe_upload()$df
       as.tbl(df)
-      proteins = unique(df$spot)
-      control = unique(df$spot[df$Category == 'control'])
-      selectInput('select_control_spot','Control Probes (labelled but not removed)',proteins,control,multiple = T, width = 1200)
+      proteins = unique(df$probe)
+      control = unique(df$probe[df$Category == 'control'])
+      selectInput('select_control_probe','Control Probes (labelled but not removed)',proteins,control,multiple = T, width = 1200)
     })})
     
-    spots = reactive({withProgress (message = 'assigning labels to probes',{
-      print('spots')
-      req(spot_upload())
-      df = spot_upload()$df
+    probes = reactive({withProgress (message = 'assigning labels to probes',{
+      print('probes')
+      req(probe_upload())
+      df = probe_upload()$df
       df$Category = 'analyte'
-      df$Category[df$spot == ''] = 'remove'
-      df$Category[df$spot %in% input$select_remove] = 'remove'
-      df$Category[df$spot %in% input$select_control_spot] = 'control'
-      #df$Category[df$Category == 'remove' & !df$spot %in% input$select_remove] = ''
+      df$Category[df$probe == ''] = 'remove'
+      df$Category[df$probe %in% input$select_remove] = 'remove'
+      df$Category[df$probe %in% input$select_control_probe] = 'control'
+      #df$Category[df$Category == 'remove' & !df$probe %in% input$select_remove] = ''
       df
     })})
     
-    removed_spots = reactive({
-      print('removed_spots')
-      req(spots())
-      spots() %>% 
+    removed_probes = reactive({
+      print('removed_probes')
+      req(probes())
+      probes() %>% 
         filter(!Category %in% c('remove')) %>% 
-        pull(spot)
+        pull(probe)
     })
     
     
-    output$spot_table = DT::renderDataTable({
-      print('spot_table')
-      req(spot_upload())
-      req(spots())
+    output$probe_table = DT::renderDataTable({
+      print('probe_table')
+      req(probe_upload())
+      req(probes())
       if(values$app_version == 'pro'){
         showTab('main','proteins')
         showTab('main','data')
@@ -1049,19 +1049,19 @@ shinyServer(function(session, input, output) {
         showTab('main','pipeline')
         showTab('main','sig')
       }
-      if(length(selected_targets()$Condition) >1){
+      if(length(selected_metadata()$Condition) >1){
         showTab('main','sig')
       }
   
       values$probes = 'hit'
-      spots()
+      probes()
     },rownames = FALSE)
     
-    output$spot_table_ui = renderUI({
-      result_list = spot_upload()
+    output$probe_table_ui = renderUI({
+      result_list = probe_upload()
       
       if(!is.null(result_list$error) | !is.null(result_list$warning)){
-        output$spot_upload_df = DT::renderDataTable({
+        output$probe_upload_df = DT::renderDataTable({
           result_list$upload_df
         })
         
@@ -1069,21 +1069,21 @@ shinyServer(function(session, input, output) {
           span(tags$h4(result_list$error), style="color:red"),
           span(tags$h4(result_list$warning), style="color:orange"),
           tags$h3('Uploaded Spot Table'),
-          DT::dataTableOutput('spot_upload_df'),
+          DT::dataTableOutput('probe_upload_df'),
           tags$h3('Array Spot Table'),
-          DT::dataTableOutput('spot_table')
+          DT::dataTableOutput('probe_table')
         )
       }else{
-        DT::dataTableOutput('spot_table')
+        DT::dataTableOutput('probe_table')
       }
     })
     
  
     
-    output$download_spots <- downloadHandler(
-      filename = function(){"spots.txt"}, 
+    output$download_probes <- downloadHandler(
+      filename = function(){"probes.txt"}, 
       content = function(fname){
-        write.table(spots(), fname,sep = '\t',row.names = F)
+        write.table(probes(), fname,sep = '\t',row.names = F)
       }
     )
     
@@ -1106,13 +1106,13 @@ shinyServer(function(session, input, output) {
       input$gpr_files
       input$reset_proteins
       selected = 'Annotation'
-      if("Name" %in% colnames(spots())){ 
+      if("Name" %in% colnames(probes())){ 
         selected = 'Name'
       }
-      if("ID" %in% colnames(spots())){
+      if("ID" %in% colnames(probes())){
         selected = 'ID'
       }
-      selectInput('protein_column','Protein Column',colnames(spots()),input$spot_column)
+      selectInput('protein_column','Protein Column',colnames(probes()),input$probe_column)
     })
     
     observeEvent(input$reset_proteins,{
@@ -1128,7 +1128,7 @@ shinyServer(function(session, input, output) {
      
     protein_upload = reactive({ withProgress(message = 'Uploading Proteins',{
       req(data_full()) 
-      input$reset_targets
+      input$reset_metadata
       input$dataset
       input$gpr_files
 
@@ -1156,7 +1156,7 @@ shinyServer(function(session, input, output) {
           if('protein' %in% colnames(upload_df)){
             if('Category' %in% colnames(upload_df)){
               #upload_df_trim = upload_df %>% 
-              #  dplyr::select(spot,Category)
+              #  dplyr::select(probe,Category)
               print('col_hit')
               df = df %>% 
                 dplyr::select(-'Category')
@@ -1247,7 +1247,7 @@ shinyServer(function(session, input, output) {
         hideTab('main','all')
       }
       
-      if(length(selected_targets()$Condition) >1){
+      if(length(selected_metadata()$Condition) >1){
         showTab('main','sig')
       }
       values$proteins = 'hit'
@@ -1287,10 +1287,10 @@ shinyServer(function(session, input, output) {
     
     #### Data Table Heatmaps #####
     
-    array_HeatMap_function <- function(m,target_names,selected_targets,spot_names,pallete,cluster) {
+    array_HeatMap_function <- function(m,metadata_names,selected_metadata,probe_names,pallete,cluster) {
           
-          colnames(m) = target_names$Name
-          m = m[,selected_targets$Name]
+          colnames(m) = metadata_names$Name
+          m = m[,selected_metadata$Name]
           
           remove = c()
           if(FALSE %in% is.finite(m)){
@@ -1316,15 +1316,15 @@ shinyServer(function(session, input, output) {
           }
           if(cluster == 'dend'){
             plot_height = 300
-            ht = dend_function(m,target_names,pallete)
+            ht = dend_function(m,metadata_names,pallete)
           }else{
             plot_height = 300+(dim(m)[1]*10)
-            ht = Heatmap_function(m,selected_targets,spot_names,pallete,cluster)
+            ht = Heatmap_function(m,selected_metadata,probe_names,pallete,cluster)
           }
      list(p = ht,plot_height = plot_height, plot_width = plot_width, warning = title,type = cluster)  
     }
     
-    Heatmap_function = function(m, targets,spots,pallete,cluster = 'Cluster'){ 
+    Heatmap_function = function(m, metadata,probes,pallete,cluster = 'Cluster'){ 
       
       plot_min = min(as.numeric(m),na.rm = T)
       if(plot_min < 0){
@@ -1334,23 +1334,23 @@ shinyServer(function(session, input, output) {
         col_fun = colorRamp2(c(plot_min,mean(as.numeric(m),na.rm = T),max(as.numeric(m),na.rm = T)), c("white",'orange',"red"))
       }
       
-      targets = targets %>% 
+      metadata = metadata %>% 
         filter(Name %in% colnames(m))
       
-      ha_annotation = targets$Condition
-      names(ha_annotation) = targets$Name
-      (condition_col = brewer.pal(n = length(unique(targets$Condition)), name = pallete)[1:length(unique(targets$Condition))])
-      (names(condition_col) = unique(targets$Condition))
+      ha_annotation = metadata$Condition
+      names(ha_annotation) = metadata$Name
+      (condition_col = brewer.pal(n = length(unique(metadata$Condition)), name = pallete)[1:length(unique(metadata$Condition))])
+      (names(condition_col) = unique(metadata$Condition))
       column_ha = HeatmapAnnotation(Condition = ha_annotation, col = list(Condition = condition_col))
       
-      sample_order = targets %>% 
+      sample_order = metadata %>% 
         arrange(Condition)
       
       
       if(cluster == 'Cluster'){
         ht = Heatmap(m,
                      col = col_fun,
-                     row_labels = spots,
+                     row_labels = probes,
                      column_dend_height = unit(4, "cm"), 
                      row_dend_width = unit(4, "cm"),
                      column_names_side = "top",
@@ -1360,7 +1360,7 @@ shinyServer(function(session, input, output) {
       if(cluster == 'Order'){
         ht = Heatmap(m,
                      col = col_fun,
-                     row_labels = spots,
+                     row_labels = probes,
                      row_names_side = "left",
                      column_names_side = "top",
                      cluster_columns = FALSE,
@@ -1371,7 +1371,7 @@ shinyServer(function(session, input, output) {
       if(cluster == 'None'){
         ht = Heatmap(m,
                      col = col_fun,
-                     row_labels = spots,
+                     row_labels = probes,
                      row_names_side = "left",
                      column_names_side = "top",
                      cluster_columns = FALSE,
@@ -1385,12 +1385,12 @@ shinyServer(function(session, input, output) {
     
 
     
-    dend_function = function(m,targets,pallete){
+    dend_function = function(m,metadata,pallete){
       ## stupid toy example
-      groupCodes = targets$Condition
+      groupCodes = metadata$Condition
       groupCodes
       palette
-      conditions = unique(targets$Condition)
+      conditions = unique(metadata$Condition)
       colorCodes = brewer.pal(n = length(conditions), name = pallete)[1:length(conditions)]
       #colorCodes = rainbow(length(conditions))
       names(colorCodes) = conditions
@@ -1419,7 +1419,7 @@ shinyServer(function(session, input, output) {
       
     }
     
-    dend_function_old = function(m,targets){
+    dend_function_old = function(m,metadata){
       m
       
       
@@ -1438,7 +1438,7 @@ shinyServer(function(session, input, output) {
       
       ddata_x$labels = ddata_x$labels %>%
         mutate(Name = label) %>% 
-        left_join(targets)
+        left_join(metadata)
       
       ddata_x$leaf_labels = ddata_x$labels$label
       
@@ -1453,11 +1453,11 @@ shinyServer(function(session, input, output) {
     foreground_table = reactive({
       df = as.data.frame(E()$E)  
       dim(df)
-      colnames(df) = target_names()
-      df$spot = spot_names()
+      colnames(df) = metadata_names()
+      df$probe = probe_names()
       as.tbl(as.data.frame(df))
       df = df %>% 
-        dplyr::select(spot,everything())
+        dplyr::select(probe,everything())
       df
     }) 
     
@@ -1473,7 +1473,7 @@ shinyServer(function(session, input, output) {
       m = E()$E   
       id = 'foreground'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
     })
@@ -1482,11 +1482,11 @@ shinyServer(function(session, input, output) {
 
       
       df_l = df %>% 
-        gather(Name,value,-spot)
+        gather(Name,value,-probe)
       as.tbl(df_l)
 
       df_cv = df_l %>% 
-        group_by(spot,Name) %>%
+        group_by(probe,Name) %>%
           summarise(count = n(),
                     mean = mean(value,na.rm = T),
                     median = median(value,na.rm = T),
@@ -1498,7 +1498,7 @@ shinyServer(function(session, input, output) {
       as.tbl(df_cv)
       
       df_cv_mean = df_cv %>% 
-        group_by(spot) %>% 
+        group_by(probe) %>% 
           summarise(mean = mean(CV,na.rm = T),
                     median = median(CV,na.rm = T),
                     max = max(CV,na.rm = T),
@@ -1509,18 +1509,18 @@ shinyServer(function(session, input, output) {
    
     }
     
-    triplicate_cv_plot_function = function(df,spots,targets){withProgress(message = 'Calculating CV',{
+    triplicate_cv_plot_function = function(df,probes,metadata){withProgress(message = 'Calculating CV',{
       #df = foreground_table() 
       df_list = triplicate_CV_function(df)
       df_cv = df_list$df_cv
-      if('Name' %in% colnames(spots)){
-        spots = spots %>% 
+      if('Name' %in% colnames(probes)){
+        probes = probes %>% 
           dplyr::select(-Name)
       }
       
       df_cv = df_cv %>% 
-        left_join(spots) %>% 
-        left_join(targets)
+        left_join(probes) %>% 
+        left_join(metadata)
       
       as.tbl(df_cv)
       q = quantile(df_cv$CV,na.rm=T)
@@ -1578,9 +1578,9 @@ shinyServer(function(session, input, output) {
     
     output$foreground_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
       df = foreground_table()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
     
       id = 'foreground'
       name = 'triplicate_CV'
@@ -1592,11 +1592,11 @@ shinyServer(function(session, input, output) {
   
     background_table = reactive({
       df = as.data.frame(E()$Eb)
-      colnames(df) = target_names()
-      df$spot = spot_names()
+      colnames(df) = metadata_names()
+      df$probe = probe_names()
       as.tbl(as.data.frame(df))
       df = df %>% 
-        dplyr::select(spot,everything())
+        dplyr::select(probe,everything())
       df
     })
     
@@ -1613,7 +1613,7 @@ shinyServer(function(session, input, output) {
       m = E()$Eb 
       id = 'backhground'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
 
@@ -1621,9 +1621,9 @@ shinyServer(function(session, input, output) {
     
     output$background_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
       df = background_table()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
       
       id = 'background'
       name = 'triplicate_CV'
@@ -1635,48 +1635,48 @@ shinyServer(function(session, input, output) {
     
 
 
-    spot_filtering_E = reactive({
+    probe_filtering_E = reactive({
       df = E()$weights %>%  
         as.data.frame
-      colnames(df) = target_names()
-      df$spot = spot_names()
+      colnames(df) = metadata_names()
+      df$probe = probe_names()
       as.tbl(as.data.frame(df))
       df = df %>% 
-        dplyr::select(spot,everything())
+        dplyr::select(probe,everything())
       df
     })
 
     
-    output$spot_filtering_table_ui = renderUI({
-      df = spot_filtering_E()
-      id = 'spot_filtering'
+    output$probe_filtering_table_ui = renderUI({
+      df = probe_filtering_E()
+      id = 'probe_filtering'
       name = 'table'
       table_Server(id,name,df)
       table_UI(id,name)
     })
     
-    output$spot_filtering_E_heatmap_ui = renderUI({ 
+    output$probe_filtering_E_heatmap_ui = renderUI({ 
       
     
     
       if('weights' %in% names(E())){
-        m = spot_filtering_E() %>% 
-          dplyr::select(-spot) %>% 
+        m = probe_filtering_E() %>% 
+          dplyr::select(-probe) %>% 
           as.matrix()
         
         if(length(unique(as.numeric(m))) >1){
         
-          id = 'spot_filtering'
+          id = 'probe_filtering'
           name = 'Hcluster'
-          ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+          ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
           ht_plot_Server(id,name,ht_list)
           do.call(tagList,plot_UI(id,name,ht_list$warning))
 
         }else{
-          tags$h4('No spots were filtered')
+          tags$h4('No probes were filtered')
         }
       }else{
-        tags$h4('No spot filtering was applied to the array data')
+        tags$h4('No probe filtering was applied to the array data')
       }
   
     })
@@ -1691,19 +1691,19 @@ shinyServer(function(session, input, output) {
 
 
     
-    array_boxplot_function = function(data,target_names,spot_names,targets,selected_targets,
+    array_boxplot_function = function(data,metadata_names,probe_names,metadata,selected_metadata,
                                       log_rb,input){
       df = data.frame(data)
 
-      colnames(df) <- target_names
-      df$Proteins = spot_names
+      colnames(df) <- metadata_names
+      df$Proteins = probe_names
       as.tbl(df)   
       
       
       df_l = df %>% 
-        gather(Name,`Expression Intensity`,c(target_names)) %>% 
-        left_join(targets) %>% 
-        filter(Name %in% selected_targets$Name)
+        gather(Name,`Expression Intensity`,c(metadata_names)) %>% 
+        left_join(metadata) %>% 
+        filter(Name %in% selected_metadata$Name)
       as.tbl(df_l)
       p = ggplot(df_l)
       if(values$collapse_boxplots == F){
@@ -1730,27 +1730,27 @@ shinyServer(function(session, input, output) {
       p 
     }
      
-    array_boxplot_function_2 = function(data,target_names,spot_names,
-                                        targets,selected_targets,
-                                        spots,
+    array_boxplot_function_2 = function(data,metadata_names,probe_names,
+                                        metadata,selected_metadata,
+                                        probes,
                                         log_rb,input,values){
       df = data.frame(data)
 
-      colnames(df) <- target_names
-      df$spot = spot_names
+      colnames(df) <- metadata_names
+      df$probe = probe_names
       as.tbl(df)   
       
       
-      if("Name" %in% colnames(spots)){
-        spots = spots %>% 
+      if("Name" %in% colnames(probes)){
+        probes = probes %>% 
           dplyr::select(-Name)
       }
       
       df_l = df %>% 
-        gather(Name,`Expression Intensity`,c(target_names)) %>% 
-        left_join(targets) %>% 
-        left_join(spots) %>% 
-        filter(Name %in% selected_targets$Name) 
+        gather(Name,`Expression Intensity`,c(metadata_names)) %>% 
+        left_join(metadata) %>% 
+        left_join(probes) %>% 
+        filter(Name %in% selected_metadata$Name) 
       as.tbl(df_l)
       p = ggplot(df_l)
       if(values$collapse_boxplots == F){
@@ -1781,17 +1781,17 @@ shinyServer(function(session, input, output) {
       list(p = p, plot_height = plot_height)
     }
     
-    CV_df_function  = function(df,targets){
+    CV_df_function  = function(df,metadata){
       
       df_l = df %>% 
-        gather(Name,value,-spot) %>% 
-        left_join(targets)
+        gather(Name,value,-probe) %>% 
+        left_join(metadata)
       
       as.tbl(df_l)
       
       df_cv = df_l %>% 
         filter(!is.na(value)) %>% 
-        group_by(spot,Condition) %>% 
+        group_by(probe,Condition) %>% 
         summarise(mean = mean(value,na.rm = T),
                   sd = sd(value,na.rm = T)) %>% 
         ungroup() %>% 
@@ -1800,9 +1800,9 @@ shinyServer(function(session, input, output) {
       df_cv
     }
     
-    CV_plot_function = function(data,targets,spots){
+    CV_plot_function = function(data,metadata,probes){
       CV_df = data %>%  
-        left_join(spots)
+        left_join(probes)
       q = quantile(CV_df$CV,na.rm = T)
       
       if(length(unique(CV_df$Category)) == 1){
@@ -1819,13 +1819,13 @@ shinyServer(function(session, input, output) {
       p
     }
     
-    missingness_function = function(df,targets){
+    missingness_function = function(df,metadata){
       df[df <= 0] = NA
       as.tbl(df)
       
       df_l = df %>% 
 
-        gather(Name,value,-spot) %>% 
+        gather(Name,value,-probe) %>% 
         filter(!is.na(value))
       as.tbl(df_l)
       
@@ -1833,7 +1833,7 @@ shinyServer(function(session, input, output) {
         group_by(Name) %>% 
         summarise(`Percentage missing` = (dim(df)[1]-n())/dim(df)[1]*100) %>% 
         ungroup() %>% 
-        left_join(targets)
+        left_join(metadata)
       df_count  
       
       p = ggplot(df_count) +
@@ -1841,12 +1841,12 @@ shinyServer(function(session, input, output) {
       list(p = p, df = df_count)
     }
     
-    MA_plot_function = function(df,spots){
-      if('spot' %in% colnames(df)){
-        spot_col = df$spot
-        df = df %>% dplyr::select(-spot)
+    MA_plot_function = function(df,probes){
+      if('probe' %in% colnames(df)){
+        probe_col = df$probe
+        df = df %>% dplyr::select(-probe)
       }else{
-        spot_col = rownames(df)
+        probe_col = rownames(df)
       }
       
       Rfit = lmFit(df)
@@ -1854,23 +1854,23 @@ shinyServer(function(session, input, output) {
       Rfit2_df = as.data.frame(Rfit2)
       as.tbl(Rfit2_df)
       dim(Rfit2_df)
-      Rfit2_df$spot = spot_col
+      Rfit2_df$probe = probe_col
       
       as.tbl(Rfit2_df)
       
       plot_df = Rfit2_df %>% 
         
-        left_join(spots)
+        left_join(probes)
       
       as.tbl(plot_df)
       
       
       if(length(unique(plot_df$Category))>1){
         MA_plot = ggplot(plot_df) + 
-          geom_point(aes(y = log(F), x = Amean,col = Category,group = spot))
+          geom_point(aes(y = log(F), x = Amean,col = Category,group = probe))
       }else{
         MA_plot = ggplot(plot_df) + 
-          geom_point(aes(y = log(F), x = Amean,group = spot))
+          geom_point(aes(y = log(F), x = Amean,group = probe))
       }
       
       
@@ -1896,13 +1896,13 @@ shinyServer(function(session, input, output) {
       m
     }
     
-    cont_matrix_function = function(df,targets,input){
-      time = factor(paste(targets$Condition), levels = unique(targets$Condition))
+    cont_matrix_function = function(df,metadata,input){
+      time = factor(paste(metadata$Condition), levels = unique(metadata$Condition))
       time
       design = model.matrix(~0+time)
       colnames(design) = levels(time)
       
-      conditions = unique(targets$Condition)
+      conditions = unique(metadata$Condition)
       comparison_list = c()
       if(values$cont_matrix_comp == "All"){
         for(i in c(1:length(conditions))){
@@ -1945,9 +1945,9 @@ shinyServer(function(session, input, output) {
       data = E()$E  
       log_rb = FALSE
       result_list = array_boxplot_function_2(data,
-                                   target_names(),spot_names(),
-                                   target_conditions(),selected_targets(),
-                                   spots(),
+                                   metadata_names(),probe_names(),
+                                   metadata_conditions(),selected_metadata(),
+                                   probes(),
                                    log_rb,input,values)
       p
       id = 'RAW'
@@ -1959,12 +1959,12 @@ shinyServer(function(session, input, output) {
     
     RAW_df = reactive({
       df = E()$E  
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       df = df %>% 
         as.data.frame()
-      df$spot = spot_names()
+      df$probe = probe_names()
       df
-      #CV_df = CV_df_function(df,targets())
+      #CV_df = CV_df_function(df,metadata())
       #CV_df
     })
     
@@ -1975,9 +1975,9 @@ shinyServer(function(session, input, output) {
     
     output[['RAW-CV_plot_ui']] = renderUI({  
       df = RAW_df()
-      data = CV_df_function(df,targets()) 
+      data = CV_df_function(df,metadata()) 
       
-      p = CV_plot_function(data,targets(),spots())
+      p = CV_plot_function(data,metadata(),probes())
       p = gg_fill_function(p)
       
       id = 'RAW'
@@ -1993,7 +1993,7 @@ shinyServer(function(session, input, output) {
    
       
       df = RAW_df()
-      p = MA_plot_function(df,spots())
+      p = MA_plot_function(df,probes())
       #p = gg_col_function(p)
       
       id = 'RAW'
@@ -2008,7 +2008,7 @@ shinyServer(function(session, input, output) {
     output[['RAW-missing_plot_ui']] = renderUI({  
  
       df = RAW_df()
-      p = missingness_function(df,targets())$p
+      p = missingness_function(df,metadata())$p
       p = gg_fill_function(p)
       
       plot_Server('RAW','missingness',p)
@@ -2018,7 +2018,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW-Heatmap_ui']] = renderUI({ 
       df = E()$E      
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input) 
@@ -2027,7 +2027,7 @@ shinyServer(function(session, input, output) {
       name = 'Hcluster'
       
 
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list) 
       #title = paste('removed ',paste(ht_list$removed,collapse = ' and '), 'values')
@@ -2037,9 +2037,9 @@ shinyServer(function(session, input, output) {
     
     output[['RAW-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
       df = RAW_df()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
       
       id = 'RAW'
       name = 'triplicate_CV'
@@ -2081,7 +2081,7 @@ shinyServer(function(session, input, output) {
       data = E_filter()
       log_rb = FALSE
       result_list = array_boxplot_function_2(data,
-                                             target_names(),spot_names(),target_conditions(),selected_targets(),spots(),
+                                             metadata_names(),probe_names(),metadata_conditions(),selected_metadata(),probes(),
                                              log_rb,input,values)
       
       id = 'RAW_filter'
@@ -2093,10 +2093,10 @@ shinyServer(function(session, input, output) {
     
     E_filter_df = reactive({
       df = E_filter() 
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       df = df %>% 
         as.data.frame
-      df$spot = spot_names()
+      df$probe = probe_names()
       df
     })
     
@@ -2106,8 +2106,8 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-CV_plot_ui']] = renderUI({     
       df = E_filter_df() 
-      data = CV_df_function(df,targets())
-      p = CV_plot_function(data,targets(),spots())
+      data = CV_df_function(df,metadata())
+      p = CV_plot_function(data,metadata(),probes())
       p = gg_fill_function(p)
       
       id = 'RAW_filter'
@@ -2121,7 +2121,7 @@ shinyServer(function(session, input, output) {
     output[['RAW_filter-MA_plot_ui']] = renderUI({
       
       df = E_filter_df()  
-      p = MA_plot_function(df,spots())
+      p = MA_plot_function(df,probes())
 
       id = 'RAW_filter'
       name = 'MA'
@@ -2134,7 +2134,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-missing_plot_ui']] = renderUI({   
       df = E_filter_df()
-      p = missingness_function(df,targets())$p
+      p = missingness_function(df,metadata())$p
       p = gg_fill_function(p)
       
       id = 'RAW_filter'
@@ -2145,14 +2145,14 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-Heatmap_ui']] = renderUI({ 
       df = E_filter()     
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       
       id = 'RAW_filter'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2161,9 +2161,9 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
       df = E_filter_df()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
       
       id = 'RAW_filter'
       name = 'triplicate_CV'
@@ -2194,7 +2194,7 @@ shinyServer(function(session, input, output) {
       data = E_corr()$E   
       log_rb = FALSE
       result_list = array_boxplot_function_2(data,
-                                             target_names(),spot_names(),target_conditions(),selected_targets(),spots(),
+                                             metadata_names(),probe_names(),metadata_conditions(),selected_metadata(),probes(),
                                              log_rb,input,values)
       
       id = 'RAW_corr'
@@ -2206,10 +2206,10 @@ shinyServer(function(session, input, output) {
     
     E_corr_df = reactive({
       df = E_corr()$E
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       df = df %>% 
         as.data.frame
-      df$spot = spot_names()
+      df$probe = probe_names()
       df
     })
     
@@ -2219,8 +2219,8 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-CV_plot_ui']] = renderUI({     
       df = E_corr_df() 
-      data = CV_df_function(df,targets())
-      p = CV_plot_function(data,targets(),spots())
+      data = CV_df_function(df,metadata())
+      p = CV_plot_function(data,metadata(),probes())
       p = gg_fill_function(p)
       
       id = 'RAW_corr'
@@ -2234,7 +2234,7 @@ shinyServer(function(session, input, output) {
     output[['RAW_corr-MA_plot_ui']] = renderUI({
       
       df = E_corr_df()  
-      p = MA_plot_function(df,spots())
+      p = MA_plot_function(df,probes())
       
       id = 'RAW_corr'
       name = 'MA'
@@ -2247,7 +2247,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-missing_plot_ui']] = renderUI({   
       df = E_corr_df()
-      p = missingness_function(df,targets())$p
+      p = missingness_function(df,metadata())$p
       p = gg_fill_function(p)
       
       id = 'RAW_corr'
@@ -2258,14 +2258,14 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-Heatmap_ui']] = renderUI({ 
       df = E_corr()$E      
-      colnames(df) = target_names()
+      colnames(df) = metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       
       id = 'RAW_corr'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,metadata(),selected_metadata(),probe_names(),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2274,9 +2274,9 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
       df = E_corr_df()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
       
       id = 'RAW_corr'
       name = 'triplicate_CV'
@@ -2294,45 +2294,45 @@ shinyServer(function(session, input, output) {
     #---------------------------------Normalization------------------------------------
     
 
-    pre_norm_function = function(data,spot_names,target_names,selected_target_names,removed_spots,log_rb){
+    pre_norm_function = function(data,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb){
       df = as.data.frame(data)
       dim(df)
-      colnames(df) <- target_names
-      df$spot = spot_names
+      colnames(df) <- metadata_names
+      df$probe = probe_names
       
       df_f = df %>% 
-        dplyr::filter(spot %in% removed_spots)
+        dplyr::filter(probe %in% removed_probes)
       
       df_m = df_f %>% 
-        dplyr::select(-spot)
+        dplyr::select(-probe)
       
       df_m = df_m %>% 
-        dplyr::select(one_of(selected_target_names))
+        dplyr::select(one_of(selected_metadata_names))
       m = as.matrix(df_m)
       if(log_rb == T){
         m = log2(m)
       }
       m
-      list(m = m, spots = df_f$spot)
+      list(m = m, probes = df_f$probe)
     }
     
-    norm_function = function(m,method,spots){
+    norm_function = function(m,method,probes){
       E_norm = normalizeBetweenArrays(m,method = method)
       E_norm = as.data.frame(E_norm)
-      E_norm$spot <- spots
+      E_norm$probe <- probes
       E_norm
     }
     
     E_norm = reactive({   withProgress(message = 'Normalisation',{
       
         data = E_corr()$E  
-        spot_names = spot_names()
-        target_names = target_names()
-        removed_spots = removed_spots()
+        probe_names = probe_names()
+        metadata_names = metadata_names()
+        removed_probes = removed_probes()
         log_rb = values$log_rb
       
-        norm_list = pre_norm_function(E_corr()$E,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb)
-        E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$spots)
+        norm_list = pre_norm_function(E_corr()$E,probe_names(),metadata_names(),selected_metadata_names(),removed_probes(),values$log_rb)
+        E_norm = norm_function(norm_list$m,input$normalisation_method,norm_list$probes)
         E_norm
 
     })})
@@ -2347,11 +2347,11 @@ shinyServer(function(session, input, output) {
     output[['RAW_norm-boxplot_ui']] = renderUI({   
        
       data = E_norm() %>% 
-        dplyr::select(-spot)
+        dplyr::select(-probe)
       log_rb = values$log_rb
-      #p = array_boxplot_function(data,target_names(),spot_names(),target_conditions(),selected_targets(),log_rb,input)
+      #p = array_boxplot_function(data,metadata_names(),probe_names(),metadata_conditions(),selected_metadata(),log_rb,input)
       result_list = array_boxplot_function_2(data,
-                                             selected_target_names(),E_norm()$spot,target_conditions(),selected_targets(),spots(),
+                                             selected_metadata_names(),E_norm()$probe,metadata_conditions(),selected_metadata(),probes(),
                                              log_rb,input,values)
       
       
@@ -2364,12 +2364,12 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-CV_plot_ui']] = renderUI({     
       df = E_norm() 
-      data = CV_df_function(df,targets())
+      data = CV_df_function(df,metadata())
       #proteins = proteins() %>% 
-      #  dplyr::rename('spot' = protein)
+      #  dplyr::rename('probe' = protein)
       
       
-      p = CV_plot_function(data,targets(),spots())
+      p = CV_plot_function(data,metadata(),probes())
       p = gg_fill_function(p)
       
       id = 'RAW_norm'
@@ -2383,7 +2383,7 @@ shinyServer(function(session, input, output) {
     output[['RAW_norm-MA_plot_ui']] = renderUI({
       
       df = E_norm()  
-      p = MA_plot_function(df,spots())
+      p = MA_plot_function(df,probes())
       
       id = 'RAW_norm'
       name = 'MA'
@@ -2396,7 +2396,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-missing_plot_ui']] = renderUI({   
       df = E_norm()
-      p = missingness_function(df,targets())$p
+      p = missingness_function(df,metadata())$p
       p = gg_fill_function(p)
       
       id = 'RAW_norm'
@@ -2407,15 +2407,15 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-Heatmap_ui']] = renderUI({ 
       df = E_norm() %>%  
-        dplyr::select(-spot)
-      colnames(df) = selected_target_names()
+        dplyr::select(-probe)
+      colnames(df) = selected_metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
       
       id = 'RAW_norm'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),E_norm()$spot,input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_metadata(),selected_metadata(),E_norm()$probe,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2424,9 +2424,9 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
       df = E_norm()  
-      spots = spots()
-      targets = targets()
-      plot_list = triplicate_cv_plot_function(df,spots(),targets())
+      probes = probes()
+      metadata = metadata()
+      plot_list = triplicate_cv_plot_function(df,probes(),metadata())
       
       id = 'RAW_norm'
       name = 'triplicate_CV'
@@ -2443,7 +2443,7 @@ shinyServer(function(session, input, output) {
     
     #---------------------------------Array weights----------------------------------
     arrayw = reactive({withProgress(message = 'Array weights',{
-        data = E_norm() %>% dplyr::select(-spot)
+        data = E_norm() %>% dplyr::select(-probe)
         aw = arrayWeights(data)
         names(aw) = colnames(data)
         aw
@@ -2474,7 +2474,7 @@ shinyServer(function(session, input, output) {
         df = arrayw_df()
         as.tbl(df)
         df_l = gather(df,Name,Weight) %>% 
-            left_join(target_conditions())
+            left_join(metadata_conditions())
         as.tbl(df_l)
         p = ggplot(df_l)
           if(length(unique(df_l$Condition)) > 1){
@@ -2508,25 +2508,25 @@ shinyServer(function(session, input, output) {
     
     CV <- function(x) ( 100*(sd(x)/mean(x)))
     
-    protein_collapse_function = function(df,spots,values){
+    protein_collapse_function = function(df,probes,values){
       
       data = df %>% 
-        dplyr::select(-spot)
+        dplyr::select(-probe)
       colnames(data)
       as.tbl(data)
       colnames(data)
 
       
-      df_spots = df  %>% 
-        left_join(spots)
-      as.tbl(df_spots)
-      colnames(df_spots)
-      if(values$spot_collapse_digits == TRUE){
-        df_spots$protein <- gsub("\\.[[:digit:]]*$", "", df_spots[,values$protein_column])
+      df_probes = df  %>% 
+        left_join(probes)
+      as.tbl(df_probes)
+      colnames(df_probes)
+      if(values$probe_collapse_digits == TRUE){
+        df_probes$protein <- gsub("\\.[[:digit:]]*$", "", df_probes[,values$protein_column])
       }else{
-        df_spots$protein = df_spots[,values$protein_column]
+        df_probes$protein = df_probes[,values$protein_column]
       }
-      df_collapse = df_spots %>% 
+      df_collapse = df_probes %>% 
         dplyr::select(one_of(c('protein','Category',colnames(data))))
       colnames(df_collapse)
       
@@ -2539,8 +2539,8 @@ shinyServer(function(session, input, output) {
       data = E_norm()
       req(values$protein_column) 
       req(E_norm())
-      req(spots())
-      df = protein_collapse_function(E_norm(),spots(),values)
+      req(probes())
+      df = protein_collapse_function(E_norm(),probes(),values)
       df
     })})
     
@@ -2607,7 +2607,7 @@ shinyServer(function(session, input, output) {
       df = data() %>% 
         dplyr::select(-protein)
       values$collapse_boxplots
-      p = array_boxplot_function(df,colnames(df),rownames(df),target_conditions(),selected_targets(),values$log_rb,input)
+      p = array_boxplot_function(df,colnames(df),rownames(df),metadata_conditions(),selected_metadata(),values$log_rb,input)
       
       id = 'Data'
       name = 'boxplot'
@@ -2618,16 +2618,16 @@ shinyServer(function(session, input, output) {
     
     data_df = reactive({
       df = data() %>%  
-        dplyr::rename(spot = protein)
+        dplyr::rename(probe = protein)
     })
     
     output[['Data-CV_plot_ui']] = renderUI({     
       df = data_df()  
-      data = CV_df_function(df,targets())
+      data = CV_df_function(df,metadata())
       proteins = proteins() %>% 
-        dplyr::rename('spot' = protein)
+        dplyr::rename('probe' = protein)
       
-      p = CV_plot_function(data,targets(),proteins)
+      p = CV_plot_function(data,metadata(),proteins)
       p = gg_fill_function(p)
       
       p
@@ -2643,7 +2643,7 @@ shinyServer(function(session, input, output) {
       
       df = data_df()  
       proteins = proteins() %>% 
-        dplyr::rename('spot' = protein)
+        dplyr::rename('probe' = protein)
       p = MA_plot_function(df,proteins)
       
       id = 'Data'
@@ -2657,7 +2657,7 @@ shinyServer(function(session, input, output) {
     
     output[['Data-missing_plot_ui']] = renderUI({   
       df = data_df()
-      p = missingness_function(df,targets())$p
+      p = missingness_function(df,metadata())$p
       p = gg_fill_function(p)
       
       id = 'Data'
@@ -2670,7 +2670,7 @@ shinyServer(function(session, input, output) {
       df = data() %>%  
         column_to_rownames('protein')
         #dplyr::select(-protein)
-      colnames(df) = selected_target_names()
+      colnames(df) = selected_metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
       m = neg_corr_function(m,input)
@@ -2678,7 +2678,7 @@ shinyServer(function(session, input, output) {
       id = 'Data'
       name = 'Hcluster'
 
-      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_metadata(),selected_metadata(),data()$protein,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -2802,7 +2802,7 @@ shinyServer(function(session, input, output) {
       df = data() %>% column_to_rownames('protein')
       m = as.matrix(df)
       
-      samples = selected_targets() %>% as.data.frame
+      samples = selected_metadata() %>% as.data.frame
       rownames(samples) = samples$Name
       
       arrayw_df = t(arrayw_df()) %>% 
@@ -2931,7 +2931,7 @@ shinyServer(function(session, input, output) {
     
   ##### Optimal Cutpoints ######
     output$threshold_control_col_ui = renderUI({
-      (selection = unique(target_conditions()$Condition))
+      (selection = unique(metadata_conditions()$Condition))
       selected = selection[1]
       if('Control' %in% selection){
         selected = 'Control'
@@ -2939,10 +2939,10 @@ shinyServer(function(session, input, output) {
       selectInput('threshold_control_column','Control Condition',selection,selected)
     })
     
-    threshold_function = function(data,targets,input){  
+    threshold_function = function(data,metadata,input){  
       thres.data = as.data.frame(t(data)) %>% 
         rownames_to_column('Name') %>% 
-        left_join(targets %>% dplyr::select(Name,Condition)) %>% 
+        left_join(metadata %>% dplyr::select(Name,Condition)) %>% 
         #rename(Name = 'Sample_ID') %>% 
         #rename(Condition = 'Label') %>% 
         dplyr::select(Name,Condition,everything())
@@ -2973,10 +2973,10 @@ shinyServer(function(session, input, output) {
       input$threshold_control_column 
       data = data() %>% 
         column_to_rownames('protein')
-      targets = target_conditions()
+      metadata = metadata_conditions()
       
   
-      threshold_df = tryCatch({threshold_function(data,targets,input)}, error = function(e) {NULL})
+      threshold_df = tryCatch({threshold_function(data,metadata,input)}, error = function(e) {NULL})
       threshold_df
     })})
     
@@ -2999,7 +2999,7 @@ shinyServer(function(session, input, output) {
       if(!is.null(threshold())){
         data = data() %>% 
           column_to_rownames('protein')
-        targets = target_conditions()
+        metadata = metadata_conditions()
         threshold_df = threshold()
         as.tbl(data)
         rownames(data)
@@ -3044,8 +3044,8 @@ shinyServer(function(session, input, output) {
           column_to_rownames('protein')
         colnames(data)
         rownames(data)
-        targets = target_conditions()
-        rownames(targets) = targets$Name
+        metadata = metadata_conditions()
+        rownames(metadata) = metadata$Name
         proteins = proteins()
         rownames(proteins) = proteins$protein
         features = proteins
@@ -3062,7 +3062,7 @@ shinyServer(function(session, input, output) {
         rownames(features) = features$protein
           
         dim(features)
-        samples = targets
+        samples = metadata
         samples = samples[colnames(data),]
         
         arrayw_df = arrayw_df()
@@ -3098,12 +3098,12 @@ shinyServer(function(session, input, output) {
         samples  = msn_set@phenoData@data
         features = msn_set@featureData@data
         m[is.na(m)] = 0
-        (select_cols = intersect(selected_targets()$Name,colnames(m)))
+        (select_cols = intersect(selected_metadata()$Name,colnames(m)))
         m = m[,select_cols]
         
         id = 'Cutoff'
         name = 'Hcluster'
-        ht_list = array_HeatMap_function(m,selected_targets(),samples,features$protein,input$r_col,values$heatmap_order)
+        ht_list = array_HeatMap_function(m,selected_metadata(),samples,features$protein,input$r_col,values$heatmap_order)
         ht_list$p
         ht_plot_Server(id,name,ht_list)
         do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -3133,36 +3133,36 @@ shinyServer(function(session, input, output) {
     
 
     
-  multi_norm_function = function(corr_data,spot_names,target_names,selected_target_names,removed_spots,log_rb,method,proteins,input){
+  multi_norm_function = function(corr_data,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb,method,proteins,input){
     
-    E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
-    E_norm = norm_function(E_norm_list$m,method,E_norm_list$spots)
-    E_proteins = protein_collapse_function(E_norm,spots(),values)
+    E_norm_list = pre_norm_function(corr_data$E$E,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb)
+    E_norm = norm_function(E_norm_list$m,method,E_norm_list$probes)
+    E_proteins = protein_collapse_function(E_norm,probes(),values)
     E_data = protein_filter_function(E_proteins,proteins,values)
     
     E_data = as.data.frame(E_data) %>% dplyr::select(-one_of('protein','Category'))
     E = list(norm = E_norm,data = E_data)
     
-    S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
-    S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
-    S_proteins = protein_collapse_function(S_norm,spots(),values)
+    S_norm_list = pre_norm_function(corr_data$S$E,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb)
+    S_norm = norm_function(S_norm_list$m,method,S_norm_list$probes)
+    S_proteins = protein_collapse_function(S_norm,probes(),values)
     S_data = protein_filter_function(S_proteins,proteins,values)
 
     S_data = as.data.frame(S_data) %>% dplyr::select(-one_of('protein','Category'))
     S = list(norm = S_norm,data = S_data)
     
-    N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
-    N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
-    N_proteins = protein_collapse_function(N_norm,spots(),values)
+    N_norm_list = pre_norm_function(corr_data$N$E,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb)
+    N_norm = norm_function(N_norm_list$m,method,N_norm_list$probes)
+    N_proteins = protein_collapse_function(N_norm,probes(),values)
     N_data = protein_filter_function(N_proteins,proteins,values)
 
     N_data = as.data.frame(N_data) %>% dplyr::select(-one_of('protein','Category'))
     N = list(norm = N_norm,data = N_data)
     
     
-    M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
-    M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
-    M_proteins = protein_collapse_function(M_norm,spots(),values)
+    M_norm_list = pre_norm_function(corr_data$M$E,probe_names,metadata_names,selected_metadata_names,removed_probes,log_rb)
+    M_norm = norm_function(M_norm_list$m,method,M_norm_list$probes)
+    M_proteins = protein_collapse_function(M_norm,probes(),values)
     M_data = protein_filter_function(M_proteins,proteins,values)
 
     M_data = as.data.frame(M_data) %>% dplyr::select(-one_of('protein','Category'))
@@ -3177,21 +3177,21 @@ shinyServer(function(session, input, output) {
   norm = reactive({withProgress(message = 'multi normalisation',{
     corr_data = corr()    
 
-    spot_names = spot_names()
-    target_names = target_names()
-    removed_spots = removed_spots()
+    probe_names = probe_names()
+    metadata_names = metadata_names()
+    removed_probes = removed_probes()
     log_rb = values$log_rb
     proteins = proteins()
     
     
     method = "none"
-    E = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
+    E = multi_norm_function(corr_data,probe_names(),metadata_names(),selected_metadata_names(),removed_probes(),values$log_rb,method,proteins(),input)
     method = "quantile"
-    Q = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
+    Q = multi_norm_function(corr_data,probe_names(),metadata_names(),selected_metadata_names(),removed_probes(),values$log_rb,method,proteins(),input)
     method = "cyclicloess"
-    C = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
+    C = multi_norm_function(corr_data,probe_names(),metadata_names(),selected_metadata_names(),removed_probes(),values$log_rb,method,proteins(),input)
     method = "scale"
-    S = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
+    S = multi_norm_function(corr_data,probe_names(),metadata_names(),selected_metadata_names(),removed_probes(),values$log_rb,method,proteins(),input)
     
     
     
@@ -3205,14 +3205,14 @@ shinyServer(function(session, input, output) {
 
 
   
-  multi_missing_function = function(data,targets,method){
-    miss_E = missingness_function(data$E$norm,targets)
+  multi_missing_function = function(data,metadata,method){
+    miss_E = missingness_function(data$E$norm,metadata)
     miss_E$df$Correction = 'None'
-    miss_S = missingness_function(data$S$norm,targets)
+    miss_S = missingness_function(data$S$norm,metadata)
     miss_S$df$Correction = 'Subtraction'
-    miss_M = missingness_function(data$M$norm,targets)
+    miss_M = missingness_function(data$M$norm,metadata)
     miss_M$df$Correction = 'Movingminimum'
-    miss_N = missingness_function(data$N$norm,targets)
+    miss_N = missingness_function(data$N$norm,metadata)
     miss_N$df$Correction = 'Normexp'
     
     df = miss_E$df %>% 
@@ -3226,14 +3226,14 @@ shinyServer(function(session, input, output) {
   
   multi_missing = reactive({ 
     corr_data = corr()
-    spot_names = spot_names()
-    target_names = selected_target_names()
-    targets = selected_targets()
+    probe_names = probe_names()
+    metadata_names = selected_metadata_names()
+    metadata = selected_metadata()
     names(norm())
-    E_df = multi_missing_function(norm()$E,selected_targets(),'None')
-    S_df = multi_missing_function(norm()$S,selected_targets(),'Scale')
-    Q_df = multi_missing_function(norm()$Q,selected_targets(),'Quantile')
-    C_df = multi_missing_function(norm()$C,selected_targets(),'Cyclicloess')
+    E_df = multi_missing_function(norm()$E,selected_metadata(),'None')
+    S_df = multi_missing_function(norm()$S,selected_metadata(),'Scale')
+    Q_df = multi_missing_function(norm()$Q,selected_metadata(),'Quantile')
+    C_df = multi_missing_function(norm()$C,selected_metadata(),'Cyclicloess')
     
     
     df = E_df %>% 
@@ -3287,14 +3287,14 @@ shinyServer(function(session, input, output) {
   
   })
    
-  multi_CV_function = function(data,targets,method){
-    miss_E = CV_df_function(data$E$norm,targets)
+  multi_CV_function = function(data,metadata,method){
+    miss_E = CV_df_function(data$E$norm,metadata)
     miss_E$Correction = 'None'
-    miss_S = CV_df_function(data$S$norm,targets)
+    miss_S = CV_df_function(data$S$norm,metadata)
     miss_S$Correction = 'Subtraction'
-    miss_M = CV_df_function(data$M$norm,targets)
+    miss_M = CV_df_function(data$M$norm,metadata)
     miss_M$Correction = 'Movingminimum'
-    miss_N = CV_df_function(data$N$norm,targets)
+    miss_N = CV_df_function(data$N$norm,metadata)
     miss_N$Correction = 'Normexp'
     
     df = miss_E %>% 
@@ -3308,15 +3308,15 @@ shinyServer(function(session, input, output) {
   
   multi_CV = reactive({ 
     corr_data = corr()
-    spot_names = spot_names()
-    target_names = selected_target_names()
-    targets = selected_targets()
+    probe_names = probe_names()
+    metadata_names = selected_metadata_names()
+    metadata = selected_metadata()
     names(norm())
     data = norm()$E
-    E_df = multi_CV_function(norm()$E,selected_targets(),'None')
-    S_df = multi_CV_function(norm()$S,selected_targets(),'Scale')
-    Q_df = multi_CV_function(norm()$Q,selected_targets(),'Quantile')
-    C_df = multi_CV_function(norm()$C,selected_targets(),'Cyclicloess')
+    E_df = multi_CV_function(norm()$E,selected_metadata(),'None')
+    S_df = multi_CV_function(norm()$S,selected_metadata(),'Scale')
+    Q_df = multi_CV_function(norm()$Q,selected_metadata(),'Quantile')
+    C_df = multi_CV_function(norm()$C,selected_metadata(),'Cyclicloess')
     
     
     df = E_df %>% 
@@ -3332,14 +3332,14 @@ shinyServer(function(session, input, output) {
     
     
     df = df %>% 
-      left_join(spots())
+      left_join(probes())
     as.tbl(df)
     
   df
     
   })
   
-  output$spot_categories_select_ui = renderUI({
+  output$probe_categories_select_ui = renderUI({
     (selection = unique(multi_CV()$Category))
     selectInput("CV_category",'Category',selection,selection,multiple = T)
   })
@@ -3417,11 +3417,11 @@ shinyServer(function(session, input, output) {
       as.data.frame# %>% 
       #column_to_rownames('protein')  
     
-    (selected_cols = intersect(selected_targets()$Name,colnames(df)))
+    (selected_cols = intersect(selected_metadata()$Name,colnames(df)))
     
     df = df[,selected_cols]
     
-    cont_matrix_list = cont_matrix_function(df,selected_targets(),input)
+    cont_matrix_list = cont_matrix_function(df,selected_metadata(),input)
     design = cont_matrix_list$design
     cont.matrix = cont_matrix_list$cont.matrix
     
@@ -3469,7 +3469,7 @@ shinyServer(function(session, input, output) {
   cont_matix = reactive({
     df = norm()$E$E$data
     as.tbl(df)
-    result_list = cont_matrix_function(df,targets(),input)
+    result_list = cont_matrix_function(df,metadata(),input)
     result_list
     
     
@@ -3868,11 +3868,11 @@ shinyServer(function(session, input, output) {
   eBayes_test = reactive({ withProgress(message = 'eBayes',{ 
     df = data() %>% column_to_rownames('protein')    
     
-    (selected_cols = intersect(selected_targets()$Name,colnames(df)))
+    (selected_cols = intersect(selected_metadata()$Name,colnames(df)))
     
     df = df[,selected_cols]
 
-    cont_matrix_list = cont_matrix_function(df,selected_targets(),input)
+    cont_matrix_list = cont_matrix_function(df,selected_metadata(),input)
     design = cont_matrix_list$design
     cont.matrix = cont_matrix_list$cont.matrix
     
@@ -3952,14 +3952,14 @@ shinyServer(function(session, input, output) {
     rownames(df)
     m[is.na(m)] = 0
     m[is.infinite(m)] = 0
-    m = m[,selected_targets()$Name]
+    m = m[,selected_metadata()$Name]
  
     if(dim(m)[1] == 0){
       tags$h4('No significant proteins')
     }else{
       id = 'EBayes'
       name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
+      ht_list = array_HeatMap_function(m,selected_metadata(),selected_metadata(),rownames(m),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -4101,8 +4101,8 @@ shinyServer(function(session, input, output) {
       lst
   }
   
-  output$target_label = renderUI({
-    lst = next_tab_UI('targets','MetaData')
+  output$metadata_label = renderUI({
+    lst = next_tab_UI('metadata','MetaData')
     do.call(tagList,lst)
   })
   

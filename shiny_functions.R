@@ -46,19 +46,19 @@ header_UI = function(app_version){
 	lst
 }
 
-spots_tab_UI = function(){
+probes_tab_UI = function(){
 	lst = tagList(tabPanel(title = uiOutput('probe_label'),value = 'probes',
-					 column(8,uiOutput('spot_file_upload_ui'),),
+					 column(8,uiOutput('probe_file_upload_ui'),),
 					 
-					 column(2,downloadButton('download_spots',"Download")),
-					 column(2,actionButton('reset_spots','Reset')), 
+					 column(2,downloadButton('download_probes',"Download")),
+					 column(2,actionButton('reset_probes','Reset')), 
 					 #column(12,uiOutput('gene_control_ui')),
-					 #uiOutput('R_spot_control_ui'),
-					 #uiOutput('G_spot_control_ui'),
-					 uiOutput('spot_columns_ui'),
-					 uiOutput('both_spot_control_ui'),
-					 radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
-					 column(12,DT::dataTableOutput('spot_table'))
+					 #uiOutput('R_probe_control_ui'),
+					 #uiOutput('G_probe_control_ui'),
+					 uiOutput('probe_columns_ui'),
+					 uiOutput('both_probe_control_ui'),
+					 radioButtons('remove_probe_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
+					 column(12,DT::dataTableOutput('probe_table'))
 					 
 	))
 	do.call(tagList,lst)
@@ -259,11 +259,12 @@ PlotTabs_UI <- function(id,values) {
 									 uiOutput(ns('boxplot_ui'))
 					),
 					tabPanel('CV',
-									 uiOutput(ns('triplicate_cv_plot_ui')))
-					),
+									 uiOutput(ns('triplicate_cv_plot_ui'))),
+					
 					tabPanel('Clustering',
 									 column(12,uiOutput(ns('Heatmap_ui')))
 					)
+				)
 				
 			)
 		}
@@ -301,7 +302,7 @@ CV_UI = function(id,name,values){
 		lst = list(tabsetPanel(
 			tabPanel('Data Tables',
 							 table_UI(id,paste0(name,'_mean'),"Summary of triplicate CV's"),
-							 table_UI(id,name,'Triplicate spot statistics'),
+							 table_UI(id,name,'Triplicate probe statistics'),
 							 ),
 			tabPanel('Plots',
 							 plot_UI(id,name,"Boxplots of CV's for probe replicates"),
@@ -436,5 +437,4 @@ Main_header_UI = function(values){
 	}
 	lst
 }
-
 
