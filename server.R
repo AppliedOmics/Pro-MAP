@@ -2748,7 +2748,7 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),data()$protein,input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
-      do.call(tagList,plot_UI(id,name,ht_list$warning))
+      do.call(tagList,ht_plot_UI(id,name,ht_list$warning))
       
     })
     
@@ -4107,7 +4107,7 @@ shinyServer(function(session, input, output) {
       ht_list$p
       ht_plot_Server(id,name,ht_list)
       #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
-      do.call(tagList,plot_UI(id,name,ht_list$warning))
+      do.call(tagList,ht_plot_UI(id,name,ht_list$warning))
       
       #do.call(tagList,data_heatmap_UI('eBayes',plot_height))
     }
