@@ -241,8 +241,8 @@ shinyUI(
                                        uiOutput('sig_Data_table_ui')
                                     
                                        ),
-                              tabPanel('Plots',
-                                       tabsetPanel(
+                              #tabPanel('Plots',
+                              #         tabsetPanel(
                                          tabPanel('Volcano Plots',
                                                   uiOutput('volcano_type_ui'),
                                                   uiOutput('volcano_plot_ui')
@@ -251,7 +251,7 @@ shinyUI(
                                          tabPanel('MA plot',
                                                   plotlyOutput('stat_MA_plot', height = 500, inline = T)
                                                   ),
-                                         tabPanel('Heatmap',
+                                         tabPanel('Clustering',
                                                   uiOutput('eBayes_Heatmap_ui')
                                                   )
                                        )
@@ -261,7 +261,7 @@ shinyUI(
                             )
                  )
                  
-                 ))
+                 #))
         )
 
     )

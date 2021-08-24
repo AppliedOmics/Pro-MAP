@@ -235,7 +235,7 @@ PlotTabs_UI <- function(id,values) {
 					),
 					tabPanel('CV',
 									 uiOutput(ns('triplicate_cv_plot_ui'))),
-					tabPanel("MA Plots",
+					tabPanel("MA Plot",
 									 uiOutput(ns('MA_plot_ui')),
 					),
 					tabPanel('Clustering',

@@ -2682,7 +2682,7 @@ shinyServer(function(session, input, output) {
             tabPanel('Missing Values',
                      uiOutput(ns('missing_plot_ui'))
             ),
-            tabPanel("MA Plots",
+            tabPanel("MA Plot",
                      uiOutput(ns('MA_plot_ui')),
             ),
             tabPanel('Clustering',
@@ -2708,7 +2708,7 @@ shinyServer(function(session, input, output) {
             tabPanel('Missing Values',
                      uiOutput(ns('missing_plot_ui'))
             ),
-            tabPanel("MA Plots",
+            tabPanel("MA Plot",
                      uiOutput(ns('MA_plot_ui')),
             ),
             tabPanel('Clustering',
@@ -3885,8 +3885,8 @@ shinyServer(function(session, input, output) {
   },rownames = FALSE)
   
   eBayes_sig_data = reactive({ 
-    sig_df = eBayes_test()$df %>%  
-      rownames_to_column('protein')
+    sig_df = eBayes_test()$df# %>%  
+      #rownames_to_column('protein')
     as.tbl(sig_df)
     df = data()
     sig_protein = sig_df %>% 
@@ -3907,10 +3907,10 @@ shinyServer(function(session, input, output) {
     df = eBayes_sig_data()
   })
   
-  output$eBayes_Heatmap_ui = renderUI({  
-    df = eBayes_sig_data() %>%    
+  output$eBayes_Heatmap_ui = renderUI({   
+    df = eBayes_sig_data() %>%     
       column_to_rownames('protein')
-    colnames(df)  
+    #colnames(df)  
     m = as.matrix(df)
     m
     rownames(df)
@@ -3983,8 +3983,9 @@ shinyServer(function(session, input, output) {
   }
 
   output$volcano_plot_ui = renderUI({
-    sig_df = eBayes_test()$df %>%   
-      rownames_to_column('protein')
+    sig_df = eBayes_test()$df
+    #%>%   
+    #  rownames_to_column('protein')
     result_list = volcano_plot_function(sig_df,input)
     id = 'eBayes'
     
@@ -4010,8 +4011,9 @@ shinyServer(function(session, input, output) {
   
   output$stat_MA_plot = renderPlotly({  
      
-    df = eBayes_test()$df %>%   
-      rownames_to_column('protein')
+    df = eBayes_test()$df
+    #%>%   
+    #  rownames_to_column('protein')
     
     plot_df = df %>% 
       
