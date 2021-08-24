@@ -126,6 +126,20 @@ shinyUI(
                    
           ),
           
+          #### _proteins ####
+          tabPanel(title = uiOutput('protein_label'),value = 'proteins',
+                   column(4,uiOutput('protein_file_upload_ui'),),
+                   column(5,uiOutput('protein_columns_ui')),
+                   
+                   column(2,downloadButton('download_proteins',"Download")),
+                   column(1,actionButton('reset_proteins','Reset')),
+                   column(12,uiOutput('protein_control_ui')),
+                   column(3,uiOutput('drop_cols_ui')),
+                   column(9,uiOutput('drop_rows_ui')),
+                   column(12,uiOutput('proteins_upload_error_ui')),
+                   column(12,uiOutput('protein_table_ui'))
+          ),
+          
           
           #### _Data Tables ####
           tabPanel(title = tags$h5('Data Tables'),value = 'data',
@@ -138,7 +152,7 @@ shinyUI(
                                          tabPanel('CV',
                                                   uiOutput('foreground_triplicate_cv_plot_ui')
                                          ),
-                                         tabPanel('Heatmap',
+                                         tabPanel('Clustering',
                                                   uiOutput('foreground_heatmap_ui')
                                          )
                               )
@@ -154,7 +168,7 @@ shinyUI(
                                                    uiOutput('background_triplicate_cv_plot_ui')
                                           ),
                                        
-                                          tabPanel("HeatMap",
+                                          tabPanel("Clustering",
                                                    uiOutput('background_heatmap_ui')
                                           )
                               )
@@ -172,19 +186,7 @@ shinyUI(
                    )),
           
           
-          #### _proteins ####
-          tabPanel(title = uiOutput('protein_label'),value = 'proteins',
-                   column(4,uiOutput('protein_file_upload_ui'),),
-                   column(5,uiOutput('protein_columns_ui')),
-                   
-                   column(2,downloadButton('download_proteins',"Download")),
-                   column(1,actionButton('reset_proteins','Reset')),
-                   column(12,uiOutput('protein_control_ui')),
-                   column(3,uiOutput('drop_cols_ui')),
-                   column(9,uiOutput('drop_rows_ui')),
-                   column(12,uiOutput('proteins_upload_error_ui')),
-                   column(12,uiOutput('protein_table_ui'))
-          ),
+       
           
 
         #### Pipeline ####

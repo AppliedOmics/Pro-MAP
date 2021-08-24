@@ -104,22 +104,32 @@ ht_plot_Server <- function(id,name,ht_list) {
 				output[[name]] = renderPlot({
 						plot(ht_list$p)
 				})
+				
+				output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+					filename = function() { paste0(id,'_',name,'.png') },
+					content = function(file) {
+						png(file, height = ht_list$plot_height, width = ht_list$plot_width)
+						plot(ht_list$p)
+						dev.off()
+					}
+				)
 
 			}else{
 				output[[name]] = renderPlot({
 						ht_list$p
 				},height = ht_list$plot_height)
+				
+				output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
+					filename = function() { paste0(id,'_',name,'.png') },
+					content = function(file) {
+						png(file, height = ht_list$plot_height, width = ht_list$plot_width)
+						print(ht_list$p)
+						dev.off()
+					}
+				)
+				
 			}
-		
-			
-			output[[paste0(name,'_downloadPlot')]] <- downloadHandler(
-				filename = function() { paste0(id,'_',name,'.png') },
-				content = function(file) {
-					png(file, height = ht_list$plot_height, width = ht_list$plot_width)
-					print(p)
-					dev.off()
-				}
-			)
+	
 		}
 	)
 }
@@ -181,7 +191,7 @@ table_UI = function(id,name,title = NULL){
 	ns <- NS(id)
 	list(
 		column(11,tags$h4(title)),
-		column(1,downloadButton(ns(paste0(name,'_downloadData')), 'csv')),
+		column(1,downloadButton(ns(paste0(name,'_downloadData')), 'txt')),
 		column(12,DT::dataTableOutput(ns(paste0(name,'_table'))))
 	)
 }
@@ -197,10 +207,10 @@ table_Server <- function(id,name,df) {
 			
 			output[[paste0(name,'_downloadData')]] <- downloadHandler(
 				filename = function() {
-					paste0(id,'_',name,'.csv')
+					paste0(id,'_',name,'.txt')
 				},
 				content = function(file) {
-					write.csv(df, file, row.names = FALSE)
+					write.table(df, file, row.names = FALSE,sep ='\t')
 				}
 			)
 		}
@@ -322,11 +332,11 @@ Pipeline_UI = function(values){
 				tabPanel('Spot Filtering',
 								 uiOutput('Raw_filter_tabs_ui')),
 				
-				tabPanel('Background Correction',
+				tabPanel('Background Corrected',
 								 uiOutput('Raw_corr_tabs_ui'),
 				),
 				
-				tabPanel('Normalisation',
+				tabPanel('Normalised',
 								 uiOutput('Raw_norm_tabs_ui')
 				),
 				tabPanel('Array Weights',
@@ -366,11 +376,11 @@ Pipeline_UI = function(values){
 			),
 		
 			
-			tabPanel('Background Correction',
+			tabPanel('Background Corrected',
 							 uiOutput('Raw_corr_tabs_ui'),
 			),
 			
-			tabPanel('Normalisation',
+			tabPanel('Normalised',
 							 uiOutput('Raw_norm_tabs_ui')
 			),
 			tabPanel('Array Weights',
