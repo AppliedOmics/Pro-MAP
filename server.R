@@ -3871,7 +3871,7 @@ shinyServer(function(session, input, output) {
   
   
   eBayes_test = reactive({ withProgress(message = 'eBayes',{ 
-    df = data() %>% column_to_rownames('protein')    
+    df = data() %>% column_to_rownames('protein')     
     
     (selected_cols = intersect(selected_metadata()$Name,colnames(df)))
     
@@ -3896,8 +3896,9 @@ shinyServer(function(session, input, output) {
       rownames_to_column('protein') 
     
     if('logFC' %in% colnames(Sig_Proteins)){
-      Sig_Proteins$threshold[Sig_Proteins$logFC < -input$fc_cutoff & Sig_Proteins$threshold == TRUE] = FALSE
-      Sig_Proteins$threshold[Sig_Proteins$logFC > input$fc_cutoff & Sig_Proteins$threshold == TRUE] = FALSE
+      Sig_Proteins$threshold[Sig_Proteins$logFC > -input$fc_cutoff & Sig_Proteins$logFC < 0 & Sig_Proteins$threshold == 'TRUE'] = 'FALSE'
+
+      Sig_Proteins$threshold[Sig_Proteins$logFC < input$fc_cutoff & Sig_Proteins$logFC > 0 & Sig_Proteins$threshold == 'TRUE'] = 'FALSE'
     }
     
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
