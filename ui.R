@@ -230,7 +230,7 @@ shinyUI(
         tabPanel(title = tags$h5('Differential Expression'),value = 'sig',
                  column(3,uiOutput('cont_matrix_comp_ui')),
                  column(3,numericInput('pvalue_select','p-value',0.05,max = 0.05,min = 0, step = 0.01)),
-                 column(3,selectInput('mtc','Multiple testing Correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
+                 column(3,selectInput('mtc','Multiple testing correction',c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"),'BH')),
                  column(3,numericInput('fc_cutoff','Fold Change',0,step = 0.5)),
                  
                  column(12,tabsetPanel(

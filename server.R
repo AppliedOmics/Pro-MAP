@@ -140,6 +140,9 @@ shinyServer(function(session, input, output) {
     values$fc_cutoff = fc_cutoff
     values$spot_collapse_digits = spot_collapse_digits
     values$cont_matrix_comp = cont_matrix_comp 
+    values$protein_column = NULL
+    values$drop_col = 'Category'
+    values$drop_row = 'control'
     print('readme_markdown_ui')
     includeMarkdown('Instructions.md')
 
@@ -270,6 +273,14 @@ shinyServer(function(session, input, output) {
   
   observeEvent(input$cont_matrix_comp,{ 
     values$cont_matrix_comp = input$cont_matrix_comp
+  })
+  
+  observeEvent(input$protein_column,{ 
+    values$protein_column = input$protein_column
+  })
+  
+  observeEvent(input$spot_column,{ 
+    values$protein_column = input$spot_column
   })
 
   
@@ -802,6 +813,8 @@ shinyServer(function(session, input, output) {
       df
     })
     
+    
+    
     selected_targets = reactive({
       target_conditions() %>% filter(Condition %in% input$condition_select)
     })
@@ -1027,9 +1040,19 @@ shinyServer(function(session, input, output) {
       print('spot_table')
       req(spot_upload())
       req(spots())
-      showTab('main','proteins')
-      showTab('main','data')
-      
+      if(values$app_version == 'pro'){
+        showTab('main','proteins')
+        showTab('main','data')
+        showTab('main','all')
+      }else{
+        showTab('main','data')
+        showTab('main','pipeline')
+        showTab('main','sig')
+      }
+      if(length(selected_targets()$Condition) >1){
+        showTab('main','sig')
+      }
+  
       values$probes = 'hit'
       spots()
     },rownames = FALSE)
@@ -2485,7 +2508,7 @@ shinyServer(function(session, input, output) {
     
     CV <- function(x) ( 100*(sd(x)/mean(x)))
     
-    protein_collapse_function = function(df,spots,input){
+    protein_collapse_function = function(df,spots,values){
       
       data = df %>% 
         dplyr::select(-spot)
@@ -2499,9 +2522,9 @@ shinyServer(function(session, input, output) {
       as.tbl(df_spots)
       colnames(df_spots)
       if(values$spot_collapse_digits == TRUE){
-        df_spots$protein <- gsub("\\.[[:digit:]]*$", "", df_spots[,input$protein_column])
+        df_spots$protein <- gsub("\\.[[:digit:]]*$", "", df_spots[,values$protein_column])
       }else{
-        df_spots$protein = df_spots[,input$protein_column]
+        df_spots$protein = df_spots[,values$protein_column]
       }
       df_collapse = df_spots %>% 
         dplyr::select(one_of(c('protein','Category',colnames(data))))
@@ -2514,10 +2537,10 @@ shinyServer(function(session, input, output) {
     
     data_full = reactive({withProgress(message = 'Generating Final Data',{ 
       data = E_norm()
-      req(input$protein_column)
+      req(values$protein_column) 
       req(E_norm())
       req(spots())
-      df = protein_collapse_function(E_norm(),spots(),input)
+      df = protein_collapse_function(E_norm(),spots(),values)
       df
     })})
     
@@ -2527,17 +2550,25 @@ shinyServer(function(session, input, output) {
         selectInput('drop_col','Drop by',colnames(df),'Category')
     })
     
-    output$drop_rows_ui = renderUI({
-        df = proteins()
-        selection = unique(df[,input$drop_col])
-        selectInput('drop_row',paste(input$drop_col,' to drop'),selection,'control',multiple = T,width = 1200)
+    observeEvent(input$drop_col,{ 
+      values$drop_col = input$drop_col
     })
     
-    protein_filter_function = function(data,proteins_df,input){
-      (var <- rlang::parse_quosures(paste(input$drop_col))[[1]])
+    output$drop_rows_ui = renderUI({
+        df = proteins()
+        selection = unique(df[,values$drop_col])
+        selectInput('drop_row',paste(values$drop_col,' to drop'),selection,'control',multiple = T,width = 1200)
+    })
+    
+    observeEvent(input$drop_row,{ 
+      values$drop_row = input$drop_row
+    })
+    
+    protein_filter_function = function(data,proteins_df,values){ 
+      (var <- rlang::parse_quosures(paste(values$drop_col))[[1]])
 
       drops = proteins_df %>% 
-        filter(!!var %in% input$drop_row) %>% 
+        filter(!!var %in% values$drop_row) %>% 
         pull(protein)
 
       drops
@@ -2551,7 +2582,7 @@ shinyServer(function(session, input, output) {
       proteins_df = proteins()  
       data = data_full() %>% 
         dplyr::select(-Category)
-      df = protein_filter_function(data,proteins(),input)
+      df = protein_filter_function(data,proteins(),values)
       df$protein
       dim(df)
       keep_weight = arrayw_df() %>% 
@@ -3106,24 +3137,24 @@ shinyServer(function(session, input, output) {
     
     E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     E_norm = norm_function(E_norm_list$m,method,E_norm_list$spots)
-    E_proteins = protein_collapse_function(E_norm,spots(),input)
-    E_data = protein_filter_function(E_proteins,proteins,input)
+    E_proteins = protein_collapse_function(E_norm,spots(),values)
+    E_data = protein_filter_function(E_proteins,proteins,values)
     
     E_data = as.data.frame(E_data) %>% dplyr::select(-one_of('protein','Category'))
     E = list(norm = E_norm,data = E_data)
     
     S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
-    S_proteins = protein_collapse_function(S_norm,spots(),input)
-    S_data = protein_filter_function(S_proteins,proteins,input)
+    S_proteins = protein_collapse_function(S_norm,spots(),values)
+    S_data = protein_filter_function(S_proteins,proteins,values)
 
     S_data = as.data.frame(S_data) %>% dplyr::select(-one_of('protein','Category'))
     S = list(norm = S_norm,data = S_data)
     
     N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
-    N_proteins = protein_collapse_function(N_norm,spots(),input)
-    N_data = protein_filter_function(N_proteins,proteins,input)
+    N_proteins = protein_collapse_function(N_norm,spots(),values)
+    N_data = protein_filter_function(N_proteins,proteins,values)
 
     N_data = as.data.frame(N_data) %>% dplyr::select(-one_of('protein','Category'))
     N = list(norm = N_norm,data = N_data)
@@ -3131,8 +3162,8 @@ shinyServer(function(session, input, output) {
     
     M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
-    M_proteins = protein_collapse_function(M_norm,spots(),input)
-    M_data = protein_filter_function(M_proteins,proteins,input)
+    M_proteins = protein_collapse_function(M_norm,spots(),values)
+    M_data = protein_filter_function(M_proteins,proteins,values)
 
     M_data = as.data.frame(M_data) %>% dplyr::select(-one_of('protein','Category'))
     M = list(norm = M_norm,data = M_data)
@@ -3835,7 +3866,7 @@ shinyServer(function(session, input, output) {
   
   
   eBayes_test = reactive({ withProgress(message = 'eBayes',{ 
-    df = data() %>% column_to_rownames('protein')   
+    df = data() %>% column_to_rownames('protein')    
     
     (selected_cols = intersect(selected_targets()$Name,colnames(df)))
     
@@ -3857,7 +3888,12 @@ shinyServer(function(session, input, output) {
     threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold) %>% 
-      rownames_to_column('protein')
+      rownames_to_column('protein') 
+    
+    if('logFC' %in% colnames(Sig_Proteins)){
+      Sig_Proteins$threshold[Sig_Proteins$logFC < -input$fc_cutoff & Sig_Proteins$threshold == TRUE] = FALSE
+      Sig_Proteins$threshold[Sig_Proteins$logFC > input$fc_cutoff & Sig_Proteins$threshold == TRUE] = FALSE
+    }
     
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
     })})
@@ -3959,9 +3995,9 @@ shinyServer(function(session, input, output) {
      
     if(type == 'ggplot'){
       p = ggplot(df_l) + 
-        geom_point(aes(x = logFC,y = -log10(adj.P.Val), col = comparison, group = protein)) + 
+        geom_point(aes(x = logFC,y = -log10(adj.P.Val), col = comparison, group = protein, shape = threshold)) + 
         geom_vline(aes(xintercept = as.numeric(input$fc_cutoff))) + 
-        geom_vline(aes(xintercept = as.numeric(input$fc_cutoff))) + 
+        geom_vline(aes(xintercept = as.numeric(-input$fc_cutoff))) + 
         geom_hline(aes(yintercept = -log10(as.numeric(input$pvalue_select)))) +
         facet_grid(comparison ~ .)
     }
@@ -4010,7 +4046,7 @@ shinyServer(function(session, input, output) {
   
   
   output$stat_MA_plot = renderPlotly({  
-     
+      
     df = eBayes_test()$df
     #%>%   
     #  rownames_to_column('protein')
@@ -4021,11 +4057,25 @@ shinyServer(function(session, input, output) {
     
     as.tbl(plot_df)
     
-    
+    if('logFC' %in% colnames(plot_df)){
 
       MA_plot = ggplot(plot_df) + 
         geom_point(aes(y = logFC, x = AveExpr,col = threshold, shape = Category, group = protein), size = 3) + 
         geom_hline(aes(yintercept = 0))
+    }else{
+      (comp_cols = grep('_vs_',colnames(plot_df),value = T))
+      if(length(comp_cols) >0){
+        plot_height = 300 * length(comp_cols)
+        (other_cols = colnames(plot_df)[!colnames(plot_df) %in% comp_cols])
+        
+        df_l = plot_df %>% 
+          gather(comparison,logFC,comp_cols)
+        as.tbl(df_l)
+      }
+      MA_plot = ggplot(df_l) + 
+        geom_point(aes(y = logFC, x = AveExpr,col = threshold, shape = comparison,group = protein), size = 3) + 
+        geom_hline(aes(yintercept = 0))
+    }
 
     
     MA_plot
