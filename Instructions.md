@@ -14,7 +14,7 @@ This section allows users to upload new data. Array files can be dragged into th
 
 ### Array Properties
 
-Once array files are upload the foreground and background columns information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus. 
+Once array files are upload the foreground and background column information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus. 
 
 - **Array Chanel**: the fluorophore wavelength used to the read the probes.
 - **Array Column**: The measurement column used for foreground and background (usually median), determined by the array processing software.
@@ -44,7 +44,7 @@ The MainPanel to the right of the SidePanel, displays the array processing outpu
 When array files are uploaded into the app, the files are first checked for consistency. Information on the number of array files uploaded, the number of probes and annotation columns are dispayed. If there are any errors or inconsistencies in the uploaded file, warnings (orange) or errors (red) are displayed. 
 Errors will prevent further processing, while warnings should be taken note of, as some data may be missing from the final analysis due to the inconsistency in the data upload. 
 
-# Samples
+# MetaData
 A sample template is extracted from the uploaded array files. This sample template can be downloaded (**Download**) as a tab-delimited file (targets.txt) and edited in Excel. The file can then be uploaded again (**Upload Sample File**). Keep this file safe if you are intending to use the app again. 
 
 An uploaded sample file needs to be a tab-delimted file with extension .txt. It needs a FileName column that corresponds to the array file names. It needs a Name column that will be used to label samples throughtout the app. Entries in the Name column need to be unique.

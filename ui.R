@@ -5,7 +5,21 @@ library(shiny)
 shinyUI(
 
   fluidPage(
+    disconnectMessage(
+      text = "Your session timed out, reload the application.",
+      refresh = "Reload now",
+      background = "#f89f43",
+      colour = "white",
+      overlayColour = "grey",
+      overlayOpacity = 0.3,
+      refreshColour = "brown"
+    ),
     
+    tags$style(type="text/css",
+               ".shiny-output-error { visibility: hidden; }",
+               ".shiny-output-error:before { visibility: visible; content: 'An error occurred. Please contact the admin (shaun.garnett@uct.ac.za).'; }"
+    ),
+    #actionButton("disconnect", "Disconnect the app"),
   
     uiOutput('header_version'),
     
@@ -35,7 +49,7 @@ shinyUI(
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,T),inline = T)),
+        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,T),T,inline = T)),
         column(12,
         uiOutput('annotation_columns_ui')),
         
@@ -49,19 +63,12 @@ shinyUI(
           ),
         tags$hr(),
         uiOutput('pro_heading_ui'),
-        #span(tags$h3('Pro Settings'),style="color:#6b8eb7"),
         column(12,
           uiOutput('app_version_ui'),
           uiOutput('sep_categories_ui'),
           uiOutput('collapse_boxplots_ui'),
           uiOutput('plot_lim_ui'),
-          #radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T),
-          #radioButtons('plot_lim','Limit Plot Axis',c('None','Quantile','2x Quantile'),inline = T),
-          
-          uiOutput('heatmap_order_ui')#,
-          
-          #uiOutput('min_corr'),
-          #radioButtons('apply_spot_filtering','Apply Spot Filtering',c(T,F),inline = T)
+          uiOutput('heatmap_order_ui')
           )
           )
         
@@ -69,20 +76,12 @@ shinyUI(
     #### mainPanel ####
     mainPanel(
       uiOutput('main_header_options_ui'),
-        #uiOutput('example_data_text_ui'),
-      # column(12,
-      #   column(4,uiOutput('select_conditions_column_ui')),
-      #   column(4,uiOutput('condition_select_ui')),
-      #   column(4,uiOutput('cont_matrix_comp_ui'))
-      #   ),
-      # column(12,
-      #   column(4,radioButtons('log_rb','log2 transform',c(FALSE,TRUE),TRUE,inline = T)),
-      #   column(4,selectInput('backgroundCorrect_method','Background Correction Method',c("none", "subtract", "movingmin","normexp"),"normexp")),
-      #   column(4,selectInput('normalisation_method','Normalisation Method',c("none", "scale", "quantile" , "cyclicloess"),'cyclicloess'))
-      # ),
+
         
       
-        column(12,tabsetPanel(id = 'main',
+        column(12,tabsetPanel(id = 'main',type = 'pills',
+                        
+                              
           #### _Instructions ####
           tabPanel(title = tags$h5("Instructions"), value = 'instructions',
                   uiOutput("instructions_markdown_ui")
@@ -137,7 +136,7 @@ shinyUI(
           
           #### _Data Tables ####
           tabPanel(title = tags$h5('Data Tables'),value = 'data',
-                   tabsetPanel(
+                   tabsetPanel(id = 'data_tables', type = 'pill',
                      tabPanel('ForeGround',
                               tabsetPanel(
                                           tabPanel('Data Table',

@@ -14,6 +14,10 @@ shinyServer(function(session, input, output) {
   
 #### Functions ####
   
+  observeEvent(input$disconnect, {
+    session$close()
+  })
+  
   values = reactiveValues(
     target_file = NULL,
     spot_file = NULL,
@@ -4242,39 +4246,19 @@ shinyServer(function(session, input, output) {
   }
   
   output$target_label = renderUI({
-    lst = next_tab_UI('targets','Samples')
-    # if(is.null(values$targets)){
-    #   lst = list(
-    #     tags$style(HTML("
-    #       .tabbable > .nav > li > a[data-value='targets'] {background-color: #6b8eb7;   color:white}
-    #     ")),
-    #     span(tags$h4('Next >>'), style="color:white")
-    #   )
-    # }else{
-    #   lst = list(tags$h5('Samples'))
-    # }
+    lst = next_tab_UI('targets','MetaData')
     do.call(tagList,lst)
   })
   
   output$probe_label = renderUI({
     lst = next_tab_UI('probes','Probes')
-    
-    # if(is.null(values$probes)){
-    #   span(tags$h4('Next >>'), style="color:#21b8cd")
-    # }else{
-    #   tags$h5('Probes')
-    # }
+
     do.call(tagList,lst)
     
   })
   
   output$protein_label = renderUI({
     lst = next_tab_UI('proteins','Proteins')
-    # if(is.null(values$proteins)){
-    #   span(tags$h4('Next >>'), style="color:#21b8cd")
-    # }else{
-    #   tags$h5('Proteins')
-    # }
     do.call(tagList,lst)
     
   })
