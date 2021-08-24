@@ -19,8 +19,7 @@ shinyUI(
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: visible; content: 'An error occurred. Please contact the admin (shaun.garnett@uct.ac.za).'; }"
     ),
-    #actionButton("disconnect", "Disconnect the app"),
-  
+
     uiOutput('header_version'),
     
  
@@ -110,7 +109,6 @@ shinyUI(
                    
                    column(12,uiOutput('condition_select_ui')),
                    column(12,uiOutput('target_upload_error_ui')),
-                   #column(12,DT::dataTableOutput('target_table'))
                    column(12,uiOutput('target_table_ui'))
           ),
           #### _spots ####
@@ -119,15 +117,10 @@ shinyUI(
                    column(5,uiOutput('spot_columns_ui')),
                    column(2,downloadButton('download_spots',"Download")),
                    column(1,actionButton('reset_spots','Reset')), 
-                   #column(12,uiOutput('gene_control_ui')),
-                   #uiOutput('R_spot_control_ui'),
-                   #uiOutput('G_spot_control_ui'),
-                   #uiOutput('spot_columns_ui'),
+            
                    column(12,
                      uiOutput('spot_control_ui'),
                      uiOutput('spot_remove_ui'),
-                     #radioButtons('remove_spot_duplicates','Remove Spot Duplicated',c(T,F),F,inline = T),
-                     #DT::dataTableOutput('spot_table'))
                      uiOutput('spot_table_ui')
                    )
                    
@@ -141,7 +134,6 @@ shinyUI(
                               tabsetPanel(
                                           tabPanel('Data Table',
                                                    uiOutput('foreground_table_ui'),
-                                                   #DT::dataTableOutput('foreground_table')
                                           ),
                                          tabPanel('CV',
                                                   uiOutput('foreground_triplicate_cv_plot_ui')
@@ -190,9 +182,7 @@ shinyUI(
                    column(12,uiOutput('protein_control_ui')),
                    column(3,uiOutput('drop_cols_ui')),
                    column(9,uiOutput('drop_rows_ui')),
-                   #column(12,uiOutput('protein_columns_ui')),
                    column(12,uiOutput('proteins_upload_error_ui')),
-                   #column(12,DT::dataTableOutput('proteins_table'))
                    column(12,uiOutput('protein_table_ui'))
           ),
           
@@ -246,21 +236,19 @@ shinyUI(
                             uiOutput('cont_matrix_text_ui'),
                             tabsetPanel(id = 'sig_panel',
                               tabPanel('Table',
-                                       DT::dataTableOutput('eBays_table')
+                                       uiOutput('sig_Data_table_ui')
+                                    
                                        ),
                               tabPanel('Plots',
                                        tabsetPanel(
                                          tabPanel('Volcano Plots',
                                                   uiOutput('volcano_type_ui'),
-                                                  #radioButtons('volcano_type','Volcano plot type',c('ggplot','gg plotly','EnhancedVolcano'),inline = T),
                                                   uiOutput('volcano_plot_ui')
                                          ),
                                          
                                          tabPanel('MA plot',
                                                   plotlyOutput('stat_MA_plot', height = 500, inline = T)
-                                                  #htmltools::div(style = "display:inline-block", plotlyOutput("stat_MA_plot",height = 600, width = '100%'))
                                                   ),
-                                                  #plotlyOutput('volcano_plots')),
                                          tabPanel('Heatmap',
                                                   uiOutput('eBayes_Heatmap_ui')
                                                   )

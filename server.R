@@ -77,8 +77,7 @@ shinyServer(function(session, input, output) {
   
   
   #### Debugging and updating #####
-  #hideTab('main','All Methods')
-  
+
   output$debug_ui = renderUI({
     if(!grepl('public',getwd())){
       actionButton('debug','Debug')
@@ -143,10 +142,7 @@ shinyServer(function(session, input, output) {
     values$cont_matrix_comp = cont_matrix_comp 
     print('readme_markdown_ui')
     includeMarkdown('Instructions.md')
-    #includeHTML('info.html')
-    #HTML(markdown::markdownToHTML(includeMarkdown("Instructions.md")))
-    #HTML(markdown::markdownToHTML(knit('Instructions.md', quiet = TRUE)))
-    #markdown::markdownToHTML("Instructions.md")
+
   })
   
   
@@ -181,16 +177,6 @@ shinyServer(function(session, input, output) {
   observeEvent(input$app_version,{
     values$app_version = input$app_version
   })
-  
-  # output$sep_categories_ui = renderUI({
-  #   if(values$app_version == 'pro'){
-  #     radioButtons('sep_categories','Separate plots by category',c(F,T),T,inline = T)
-  #   }
-  # })
-  # 
-  # observeEvent(input$sep_categories,{
-  #   values$sep_categories = input$sep_categories
-  # })
   
   
   output$sep_categories_ui = renderUI({ 
@@ -310,7 +296,6 @@ shinyServer(function(session, input, output) {
         }else{
           selectInput('dataset','Example Datasets',c('Upload',basic_data_list),'Upload')
         }
-        #selectInput('dataset','Dataset',c('Upload',paper_data_list),'Upload')
       }
       
     })
@@ -369,9 +354,6 @@ shinyServer(function(session, input, output) {
    
     test_files = reactive({#withProgress(message = 'testing array files',{ 
       req(array_file_list())  
-      #updateTabsetPanel(session,'main',selected = 'Instructions')
-      #updateTabItems(inputId = "main", selected = "Instructions")
-      # 
    
     #Tab('main','targets')
       values$targets = NULL
@@ -445,38 +427,13 @@ shinyServer(function(session, input, output) {
         file_error_list[['rows']] = file_error
         
       } 
-      #&
-      #    length(unique(col_list)) == 1 &
-      #    #length(unique(colnames_list)) == 1 &
-      #    length(unique(rownames_list)) == 1
-      # ){
-      #   # showTab('main','File Details')
-      #   # showTab('main','Targets')files
-      # 
-      #   #showTab('main','Spots')
-      #   #showTab('main','Proteins')
-      #   #showTab('main','Plots')
-      #   #showTab('main','Data')
-      #   file_error = FALSE
-      #   
-      # }else{
-      #   # hideTab('main','Targets')
-      #   # hideTab('main','Spots')
-      #   # hideTab('main','Proteins')
-      #   # hideTab('main','Plots')
-      #   # hideTab('main','Data')
-      #   file_error = 'The array files are too disparate to compare, check the number of spots in each file'
-      # }
+
       
       if(!TRUE %in% grepl('635|535',col_names)){
         file_error = 'No array channels found in the uploaded files'
         file_error_list[['cols']] = file_error
       }
-      #file_error
-      
-      #if(length(file_error_list) == 0){
-      #  hideTab('main','targets')
-      #}
+
       colnames_list = unique(colnames_list)
       col_names = colnames_list[1]
       if(length(colnames_list) > 1){
@@ -492,7 +449,6 @@ shinyServer(function(session, input, output) {
 
     output$file_num_text = renderText({
   
-        #hideTab('main','files')
         updateTabItems(session,"main", "Targets")
         df = test_files()$file_df 
         as.tbl(df)
@@ -510,7 +466,6 @@ shinyServer(function(session, input, output) {
    
       if(length(test_files()$file_error) > 0){
         if('rows' %in% names(test_files()$file_error)){
-          #updateTabItems(session,"main", "File Details")
           span(tags$h4(test_files()$file_error$rows), style="color:red")
         }
       }
@@ -522,7 +477,6 @@ shinyServer(function(session, input, output) {
       
       if(length(test_files()$file_error) > 0){
         if('cols' %in% names(test_files()$file_error)){
-          #updateTabItems(session,"main", "File Details")
           hideTab('main','targets')
           
           span(tags$h4(test_files()$file_error$cols), style="color:red")
@@ -699,18 +653,7 @@ shinyServer(function(session, input, output) {
       print('E')
       file_path_list = array_file_list()$path  
       file_path_list
-          # if(input$spot_filtering == 'wtflags(0.1)'){
-          #   E <- read.maimages(file_path_list,
-          #                      columns=list(E=input$foreground_column, Eb=input$background_column),
-          #                      annotation=c(input$select_annotation), 
-          #                      wt.fun=wtflags(0.1))
-          # }
-          # if(input$spot_filtering == 'wtarea(150)'){
-          #   E <- read.maimages(file_path_list,
-          #                      columns=list(E=input$foreground_column, Eb=input$background_column),
-          #                      annotation=c(input$select_annotation), 
-          #                      wt.fun=wtarea(150))
-          # }
+ 
           if(input$spot_filtering == TRUE){
             E <- read.maimages(file_path_list,
                                columns=list(E=input$foreground_column, Eb=input$background_column),
@@ -1442,9 +1385,6 @@ shinyServer(function(session, input, output) {
         if (is.leaf(x)) {
           ## fetch label
           label <- attr(x, "label")
-          #code <- substr(label, 1, 1)
-          ## use the following line to reset the label to one letter code
-          # attr(x, "label") <- code
           attr(x, "nodePar") <- list(lab.col=colorCodes[label])
         }
         return(x)
@@ -1516,19 +1456,12 @@ shinyServer(function(session, input, output) {
     })
     
     triplicate_CV_function = function(df){
-      #df = foreground_table() 
-      #as.tbl(df)
+
       
       df_l = df %>% 
         gather(Name,value,-spot)
       as.tbl(df_l)
-      
-      # df_cv_t = df_l %>% 
-      #   filter(Name == '10289345_06') %>% 
-      #   filter(spot == 'CT62')
-      # 
-      # as.tbl(df_cv_t)
-      
+
       df_cv = df_l %>% 
         group_by(spot,Name) %>%
           summarise(count = n(),
@@ -1677,24 +1610,7 @@ shinyServer(function(session, input, output) {
       do.call(tagList,CV_UI(id,name,values))
     })})
     
-    # output$background_triplicate_cv_plot_ui = renderUI({withProgress(message = 'Generating Plots',{
-    #   df = background_table()
-    #   spots = spots()
-    #   targets = targets()
-    #   plot_list = triplicate_cv_plot_function(df,spots(),targets())
-    #   plot_list$p
-    #   id = 'background'
-    #   name = 'triplicate_CV'
-    #   plot_Server(id,'triplicate_CV',plot_list$p)
-    #   plot_Server(id,'triplicate_CV_density',plot_list$d)
-    #   plot_Server(id,'triplicate_diff',plot_list$b)
-    #   
-    #   lst = list(plot_UI(id,'triplicate_CV',"Boxplots of CV's for probe replicates"),
-    #              plot_UI(id,'triplicate_CV_density',"Density plot of CV's for probe replicates"),
-    #              plot_UI(id,'triplicate_diff','Boxplot of the absolute difference between probe replicate means and medians'))
-    #   lst
-    #   do.call(tagList,lst)
-    # })})
+
 
     spot_filtering_E = reactive({
       df = E()$weights %>%  
@@ -1706,9 +1622,7 @@ shinyServer(function(session, input, output) {
         dplyr::select(spot,everything())
       df
     })
-    #output$spot_filtering_E_table = DT::renderDataTable({
-    #  df = spot_filtering_E()
-    #})
+
     
     output$spot_filtering_table_ui = renderUI({
       df = spot_filtering_E()
@@ -1734,10 +1648,7 @@ shinyServer(function(session, input, output) {
           ht_list = array_HeatMap_function(m,targets(),selected_targets(),spot_names(),input$r_col,values$heatmap_order)
           ht_plot_Server(id,name,ht_list)
           do.call(tagList,plot_UI(id,name,ht_list$warning))
-          
-          #plot_height = data_heatmap_Server('spot_filtering',m,targets(),selected_targets(),spot_names(),input$r_col,input$heatmap_order)
-          
-          #do.call(tagList,data_heatmap_UI('spot_filtering',plot_height))
+
         }else{
           tags$h4('No spots were filtered')
         }
@@ -1760,9 +1671,7 @@ shinyServer(function(session, input, output) {
     array_boxplot_function = function(data,target_names,spot_names,targets,selected_targets,
                                       log_rb,input){
       df = data.frame(data)
-      #if(log_rb == TRUE){
-      #  df = log2(df)
-      #}
+
       colnames(df) <- target_names
       df$Proteins = spot_names
       as.tbl(df)   
@@ -1803,9 +1712,7 @@ shinyServer(function(session, input, output) {
                                         spots,
                                         log_rb,input,values){
       df = data.frame(data)
-      #if(log_rb == TRUE){
-      #  df = log2(df)
-      #}
+
       colnames(df) <- target_names
       df$spot = spot_names
       as.tbl(df)   
@@ -1824,8 +1731,7 @@ shinyServer(function(session, input, output) {
       as.tbl(df_l)
       p = ggplot(df_l)
       if(values$collapse_boxplots == F){
-        #p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, fill = Condition, col = Category))
-        
+
         if(length(unique(df_l$Condition)) > 1 ){
           p = p + geom_boxplot(aes(x = Name,y = `Expression Intensity`, col = Condition))
           
@@ -1841,10 +1747,7 @@ shinyServer(function(session, input, output) {
         p = p + scale_y_continuous(trans='log2')
       }
       p = gg_col_function(p)
-      #if(length(unique(df_l$Group)) > 1){
-      #  p = p + facet_grid(Group ~ .)
-      #  p = p + facet_grid(Category ~ ., scales = 'free')
-      #}
+ 
       plot_height = 400
       if(values$sep_categories == TRUE){
         if(length(unique(df_l$Category)) > 1){
@@ -1898,7 +1801,7 @@ shinyServer(function(session, input, output) {
       as.tbl(df)
       
       df_l = df %>% 
-        #rownames_to_column('spot') %>% 
+
         gather(Name,value,-spot) %>% 
         filter(!is.na(value))
       as.tbl(df_l)
@@ -1928,7 +1831,6 @@ shinyServer(function(session, input, output) {
       Rfit2_df = as.data.frame(Rfit2)
       as.tbl(Rfit2_df)
       dim(Rfit2_df)
-      #rownames(Rfit2_df) = rownames(df)
       Rfit2_df$spot = spot_col
       
       as.tbl(Rfit2_df)
@@ -2752,38 +2654,91 @@ shinyServer(function(session, input, output) {
       
     })
     
+    
+    
+    
+    
     output$Data_tabs_ui = renderUI({
       #do.call(tagList,PlotTabs_UI(id = "Data"))
       
       ns <- NS("Data")
-      
-      lst = list(
-        tabsetPanel(
-          tabPanel('Table',
-                   column(6,tags$h4(htmlOutput('data_dim_text'))),
-                   column(2,downloadButton('download_data',"Data Table")),
-                   column(2,downloadButton('download_ExpSet',"ExpSet")),
-                   column(2,downloadButton('download_MSnSet',"MSnSet")),
-                   
-                   column(12,DT::dataTableOutput('data_table'))
-          ),
-          tabPanel('Boxplot',
-                   uiOutput(ns('boxplot_ui'))
-                   ),
-          tabPanel('CV',
-                   uiOutput(ns('CV_plot_ui'))
-                   ),
-          tabPanel('Missing Values',
-                   uiOutput(ns('missing_plot_ui'))
-          ),
-          tabPanel("MA Plots",
-                   uiOutput(ns('MA_plot_ui')),
-          ),
-          tabPanel('Clustering',
-                   column(12,uiOutput(ns('Heatmap_ui')))
-          ))
-      )
+      if(values$app_version == 'pro'){
+        lst = list(
+          tabsetPanel(
+            tabPanel('Table',
+                     column(6,tags$h4(htmlOutput('data_dim_text'))),
+                     column(2,downloadButton('download_data',"Data Table")),
+                     column(2,downloadButton('download_ExpSet',"ExpSet")),
+                     column(2,downloadButton('download_MSnSet',"MSnSet")),
+                     
+                     column(12,DT::dataTableOutput('data_table'))
+            ),
+            tabPanel('Expression Intensity Boxplot',
+                     uiOutput(ns('boxplot_ui'))
+                     ),
+            tabPanel('CV',
+                     uiOutput(ns('CV_plot_ui'))
+                     ),
+            tabPanel('Missing Values',
+                     uiOutput(ns('missing_plot_ui'))
+            ),
+            tabPanel("MA Plots",
+                     uiOutput(ns('MA_plot_ui')),
+            ),
+            tabPanel('Clustering',
+                     column(12,uiOutput(ns('Heatmap_ui')))
+            ))
+        )
+      }else{
+        lst = list(
+          tabsetPanel(
+            tabPanel('Table',
+                     column(8,tags$h4(htmlOutput('data_dim_text'))),
+                     column(2,downloadButton('download_data',"Data Table")),
+                     column(2,downloadButton('download_ExpSet',"ExpSet")),
+                     
+                     column(12,DT::dataTableOutput('data_table'))
+            ),
+            tabPanel('Expression Intensity Boxplot',
+                     uiOutput(ns('boxplot_ui'))
+            ),
+            tabPanel('CV',
+                     uiOutput(ns('CV_plot_ui'))
+            ),
+            tabPanel('Missing Values',
+                     uiOutput(ns('missing_plot_ui'))
+            ),
+            tabPanel("MA Plots",
+                     uiOutput(ns('MA_plot_ui')),
+            ),
+            tabPanel('Clustering',
+                     column(12,uiOutput(ns('Heatmap_ui')))
+            ))
+        )
+      }
       do.call(tagList,lst)
+    })
+    
+    output$sig_Data_table_ui = renderUI({
+      if(values$app_version == 'pro'){
+        lst = list(
+          column(6),
+          column(2,downloadButton('download_sig_data',"Data Table")),
+          column(2,downloadButton('download_sig_ExpSet',"ExpSet")),
+          column(2,downloadButton('download_sig_MSnSet',"MSnSet")),
+          
+          column(12,DT::dataTableOutput('eBays_table'))
+        )
+      }else{
+        lst = list(
+          column(8),
+          column(2,downloadButton('download_sig_data',"Data Table")),
+          column(2,downloadButton('download_sig_ExpSet',"ExpSet")),
+          column(12,DT::dataTableOutput('eBays_table'))
+        )
+      }
+      do.call(tagList,lst)
+      
     })
 
     
@@ -2792,107 +2747,132 @@ shinyServer(function(session, input, output) {
     },rownames = FALSE)
     
     output$download_data <- downloadHandler(
-        filename = function(){"data.txt"}, 
+        filename = function(){"data.txt"},  
         content = function(fname){
-            write.table(data(), fname,sep = '\t', col.names=NA,)
+            write.table(data(), fname,sep = '\t', row.names = F)
         }
+    )
+    
+    output$download_sig_data <- downloadHandler(
+      filename = function(){"data_DE.txt"},  
+      content = function(fname){
+        write.table(eBayes_test()$df, fname,sep = '\t', row.names = F)
+      }
     )
     
     output$data_dim_text = renderPrint({
       cat(paste(dim(data())[1],'proteins and ',dim(data())[2],'samples'))
     })
     
-    # expression_set_function = function(data,targets,proteins){
-    #   m = as.matrix(data)
-    #   p = targets()
-    #   rownames(p) = p$Name
-    #   p$sample_name = rownames(p)
-    #   phenoData = new('AnnotatedDataFrame',data = p)
-    #   phenoData
-    #   features = proteins()[proteins()$protein %in% rownames(data),]
-    #   
-    #   features
-    #   rownames(features) = features$protein
-    #   
-    #   featureData =  new('AnnotatedDataFrame',data = features)
-    #   featureData
-    #   expSet = ExpressionSet(assayData = as.matrix(data),
-    #                          phenoData = phenoData,
-    #                          featureData = featureData)
-    #   
-    #   expSet
-    #   
-    #   
-    #   
-    #   MSnSet = MSnSet(m,featureData,phenoData)
-    #   MSnSet
-    #   
-    #   list(ExpressionSet = expSet, MSnSet = MSnSet)
-    # }
     
-    expression_set_function = function(data,samples,features){
-      #library(MSnbase)
-      df = data[rownames(features),rownames(samples)]
-      m <- df %>% mutate_all(as.numeric) %>% 
-        as.matrix()
+
+    
+    data_exp_set = reactive({
+      df = data() %>% column_to_rownames('protein')
+      m = as.matrix(df)
       
-      samples$sample_name = rownames(samples)
+      samples = selected_targets() %>% as.data.frame
+      rownames(samples) = samples$Name
+      
+      arrayw_df = t(arrayw_df()) %>% 
+        as.data.frame() %>% 
+        rownames_to_column('Name')
+      as.tbl(arrayw_df)
+      
       samples = samples %>% 
-        dplyr::select(sample_name,everything())
+        left_join(arrayw_df)
+      as.tbl(samples)
       
+      
+      features = proteins() %>% as.data.frame()
+      rownames(features) = proteins()$protein
+      features = features[rownames(m),]
+      
+      list(m = m, samples = samples, features = features)
+    })
+    
+    sig_data_exp_set = reactive({
+      
+      data_exp_set = data_exp_set()
+      
+      data_exp_set$features
+      sig_df = eBayes_test()$df
+  
+      data_exp_set$features = data_exp_set$features %>% 
+        left_join(sig_df)
+      
+      
+      data_exp_set
+      
+    })
+    
+    MSnSet_function = function(m,samples,features){
+      samples$sample_name = rownames(samples)
       phenoData = new('AnnotatedDataFrame',data = samples)
       phenoData
       
-      features$feature_name = rownames(features)
-      features = features %>% 
-        dplyr::select(feature_name,everything())
-      rownames(features) = features$feature_name
-      
-      #features$features = rownames(features)
+      features$feature = rownames(features)
       featureData =  new('AnnotatedDataFrame',data = features)
       featureData
       
-      MSnSet = MSnSet(m,featureData,phenoData)
-      
-      
-      MSnSet
+      exp_set  = MSnSet(m) 
+      phenoData(exp_set) = phenoData
+      featureData(exp_set) = featureData
+      exp_set
+      #MSnSet(m,phenoData = phenoData,featureData = featureData)
     }
     
+    ExpressionSet_function = function(m,samples,features){
+      phenoData = new('AnnotatedDataFrame',data = samples)
+      phenoData
+      
+      featureData =  new('AnnotatedDataFrame',data = features)
+      featureData
+      
+      exp_set  = ExpressionSet(m) 
+      phenoData(exp_set) = phenoData
+      featureData(exp_set) = featureData
+      exp_set
+                    
+    }
+    
+    data_ExpressionSet = reactive({ 
+      
+      data_exp_set = data_exp_set()
+      
+      ExpressionSet_function(data_exp_set$m,data_exp_set$samples,data_exp_set$features)
+    })
+    
     data_MSnSet = reactive({  
-      data = data() %>%     
-        column_to_rownames('protein')
-      colnames(data)
-      rownames(data)
-      targets = target_conditions()
-      rownames(targets) = targets$Name
-      proteins = proteins()
-      rownames(proteins) = proteins$protein
-      features = proteins
-      features = features[data()$protein,]
-      dim(features)
-      samples = targets
-      samples = samples[colnames(data),]
+
+      data_exp_set = data_exp_set()
       
-      arrayw_df = arrayw_df()
-      w = t(arrayw_df) %>% 
-        as.data.frame %>% 
-        rownames_to_column('Name')
-      
-      samples =samples %>% 
-        left_join(w) %>% 
-        as.data.frame()
-      
-      rownames(samples) = samples$Name
-      
-      #samples$array_weight = arrayw_df()[1,]
-      dim(samples)
-      dim(data)
-      features = as.data.frame(features)
-      rownames(features) = features$protein
-      
-      expression_set_function(data,samples,features)
+      MSnSet_function(data_exp_set$m,data_exp_set$samples,data_exp_set$features)
        
     })
+    
+    sig_data_ExpressionSet = reactive({ 
+      
+      data_exp_set = sig_data_exp_set() 
+      as.tbl(data_exp_set$features)
+      
+      ExpressionSet_function(data_exp_set$m,data_exp_set$samples,data_exp_set$features)
+    })
+    
+    sig_data_MSnSet = reactive({  
+      
+      data_exp_set = sig_data_exp_set()
+      
+      MSnSet_function(data_exp_set$m,data_exp_set$samples,data_exp_set$features)
+      
+    })
+    
+    output$download_ExpSet <- downloadHandler(
+      filename = function(){"ExpressionSet.rds"}, 
+      content = function(fname){
+        saveRDS(data_ExpressionSet(),fname)
+      }
+    )
     
     output$download_MSnSet <- downloadHandler(
       filename = function(){"MSnSet.rds"}, 
@@ -2901,8 +2881,24 @@ shinyServer(function(session, input, output) {
       }
     )
     
+    output$download_sig_ExpSet <- downloadHandler(
+      filename = function(){"ExpressionSet_DE.rds"}, 
+      content = function(fname){
+        saveRDS(sig_data_ExpressionSet(),fname)
+      }
+    )
     
-    ##### Optimal Cutpoints ######
+    output$download_sig_MSnSet <- downloadHandler(
+      filename = function(){"MSnSet_DE.rds"}, 
+      content = function(fname){
+        saveRDS(sig_data_MSnSet(),fname)
+      }
+    )
+    
+
+    
+    
+  ##### Optimal Cutpoints ######
     output$threshold_control_col_ui = renderUI({
       (selection = unique(target_conditions()$Condition))
       selected = selection[1]
@@ -2948,8 +2944,7 @@ shinyServer(function(session, input, output) {
         column_to_rownames('protein')
       targets = target_conditions()
       
-      #threshold_df = threshold_function(data,targets)
-      #threshold_df
+  
       threshold_df = tryCatch({threshold_function(data,targets,input)}, error = function(e) {NULL})
       threshold_df
     })})
@@ -3082,19 +3077,7 @@ shinyServer(function(session, input, output) {
         ht_plot_Server(id,name,ht_list)
         do.call(tagList,plot_UI(id,name,ht_list$warning))
       }
-      # df = E_norm() %>% 
-      #   dplyr::select(-spot)
-      # colnames(df) = target_names()
-      # m = as.matrix(df)
-      # m = log_min_function(m,input)
-      # m = neg_corr_function(m,input)
-      # 
-      # id = 'RAW_norm'
-      # name = 'Hcluster'
-      # ht_list = array_HeatMap_function(m,samples,features$protein,input$r_col,input$r_col,input$heatmap_order)
-      # ht_list$p
-      # ht_plot_Server(id,name,ht_list$p,ht_list$plot_height,ht_list$plot_width)
-      # do.call(tagList,plot_UI(id,name))
+
       
     })
 
@@ -3479,63 +3462,7 @@ shinyServer(function(session, input, output) {
     
   })})
   
-  # multi_df = reactive({
-  #   norm = norm()$E
-  #   E = multi_DE_function(norm()E,cont_matrix())
-  # })
-  
-  
 
-  # MA_plots = renderPlot({
-  #   df = Rfit()$E$E
-  #   as.tbl(df)  
-  # })
-  
-  
-
-  # multi_Amean_function = function(fit,norm,column_name,table){
-  #   Amean <- cbind(fit$E[[table]][column_name], fit$S[[table]][column_name], fit$M[[table]][column_name], fit$N[[table]][column_name])
-  #   dim(Amean)
-  #   colnames(Amean) <- c("Rawdata","Subtraction","Movingminimum","Normexp")
-  #   as.tbl(as.data.frame(Amean))
-  #   Amean_l = Amean %>% 
-  #     as.data.frame() %>% 
-  #     gather(Correction,A)
-  #   
-  #   Amean_l$A[is.infinite(Amean_l$A)] = NA
-  #   Amean_l$Normalisation = norm
-  #   Amean_l
-  # }
-  # 
-  # Amean_data = reactive({withProgress(message = 'A data',{
-  #   if(input$multi_DE == FALSE){
-  #     fit = Rfit()
-  #   }else{
-  #     fit = DE_Rfit()
-  #   }
-  #   if(input$multi_top == FALSE){
-  #     E_Amean = multi_Amean_function(fit$E,"None",'Amean','df')  
-  #     S_Amean = multi_Amean_function(fit$S,"Scale",'Amean','df')
-  #     Q_Amean = multi_Amean_function(fit$Q,"Quantile",'Amean','df')
-  #     C_Amean = multi_Amean_function(fit$C,"Cyclicloess",'Amean','df')
-  #   }else{
-  #     E_Amean = multi_Amean_function(fit$E,"None",'AveExpr','top_df')  
-  #     S_Amean = multi_Amean_function(fit$S,"Scale",'AveExpr','top_df')
-  #     Q_Amean = multi_Amean_function(fit$Q,"Quantile",'AveExpr','top_df')
-  #     C_Amean = multi_Amean_function(fit$C,"Cyclicloess",'AveExpr','top_df')
-  #   }
-  #   
-  #   Amean = rbind(E_Amean,S_Amean) %>% 
-  #     rbind(Q_Amean) %>% 
-  #     rbind(C_Amean)
-  #   
-  #   as.tbl(as.data.frame(Amean))
-  #   Amean$Correction = factor(Amean$Correction, levels = unique(Amean$Correction))
-  #   Amean$Normalisation = factor(Amean$Normalisation, levels = unique(Amean$Normalisation))
-  #   Amean
-  #   #Amean$A
-  #   
-  # })})
   
   
   
@@ -3549,53 +3476,7 @@ shinyServer(function(session, input, output) {
     selectInput('MA_normalisation','Normalisation',unique(df$Normalisation),unique(df$Normalisation),multiple = T)
   })
   
-  
-  
-  
-  # output$Amean_plot_ui = renderUI({
-  #     plot_height = single_plot_height * length(input$MA_normalisation)
-  #     output$Amean_plot = renderPlot({
-  #   
-  #         
-  #         Amean = Amean_data() %>% 
-  #           filter(Correction %in% input$MA_correction, 
-  #                  Normalisation %in% input$MA_normalisation)
-  #         
-  #         
-  #     
-  #     
-  #           p = ggplot(Amean, aes(x= Correction, y=A, fill=Correction))+
-  #             geom_boxplot()+
-  #             #theme_classic()+
-  #             theme(axis.text = element_text(size = 12), axis.title.x = element_blank(), legend.position = "none") + 
-  #             facet_grid(Normalisation ~ .)
-  #           q = quantile(Amean$A,na.rm = T)
-  #           if(input$MA_quantile == T){
-  #             p = p + 
-  #               ylim(q[1],q[3])
-  #           }
-  #           p
-  #         
-  #       },height = plot_height)
-  #     
-  #     plotOutput('Amean_plot',height = plot_height)
-  # })
-  
-  # multi_M_function = function(data,norm,column_name,table){
-  #   Rfit2 = data$E
-  #   Sfit2 = data$S
-  #   Mfit2 = data$M
-  #   Nfit2 = data$N
-  #   
-  #   M <- cbind(Rfit2[[table]][column_name], Sfit2[[table]][column_name], Mfit2[[table]][column_name], Nfit2[[table]][column_name])
-  #   M <- as.data.frame(M)
-  #   colnames(M) = c("Rawdata","Subtraction","Movingminimum","Normexp")
-  #   #M = log2(M)
-  #   M_l = M %>% 
-  #     gather('Correction','M')
-  #   M_l$Normalisation = norm
-  #   M_l
-  # }
+
   
   multi_collate_fit_function = function(data,norm,table){
     print('hit') 
@@ -3616,11 +3497,7 @@ shinyServer(function(session, input, output) {
   }
   
   multi_fit_data = reactive({
-    #if(input$multi_DE == FALSE){
-    #  fit = Rfit()
-    #}else{
-    #  fit = DE_Rfit() 
-    #}
+
     
     if(input$multi_DE == FALSE){
       E_M_l = multi_collate_fit_function(Rfit()$E,"None",'df')
@@ -3647,49 +3524,14 @@ shinyServer(function(session, input, output) {
     
   })
   
-  # M_plot_data = reactive({withProgress(message = 'M data',{
-  #    
-  #   if(input$multi_DE == FALSE){
-  #     fit = Rfit()
-  #   }else{
-  #     fit = DE_Rfit() 
-  #   }
-  # 
-  #   if(input$multi_top == FALSE){
-  #     E_M_l = multi_M_function(fit$E,"None",'F','df')
-  #     S_M_l = multi_M_function(fit$S,"Scale",'F','df')
-  #     Q_M_l = multi_M_function(fit$Q,"Quantile",'F','df')
-  #     C_M_l = multi_M_function(fit$C,"Cyclicloess",'F','df')
-  #   }else{
-  #     E_M_l = multi_M_function(fit$E,"None",'logFC','top_df')
-  #     S_M_l = multi_M_function(fit$S,"Scale",'logFC','top_df')
-  #     Q_M_l = multi_M_function(fit$Q,"Quantile",'logFC','top_df')
-  #     C_M_l = multi_M_function(fit$C,"Cyclicloess",'logFC','top_df')
-  #   }
-  #   
-  #   M_l = E_M_l %>% 
-  #     rbind(S_M_l) %>% 
-  #     rbind(Q_M_l) %>% 
-  #     rbind(C_M_l)
-  #   
-  #   as.tbl(M_l)
-  #   
-  #   M_l$Correction = factor(M_l$Correction, levels = unique(M_l$Correction))
-  #   M_l$Normalisation = factor(M_l$Normalisation, levels = unique(M_l$Normalisation))
-  #   
-  #   M_l
-  # })})
-  # 
+
   
   output$M_plot_ui = renderUI({   
     plot_height = single_plot_height * length(input$MA_normalisation)
   
     output$M_plot = renderPlot({
       
-      #multi_fit_data
-      #M_l = M_plot_data()  %>% 
-      #  filter(Correction %in% input$MA_correction, 
-      #         Normalisation %in% input$MA_normalisation)
+
       
       M_l = multi_fit_data()  %>% 
         filter(Correction %in% input$MA_correction, 
@@ -3731,10 +3573,7 @@ shinyServer(function(session, input, output) {
     
     output$A_plot = renderPlot({
       
-      #multi_fit_data
-      #M_l = M_plot_data()  %>% 
-      #  filter(Correction %in% input$MA_correction, 
-      #         Normalisation %in% input$MA_normalisation)
+
       
       M_l = multi_fit_data()  %>% 
         filter(Correction %in% input$MA_correction, 
@@ -3767,20 +3606,7 @@ shinyServer(function(session, input, output) {
     plotOutput('A_plot',height = plot_height)
   })
   
- 
-  # MA_data = reactive({
-  #   A = Amean_data()
-  #   M = M_plot_data()
-  #   
-  #   dim(A)
-  #   dim(M)
-  #   
-  #   MA = A
-  #   MA$M = M$M
-  #   as.tbl(MA)
-  #   
-  #   MA
-  # })
+
 
 
   output$MA_plot_ui = renderUI({ 
@@ -3825,8 +3651,7 @@ shinyServer(function(session, input, output) {
     Mfit2 = data$M[[table]]
     Nfit2 = data$N[[table]]
     
-    #df = multi_collate_fit_function(data,norm,table)
-    
+
     Raw_P <- cbind(log2(Rfit2$sigma^2), Rfit2$Amean)
     colnames(Raw_P) <- c("Raw_variance", "Raw_A")
     
@@ -4032,7 +3857,7 @@ shinyServer(function(session, input, output) {
     threshold <- Sig_Proteins$adj.P.Val < as.numeric(input$pvalue_select)
     length(which(threshold))
     Sig_Proteins <- cbind(Sig_Proteins, threshold) %>% 
-      rownames_to_column('proteins')
+      rownames_to_column('protein')
     
     list(df = Sig_Proteins,cont_matrix = cont_matrix_list$cmd, comparison_list = cont_matrix_list$comparison_list)
     })})
@@ -4086,18 +3911,13 @@ shinyServer(function(session, input, output) {
     df = eBayes_sig_data() %>%    
       column_to_rownames('protein')
     colnames(df)  
-    #colnames(df) = target_names()
     m = as.matrix(df)
     m
     rownames(df)
-    #m = log_min_function(m,input)
     m[is.na(m)] = 0
     m[is.infinite(m)] = 0
     m = m[,selected_targets()$Name]
-    #plot_height = 300 + (dim(m)[1]*10)
-    # output$eBayes_Heatmap = renderPlot({
-    #   Heatmap_function(m,target_conditions(),rownames(m))
-    # },height = plot_height)
+ 
     if(dim(m)[1] == 0){
       tags$h4('No significant proteins')
     }else{
@@ -4106,26 +3926,11 @@ shinyServer(function(session, input, output) {
       ht_list = array_HeatMap_function(m,selected_targets(),selected_targets(),rownames(m),input$r_col,values$heatmap_order)
       ht_list$p
       ht_plot_Server(id,name,ht_list)
-      #plot_height = data_heatmap_Server('eBayes',m,target_conditions(),selected_targets(),rownames(m),input$r_col,input$heatmap_order)
       do.call(tagList,plot_UI(id,name,ht_list$warning))
       
-      #do.call(tagList,data_heatmap_UI('eBayes',plot_height))
     }
  
-    # if(dim(m)[1] < max_heatmap_rows){
-    #   plot_height = 300 + (dim(m)[1]*10)
-    #   output$eBayes_Heatmap = renderPlot({
-    #     Heatmap_function(m,target_conditions(),rownames(m),input$r_col,input$heatmap_order)
-    #   },height = plot_height)
-    #   plotOutput('eBayes_Heatmap',height = plot_height)
-    # }else{
-    #   output$eBayes_dend = renderPlot({withProgress(message = 'generating dendrogram',{
-    #     dend_function(m,target_conditions())
-    #   })})
-    #   plotOutput('eBayes_dend')
-    # }
 
-    #plotOutput('eBayes_Heatmap')
     
   })
   
@@ -4225,9 +4030,8 @@ shinyServer(function(session, input, output) {
   })
   
   
-  #targets()
-  
-  #E()$targets
+
+
   
   #### Panel Labels ####
   

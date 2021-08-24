@@ -228,23 +228,52 @@ PlotTabs_UI <- function(id,values) {
 					tabPanel("MA Plots",
 									 uiOutput(ns('MA_plot_ui')),
 					),
-					tabPanel('Heatmap',
+					tabPanel('Clustering',
 									 column(12,uiOutput(ns('Heatmap_ui')))
 					))
 			)
 	}else{
 		lst = list(
 			tabsetPanel(
-				tabPanel('Boxplot',
+				tabPanel('Expression Intensity Boxplot',
 								 uiOutput(ns('boxplot_ui'))
-								 #uiOutput(ns('CV_plot_ui')),
-								 #uiOutput(ns('missing_plot_ui'))
 				),
-				tabPanel('Heatmap',
+				tabPanel('Clustering',
 								 column(12,uiOutput(ns('Heatmap_ui')))
 				))
 		)
+		if(id == 'RAW_norm'){
+			lst = list(
+				tabsetPanel(
+					tabPanel('Expression Intensity Boxplot',
+									 uiOutput(ns('boxplot_ui'))
+					),
+					tabPanel('CV',
+									 uiOutput(ns('triplicate_cv_plot_ui')))
+					),
+					tabPanel('Clustering',
+									 column(12,uiOutput(ns('Heatmap_ui')))
+					)
+				
+			)
+		}
+		if(id == 'RAW_corr'){
+			lst = list(
+				tabsetPanel(
+					tabPanel('Expression Intensity Boxplot',
+									 uiOutput(ns('boxplot_ui'))
+					),
+					tabPanel('Missing Values',
+									 uiOutput(ns('missing_plot_ui'))),
+					tabPanel('Clustering',
+									 column(12,uiOutput(ns('Heatmap_ui')))
+					)
+					
+				)
+			)
+		}
 	}
+	lst
 }
 
 ### Pro UI ###
@@ -272,17 +301,11 @@ CV_UI = function(id,name,values){
 		
 		))
 	}else{
-		lst = list(tabsetPanel(
-			tabPanel('Data Tables',
-							 table_UI(id,paste0(name,'_mean'),"Summary of triplicate CV's"),
-							 table_UI(id,name,'Triplicate spot statistics'),
-			),
-			tabPanel('Plots',
+		lst = list(
 							 plot_UI(id,name,"Boxplots of CV's for probe replicates"),
 							 plot_UI(id,paste0(name,'_density'),"Density plot of CV's for probe replicates") 
 			)
-			
-		))
+
 	}
 				 
 	lst
