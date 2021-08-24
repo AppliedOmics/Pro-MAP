@@ -1892,8 +1892,6 @@ shinyServer(function(session, input, output) {
     }
     
     missingness_function = function(df,targets){
-      
-      
       df[df <= 0] = NA
       as.tbl(df)
       
@@ -1912,7 +1910,7 @@ shinyServer(function(session, input, output) {
       
       p = ggplot(df_count) +
         geom_col(aes(x = Name,y = `Percentage missing`, fill = Condition))
-      p
+      list(p = p, df = df_count)
     }
     
     MA_plot_function = function(df,spots){
@@ -2083,7 +2081,7 @@ shinyServer(function(session, input, output) {
     output[['RAW-missing_plot_ui']] = renderUI({  
  
       df = RAW_df()
-      p = missingness_function(df,targets())
+      p = missingness_function(df,targets())$p
       p = gg_fill_function(p)
       
       plot_Server('RAW','missingness',p)
@@ -2209,7 +2207,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_filter-missing_plot_ui']] = renderUI({   
       df = E_filter_df()
-      p = missingness_function(df,targets())
+      p = missingness_function(df,targets())$p
       p = gg_fill_function(p)
       
       id = 'RAW_filter'
@@ -2322,7 +2320,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_corr-missing_plot_ui']] = renderUI({   
       df = E_corr_df()
-      p = missingness_function(df,targets())
+      p = missingness_function(df,targets())$p
       p = gg_fill_function(p)
       
       id = 'RAW_corr'
@@ -2471,7 +2469,7 @@ shinyServer(function(session, input, output) {
     
     output[['RAW_norm-missing_plot_ui']] = renderUI({   
       df = E_norm()
-      p = missingness_function(df,targets())
+      p = missingness_function(df,targets())$p
       p = gg_fill_function(p)
       
       id = 'RAW_norm'
@@ -2724,7 +2722,7 @@ shinyServer(function(session, input, output) {
     
     output[['Data-missing_plot_ui']] = renderUI({   
       df = data_df()
-      p = missingness_function(df,targets())
+      p = missingness_function(df,targets())$p
       p = gg_fill_function(p)
       
       id = 'Data'
@@ -2859,7 +2857,7 @@ shinyServer(function(session, input, output) {
     }
     
     data_MSnSet = reactive({  
-      data = data() %>%    
+      data = data() %>%     
         column_to_rownames('protein')
       colnames(data)
       rownames(data)
@@ -2879,13 +2877,17 @@ shinyServer(function(session, input, output) {
         rownames_to_column('Name')
       
       samples =samples %>% 
-        left_join(w)
+        left_join(w) %>% 
+        as.data.frame()
+      
       rownames(samples) = samples$Name
       
       #samples$array_weight = arrayw_df()[1,]
       dim(samples)
       dim(data)
+      features = as.data.frame(features)
       rownames(features) = features$protein
+      
       expression_set_function(data,samples,features)
        
     })
@@ -3073,7 +3075,7 @@ shinyServer(function(session, input, output) {
         
         id = 'Cutoff'
         name = 'Hcluster'
-        ht_list = array_HeatMap_function(m,targets(),samples,features$protein,input$r_col,values$heatmap_order)
+        ht_list = array_HeatMap_function(m,selected_targets(),samples,features$protein,input$r_col,values$heatmap_order)
         ht_list$p
         ht_plot_Server(id,name,ht_list)
         do.call(tagList,plot_UI(id,name,ht_list$warning))
@@ -3112,38 +3114,44 @@ shinyServer(function(session, input, output) {
          M = M_corr,
          N = N_corr)
   })})
-  
+    
+
     
   multi_norm_function = function(corr_data,spot_names,target_names,selected_target_names,removed_spots,log_rb,method,proteins,input){
     
     E_norm_list = pre_norm_function(corr_data$E$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     E_norm = norm_function(E_norm_list$m,method,E_norm_list$spots)
     E_proteins = protein_collapse_function(E_norm,spots(),input)
-    E = protein_filter_function(E_proteins,proteins,input)
+    E_data = protein_filter_function(E_proteins,proteins,input)
     
-    E = as.data.frame(E) %>% dplyr::select(-one_of('protein','Category'))
+    E_data = as.data.frame(E_data) %>% dplyr::select(-one_of('protein','Category'))
+    E = list(norm = E_norm,data = E_data)
     
     S_norm_list = pre_norm_function(corr_data$S$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     S_norm = norm_function(S_norm_list$m,method,S_norm_list$spots)
     S_proteins = protein_collapse_function(S_norm,spots(),input)
-    S = protein_filter_function(S_proteins,proteins,input)
+    S_data = protein_filter_function(S_proteins,proteins,input)
 
-    S = as.data.frame(S) %>% dplyr::select(-one_of('protein','Category'))
+    S_data = as.data.frame(S_data) %>% dplyr::select(-one_of('protein','Category'))
+    S = list(norm = S_norm,data = S_data)
     
     N_norm_list = pre_norm_function(corr_data$N$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     N_norm = norm_function(N_norm_list$m,method,N_norm_list$spots)
     N_proteins = protein_collapse_function(N_norm,spots(),input)
-    N = protein_filter_function(N_proteins,proteins,input)
+    N_data = protein_filter_function(N_proteins,proteins,input)
 
-    N = as.data.frame(N) %>% dplyr::select(-one_of('protein','Category'))
+    N_data = as.data.frame(N_data) %>% dplyr::select(-one_of('protein','Category'))
+    N = list(norm = N_norm,data = N_data)
+    
     
     M_norm_list = pre_norm_function(corr_data$M$E,spot_names,target_names,selected_target_names,removed_spots,log_rb)
     M_norm = norm_function(M_norm_list$m,method,M_norm_list$spots)
     M_proteins = protein_collapse_function(M_norm,spots(),input)
-    M = protein_filter_function(M_proteins,proteins,input)
+    M_data = protein_filter_function(M_proteins,proteins,input)
 
-    M = as.data.frame(M) %>% dplyr::select(-one_of('protein','Category'))
-
+    M_data = as.data.frame(M_data) %>% dplyr::select(-one_of('protein','Category'))
+    M = list(norm = M_norm,data = M_data)
+    
     
     list(E = E,
          S = S,
@@ -3162,7 +3170,6 @@ shinyServer(function(session, input, output) {
     
     method = "none"
     E = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
-    
     method = "quantile"
     Q = multi_norm_function(corr_data,spot_names(),target_names(),selected_target_names(),removed_spots(),values$log_rb,method,proteins(),input)
     method = "cyclicloess"
@@ -3180,6 +3187,175 @@ shinyServer(function(session, input, output) {
     
   })})
 
+
+  
+  multi_missing_function = function(data,targets,method){
+    miss_E = missingness_function(data$E$norm,targets)
+    miss_E$df$Correction = 'None'
+    miss_S = missingness_function(data$S$norm,targets)
+    miss_S$df$Correction = 'Subtraction'
+    miss_M = missingness_function(data$M$norm,targets)
+    miss_M$df$Correction = 'Movingminimum'
+    miss_N = missingness_function(data$N$norm,targets)
+    miss_N$df$Correction = 'Normexp'
+    
+    df = miss_E$df %>% 
+      rbind(miss_S$df) %>% 
+      rbind(miss_M$df) %>% 
+      rbind(miss_N$df)
+    
+    df$Normalisation = method
+    df
+  }
+  
+  multi_missing = reactive({ 
+    corr_data = corr()
+    spot_names = spot_names()
+    target_names = selected_target_names()
+    targets = selected_targets()
+    names(norm())
+    E_df = multi_missing_function(norm()$E,selected_targets(),'None')
+    S_df = multi_missing_function(norm()$S,selected_targets(),'Scale')
+    Q_df = multi_missing_function(norm()$Q,selected_targets(),'Quantile')
+    C_df = multi_missing_function(norm()$C,selected_targets(),'Cyclicloess')
+    
+    
+    df = E_df %>% 
+      rbind(S_df) %>% 
+      rbind(Q_df) %>% 
+      rbind(C_df)
+    
+    df$Correction = factor(df$Correction, levels = unique(df$Correction))
+    
+    df$Normalisation = factor(df$Normalisation, levels = unique(df$Normalisation))
+    
+    
+
+    df
+    # p = ggplot(df) +
+    #   geom_boxplot(aes(x = Correction,y = `Percentage missing`, fill = Condition)) + 
+    #   facet_grid(Normalisation ~ .)
+    # 
+    # p
+
+  })
+  
+  output$multi_missing_plot_ui = renderUI({
+    
+    #plot_height = single_plot_height * length(input$MA_normalisation)
+   
+      df = multi_missing() %>% 
+        filter(Correction %in% input$MA_correction, 
+               Normalisation %in% input$MA_normalisation)
+      as.tbl(df)
+      
+      
+      
+      
+      if(input$flip_facets == F){
+        plot_height = single_plot_height * length(input$MA_normalisation)
+        p = ggplot(df) +
+          geom_boxplot(aes(x = Correction,y = `Percentage missing`, fill = Category)) + 
+          facet_grid(Normalisation ~ .)
+      }else{
+        plot_height = single_plot_height * length(input$MA_correction)
+        p = ggplot(df) +
+          geom_boxplot(aes(x = Normalisation,y = `Percentage missing`, fill = Category)) + 
+          facet_grid(Correction ~ .)
+      }
+
+    output$multi_missing_plot = renderPlot({
+      p
+    },height = plot_height)
+    plotOutput('multi_missing_plot',height = plot_height)
+  
+  })
+   
+  multi_CV_function = function(data,targets,method){
+    miss_E = CV_df_function(data$E$norm,targets)
+    miss_E$Correction = 'None'
+    miss_S = CV_df_function(data$S$norm,targets)
+    miss_S$Correction = 'Subtraction'
+    miss_M = CV_df_function(data$M$norm,targets)
+    miss_M$Correction = 'Movingminimum'
+    miss_N = CV_df_function(data$N$norm,targets)
+    miss_N$Correction = 'Normexp'
+    
+    df = miss_E %>% 
+      rbind(miss_S) %>% 
+      rbind(miss_M) %>% 
+      rbind(miss_N)
+    
+    df$Normalisation = method
+    df
+  }
+  
+  multi_CV = reactive({ 
+    corr_data = corr()
+    spot_names = spot_names()
+    target_names = selected_target_names()
+    targets = selected_targets()
+    names(norm())
+    data = norm()$E
+    E_df = multi_CV_function(norm()$E,selected_targets(),'None')
+    S_df = multi_CV_function(norm()$S,selected_targets(),'Scale')
+    Q_df = multi_CV_function(norm()$Q,selected_targets(),'Quantile')
+    C_df = multi_CV_function(norm()$C,selected_targets(),'Cyclicloess')
+    
+    
+    df = E_df %>% 
+      rbind(S_df) %>% 
+      rbind(Q_df) %>% 
+      rbind(C_df)
+    as.tbl(df)
+    
+    df$Correction = factor(df$Correction, levels = unique(df$Correction))
+    
+    df$Normalisation = factor(df$Normalisation, levels = unique(df$Normalisation))
+    
+    
+    
+    df = df %>% 
+      left_join(spots())
+    as.tbl(df)
+    
+  df
+    
+  })
+  
+  output$spot_categories_select_ui = renderUI({
+    (selection = unique(multi_CV()$Category))
+    selectInput("CV_category",'Category',selection,selection,multiple = T)
+  })
+  
+  
+  output$multi_CV_plot_ui = renderUI({  
+    #plot_height = single_plot_height * length(input$MA_normalisation)
+    df = multi_CV() %>% 
+      filter(Correction %in% input$MA_correction, 
+             Normalisation %in% input$MA_normalisation,
+             Category %in% input$CV_category)
+    if(input$flip_facets == F){
+      plot_height = single_plot_height * length(input$MA_normalisation)
+      p = ggplot(df) +
+        geom_boxplot(aes(x = Correction,y = CV, fill = Category)) + 
+        facet_grid(Normalisation ~ .)
+    }else{
+      plot_height = single_plot_height * length(input$MA_correction)
+      p = ggplot(df) +
+        geom_boxplot(aes(x = Normalisation,y = CV, fill = Category)) + 
+        facet_grid(Correction ~ .)
+    }
+
+    output$multi_CV_plot = renderPlot({
+   
+
+      p
+    },height = plot_height)
+    plotOutput('multi_CV_plot',height = plot_height)
+    
+  })
+  
   eBayes_single_function = function(df){
     fit <- lmFit(df)
     fit2 <- eBayes(fit)
@@ -3209,10 +3385,10 @@ shinyServer(function(session, input, output) {
     # Nfit <- lmFit(norm$N)
     # Nfit2 <- eBayes(Nfit)
     # Nfit2 <- as.data.frame(Nfit2)
-    Rfit2 = eBayes_single_function(norm$E)
-    Sfit2 = eBayes_single_function(norm$S)
-    Mfit2 = eBayes_single_function(norm$M)
-    Nfit2 = eBayes_single_function(norm$N)
+    Rfit2 = eBayes_single_function(norm$E$data)
+    Sfit2 = eBayes_single_function(norm$S$data)
+    Mfit2 = eBayes_single_function(norm$M$data)
+    Nfit2 = eBayes_single_function(norm$N$data)
     
     list(E = Rfit2,
          S = Rfit2,
@@ -3252,19 +3428,19 @@ shinyServer(function(session, input, output) {
   
   multi_DE_function = function(norm){
    
-    df = norm$E
+    df = norm$E$data
     df$protein = data()$protein
     Rfit2 <- eBayes_function(df)
     
-    df = norm$S
+    df = norm$S$data
     df$protein = data()$protein
     Sfit2 <- eBayes_function(df)
     
-    df = norm$M
+    df = norm$M$data
     df$protein = data()$protein
     Mfit2 <- eBayes_function(df)
     
-    df = norm$N
+    df = norm$N$data
     df$protein = data()$protein
     Nfit2 <- eBayes_function(df)
     
@@ -3275,7 +3451,7 @@ shinyServer(function(session, input, output) {
   }
   
   cont_matix = reactive({
-    df = norm()$E 
+    df = norm()$E$E$data
     as.tbl(df)
     result_list = cont_matrix_function(df,targets(),input)
     result_list
@@ -3422,7 +3598,7 @@ shinyServer(function(session, input, output) {
   multi_collate_fit_function = function(data,norm,table){
     print('hit') 
     Rfit2 = data$E[[table]]
-    Rfit2$Correction = 'Rawdata'
+    Rfit2$Correction = 'None'
     Sfit2 = data$S[[table]]
     Sfit2$Correction = 'Subtraction'
     Mfit2 = data$M[[table]]
@@ -3759,25 +3935,25 @@ shinyServer(function(session, input, output) {
   
   ### _ Line Graphs ####
   multi_norm_full_function = function(data,norm){
-    E_df = as.data.frame(data$E)
+    E_df = as.data.frame(data$E$data)
     E_df_l = E_df %>% 
       rownames_to_column('Proteins') %>% 
       gather('Target','Intensity',colnames(E_df))
     E_df_l$Correction = 'None'
     
-    S_df = as.data.frame(data$S)
+    S_df = as.data.frame(data$S$data)
     S_df_l = S_df %>% 
       rownames_to_column('Proteins') %>% 
       gather('Target','Intensity',colnames(S_df))
     S_df_l$Correction = 'Substraction'
     
-    M_df = as.data.frame(data$M)
+    M_df = as.data.frame(data$M$data)
     M_df_l = M_df %>% 
       rownames_to_column('Proteins') %>% 
       gather('Target','Intensity',colnames(M_df))
     M_df_l$Correction = 'Movingminimum'
     
-    N_df = as.data.frame(data$N)
+    N_df = as.data.frame(data$N$data)
     N_df_l = N_df %>% 
       rownames_to_column('Proteins') %>% 
       gather('Target','Intensity',colnames(N_df))

@@ -36,7 +36,7 @@ header_UI = function(app_version){
 		lst = list(
 			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
 			tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
-			tags$h6('Mowoe MO., Garnett S., Lennard K., Talbot J., Jonas E., Blackburn J, (',
+			tags$h6('Metoboroghene O. Mowoe, Shaun Garnett, Katherine Lennard, Jade Talbot, Paul Townsend, Eduard Jonas, Jonathan M. Blackburn (',
 							tagList(a("doi link - not available yet", href="doi link")),')'),
 			tags$h6('R script for pipeline available on Github (',
 							tagList(a("github link", href="https://github.com/AppliedOmics/SCaMP")),')')

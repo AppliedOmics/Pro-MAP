@@ -35,7 +35,7 @@ shinyUI(
         
         column(6,uiOutput('foreground_column_ui')),
         column(6,uiOutput('background_column_ui')),
-        column(12,radioButtons('spot_filtering','Spot Filtering',c(T,F),inline = T)),
+        column(12,radioButtons('spot_filtering','Spot Filtering',c(F,T),inline = T)),
         column(12,
         uiOutput('annotation_columns_ui')),
         
@@ -251,7 +251,8 @@ shinyUI(
         tabPanel(title = tags$h5('All Methods'),value = 'all',
                  column(3,uiOutput('MA_correction_ui')),
                  column(3,uiOutput('MA_normalisation_ui')),
-                 column(3,radioButtons('log_rb_M','log(M)',c(T,F),inline = T)),
+                 column(3,radioButtons('log_rb_M','log(M)',c(F,T),inline = T),
+                        radioButtons('flip_facets','Flip Facets',c(F,T),inline = T)),
                  #column(3,radioButtons('MA_quantile','Limit axes plots to Quantitles',c(T,F))),
                  column(3,radioButtons('multi_DE','Differential Expression',c(F,T),inline = T)),
                  #column(12,radioButtons('multi_top','topTable',c(F,T),inline = T)),
@@ -268,6 +269,11 @@ shinyUI(
                        tabPanel('M plot',
                           uiOutput('M_plot_ui')
                        ),
+                       tabPanel('Missingness Plots',
+                                uiOutput('multi_missing_plot_ui')),
+                       tabPanel("CV's",
+                                uiOutput('spot_categories_select_ui'),
+                                uiOutput('multi_CV_plot_ui')),
                        tabPanel('Precision Plots',
                           uiOutput('precision_plot_ui')
                        )
