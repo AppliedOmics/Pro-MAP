@@ -1303,16 +1303,21 @@ shinyServer(function(session, input, output) {
             remove = c(remove,'na')
           }
           
-          title = ''
+          title = NULL
           if(length(remove) > 0){
-            title = paste('replaced ',paste(remove,collapse = ' and '), "values with zero's")
+            title = paste('Replaced ',paste(remove,collapse = ' and '), "values with zeros values.")
           }
           plot_height = 300+(dim(m)[1]*10)
           plot_width = 600 + (dim(m)[2]*5) 
           if(values$app_version == 'basic'){
             if(dim(m)[1] > max_heatmap_rows){
               cluster = 'dend'
+              title = paste('There are too many rows to generate a heatmap so a dendrogram was produced instead.',
+                            title)
             }
+          }
+          if(is.null(title)){
+            title = ''
           }
           if(cluster == 'dend'){
             plot_height = 300
@@ -2257,7 +2262,7 @@ shinyServer(function(session, input, output) {
     })
     
     output[['RAW_corr-Heatmap_ui']] = renderUI({ 
-      df = E_corr()$E      
+      df = E_corr()$E       
       colnames(df) = metadata_names()
       m = as.matrix(df)
       m = log_min_function(m,input)
