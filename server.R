@@ -1030,6 +1030,8 @@ shinyServer(function(session, input, output) {
       df$Category[df$probe == ''] = 'remove'
       df$Category[df$probe %in% input$select_remove] = 'remove'
       df$Category[df$probe %in% input$select_control_probe] = 'control'
+      df$Category[is.na(df$Category)] = 'analyte'
+      
       #df$Category[df$Category == 'remove' & !df$probe %in% input$select_remove] = ''
       df
     })})
@@ -1537,34 +1539,48 @@ shinyServer(function(session, input, output) {
       as.tbl(df_cv)
       q = quantile(df_cv$CV,na.rm=T)
       q
-      if(values$collapse_boxplots == F){
-        p = ggplot(df_cv,aes(x = Name,y = CV, col = Condition)) 
+  
+      
+      if(length(unique(df_cv$Condition)) == 1){
+        p = ggplot(df_cv,aes(x = Name,y = CV)) 
+        d = ggplot(df_cv,aes(x = CV, group = Name))
+        
       }else{
-        p = ggplot(df_cv,aes(x = Condition,y = CV, col = Condition))
+        if(values$collapse_boxplots == F){
+          d = ggplot(df_cv,aes(x = CV, group = Name,col = Condition))
+            
+          p = ggplot(df_cv,aes(x = Name,y = CV, col = Condition)) 
+        }else{
+          p = ggplot(df_cv,aes(x = Condition,y = CV, col = Condition))
+          d = ggplot(df_cv,aes(x = CV, col = Condition))
+            
+        }
       }
       
       p = p + 
-        geom_boxplot() + 
-        facet_grid(Category ~ ., scales = 'free_y')
+        geom_boxplot()
+      
+      d = d + 
+        geom_density()
+      
+      if(length(unique(df_cv$Category)) > 1){
+        
+        p = p + facet_grid(Category ~ ., scales = 'free_y')
+        d = d + facet_grid(Category ~ ., scales = 'free_y')
+
+      }
+      
       if(values$plot_lim == 'Quantile'){
        p = p +  ylim(q[2],q[4])
       }
       if(values$plot_lim == '2x Quantile'){
         p = p +  ylim(q[2]/2,q[4]*2)
       }
+      
       p = gg_col_function(p)
-      p
-      if(values$collapse_boxplots == F){
-        
-        d = ggplot(df_cv,aes(x = CV, group = Name,col = Condition)) +
-          geom_density() + 
-          facet_grid(Category ~ .)
-      }else{
-        d = ggplot(df_cv,aes(x = CV, col = Condition)) +
-          geom_density() + 
-          facet_grid(Category ~ .)
-      }
       d = gg_col_function(d)
+      
+   
       
       bq = quantile(df_cv$diff_mm,na.rm=T)
       if(values$collapse_boxplots == F){
@@ -1825,7 +1841,7 @@ shinyServer(function(session, input, output) {
         
       }else{
         p = ggplot(CV_df) + 
-          geom_boxplot(aes(y = CV,x = Condition, fill = Condition))
+          geom_boxplot(aes(y = CV,x = Condition, col = Condition))
         
         d = ggplot(CV_df,aes(x = CV,col = Condition)) +
           geom_density()
@@ -1848,21 +1864,7 @@ shinyServer(function(session, input, output) {
       list(p = p, d = d)
     }
     
-    CV_sample_density_function = function(data,metadata,probes){
-      CV_df = data %>%  
-        left_join(probes)
-      q = quantile(CV_df$CV,na.rm = T)
-      
-      if(values$collapse_boxplots == F){
-       
-      }else{
-        d = ggplot(df_cv,aes(x = CV, col = Condition)) +
-          geom_density() + 
-          facet_grid(Category ~ .)
-      }
-   
-      
-    }
+
 
     
     
@@ -2496,7 +2498,7 @@ shinyServer(function(session, input, output) {
     })
     
     output[['RAW_norm-triplicate_cv_plot_ui']] = renderUI({withProgress(message = 'Generating Plots',{
-      df = E_norm()  
+      df = E_norm()   
       probes = probes()
       metadata = metadata()
       plot_list = triplicate_cv_plot_function(df,probes(),metadata())
@@ -2703,7 +2705,7 @@ shinyServer(function(session, input, output) {
       result_list = CV_sample_plot_function(data,metadata(),proteins)
       
       p = result_list$p
-      p = gg_fill_function(p)
+      p = gg_col_function(p)
       p
       
       d = result_list$d
