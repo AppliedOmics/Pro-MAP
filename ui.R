@@ -110,7 +110,7 @@ shinyUI(
                    column(1,actionButton('reset_metadata','Reset')), 
                    
                    column(12,uiOutput('condition_select_ui')),
-                   column(12,uiOutput('metadata_upload_error_ui')),
+                   #column(12,uiOutput('metadata_upload_error_ui')),
                    column(12,uiOutput('metadata_table_ui'))
           ),
           #### _probes ####

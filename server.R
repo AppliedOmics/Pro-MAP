@@ -464,7 +464,7 @@ shinyServer(function(session, input, output) {
 
     output$file_num_text = renderText({
   
-        updateTabItems(session,"main", "Targets")
+        #updateTabItems(session,"main", "Targets")
         df = test_files()$file_df 
         as.tbl(df)
         
@@ -750,7 +750,7 @@ shinyServer(function(session, input, output) {
           df_upload = read.csv(metadata_file_path,sep ='\t',stringsAsFactors = F)
           if('FileName' %in% colnames(df_upload)){
             if(TRUE %in% duplicated(df_upload$Name)){
-              warning = 'There were duplicates in the Name column of the uploaded sample file'
+              warning = 'WARNING: There were duplicates in the Name column of the uploaded sample file'
               df_upload = df_upload %>% 
                 filter(!duplicated(df_upload$Name))
             }
@@ -760,19 +760,19 @@ shinyServer(function(session, input, output) {
                             filter(!duplicated(FileName))) %>%
                 filter(FileName %in% file_names)
               if(TRUE %in% is.na(df$Name)){
-                warning = 'Some arrays files were missing in the uploaded sample file'
+                warning = 'WARNING: Some arrays files were missing in the uploaded sample file'
                 df$Name[is.na(df$Name)] = df$FileName[is.na(df$Name)]
               }
               
               
               if(length(intersect(df_files$FileName,df_upload$FileName)) == 0){
-                error = "There is no intersect between the uploaded metadata file and the array files"
+                warning = "WARNING: There is no intersect between the uploaded metadata file and the array files"
                 df = df_files
               }
               
           
           }else{
-            error = 'There is no FileName column in the uploaded metadata file.'
+            warning = 'WARNING: There is no FileName column in the uploaded metadata file.'
             df = df_files
           }
       }
@@ -797,9 +797,11 @@ shinyServer(function(session, input, output) {
         output$metadata_upload_df = DT::renderDataTable(metadata_upload()$df_upload,rownames = FALSE)
         
         lst = list(span(tags$h4(htmlOutput('metadata_upload_error_text')), style="color:red"),
-                   tags$h2('Uploaded Targets Table'),
+                   tags$h2('Uploaded MetaData Table'),
                    DT::dataTableOutput('metadata_upload_df'),
-                   tags$h2('Targets Table'))
+                   tags$h2('MetaData Table'),
+                   DT::dataTableOutput('metadata_table')
+        )
         do.call(tagList,lst)
       }
     })
@@ -845,9 +847,9 @@ shinyServer(function(session, input, output) {
         lst = list(
           span(tags$h4(result_list$error), style="color:red"),
           span(tags$h4(result_list$warning), style="color:orange"),
-          tags$h3('Uploaded Sample Table'),
+          tags$h3('Uploaded MetaData'),
           DT::dataTableOutput('metadata_upload_df'),
-          tags$h3('Array Sample Table'),
+          tags$h3('Array MetaData'),
           DT::dataTableOutput('metadata_table')
         )
       }else{
@@ -951,25 +953,26 @@ shinyServer(function(session, input, output) {
           if('probe' %in% colnames(upload_df)){
             if('Category' %in% colnames(upload_df)){
               print('col hit')
+              if(length(intersect(df$probe,upload_df$probe)) == 0){
+                error = 'WARNING: There are no overlapping probes between the uploded probe file and the uploaded array files'
+              }else{
+                if(length(setdiff(df$probe,upload_df$probe)) > 0){
+                  warning = 'WARNING: Not all the probes in the array files are in the uploaded probe file.'
+                }
+              }
               
               #upload_df_trim = upload_df %>% 
               #  dplyr::select(probe,Category) %>% 
               #  distinct()
             }else{
-              error = 'No Category column in uploaded probe file'
+              error = 'WARNING: No Category column in uploaded probe file'
             }
           }else{
-            error = 'No probe column in uploaded probe file'
+            error = 'WARNING: No probe column in uploaded probe file'
             
           }
           
-          if(length(intersect(df$probe,upload_df$probe)) == 0){
-            error = 'There are no overlapping probes between the uploded probe file and the uploaded array files'
-          }else{
-            if(length(setdiff(df$probe,upload_df$probe)) > 0){
-              warning = 'Not all the probes in the array files are in the uploaded probe file.'
-            }
-          }
+      
           
           # if(TRUE %in% duplicated(upload_df$probe)){
           #   warning = "There are duplicates in the probe column, the duplicates have been removed" 
