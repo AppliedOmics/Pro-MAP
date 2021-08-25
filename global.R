@@ -1,23 +1,28 @@
-library("limma")
-#library("tcltk")
-library("ggplot2");  theme_set(theme_bw())
-library(plotly)
-library("tidyverse")
-library(Biobase)
-library(MSnbase)
-library(reshape)
-library(dplyr)
-library(ComplexHeatmap)
-library(circlize)
-library(RColorBrewer)
-
-library(OptimalCutpoints)
-library(magrittr)
-library(tibble)
-library(foreach) 
-
+library(shiny)
 library(shinydashboard)
 library(shinydisconnect)
+
+library(tidyverse)
+library(dplyr)
+library(tibble)
+
+library(Biobase)
+library(MSnbase)
+#library(reshape)
+
+library(ComplexHeatmap)
+library(circlize) #colorRamp
+library(RColorBrewer)
+
+
+library(limma)
+library(OptimalCutpoints)
+library(magrittr)
+library(foreach) 
+
+
+library(ggplot2);  theme_set(theme_bw())
+library(plotly)
 
 library(EnhancedVolcano)
 

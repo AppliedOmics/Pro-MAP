@@ -149,6 +149,10 @@ shinyServer(function(session, input, output) {
   })
   
   
+  output$sessioninfo = renderPrint({
+    sessionInfo() 
+  })
+  
   ##### Default Values ######
   
   observeEvent(values$app_version,{

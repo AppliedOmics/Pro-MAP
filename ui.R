@@ -83,7 +83,9 @@ shinyUI(
                               
           #### _Instructions ####
           tabPanel(title = tags$h5("Instructions"), value = 'instructions',
-                  uiOutput("instructions_markdown_ui")
+                  uiOutput("instructions_markdown_ui"),
+                  tags$h2('R SessionInfo'),
+                  verbatimTextOutput('sessioninfo')
           ),
           #### _File Details #####
           tabPanel(title = tags$h5('File Details'), value = 'files',
