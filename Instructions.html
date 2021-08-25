@@ -378,122 +378,144 @@ summary {
 </div>
 
 
-<p>The <strong>Single Channel Microarray Preprocessing pipeline (SCaMP)</strong> enables the easy upload of antibody array data in various file formats. Users are able to view the raw data, perform spot filtering, background correction, normalization, data conosolidation and differential expression analysis. The webtool is used in order by which the following instructions are arranged.</p>
+<p>The <strong>Single Channel Microarray Preprocessing pipeline (SCaMP)</strong> enables the easy upload of antibody array data in various file formats. Users can view the raw data, perform spot filtering, background correction, normalisation, data consolidation and differential expression analysis.</p>
 <div id="side-panel" class="section level1">
 <h1>Side Panel</h1>
 <p>This section refers to the grey panel to the left, which contains file input settings and plot display properties.</p>
 <div id="data-upload" class="section level3">
 <h3>Data Upload</h3>
-<p>This section allows users to upload new data. Array files can be dragged into the browse window or selected from the file system.</p>
+<p>Array files, in .txt or .gpr format, and of any wavelength, can be selected from a file system or dragged into the browser by users.</p>
 <ul>
-<li><strong>Example Datasets</strong>: switched between example datasets already uploaded. The example datasets can be used to explore the app functionality.</li>
-<li><strong>Upload array files</strong> upload new array data. The app will accept .gpr and .txt files.</li>
+<li><strong>Example Datasets</strong>: Four example datasets, showcased in the linked paper (Mowoe et al., 2021), are available here to explore app functionality.</li>
 </ul>
 </div>
 <div id="array-properties" class="section level3">
 <h3>Array Properties</h3>
-<p>Once array files are upload the foreground and background column information is extracted from the array data. The app will attempt to determine the default values, these can be adjusted using the dropdown menus.</p>
+<p>Array information, such as foreground, background and ID columns, is extracted from uploaded data and is available in a dropdown menu. The default columns used are set to median foreground and background and are editable by the user.</p>
 <ul>
-<li><strong>Array Chanel</strong>: the fluorophore wavelength used to the read the probes.</li>
-<li><strong>Array Column</strong>: The measurement column used for foreground and background (usually median), determined by the array processing software.</li>
-<li><strong>Foreground</strong> and <strong>Background</strong> : columns to use in the pre-processing pipeline.<br />
-</li>
-<li><strong>Spot Filtering</strong>: ’TRUE&quot; removes all probes that have an intensity value less than two standard deviations of the background</li>
-<li><strong>Annotation Columns</strong> : Additional annotation columns used in the Probes Tab.</li>
+<li><strong>Array Chanel</strong>: This refers to the fluorophore wavelengths used to visualise the probes.</li>
+<li><strong>Array Column</strong>: The measurement column used for foreground and background (default is median), determined by the image extraction software used.</li>
+<li><strong>Foreground</strong> and <strong>Background</strong> : Expression intensity columns used for microarray analysis</li>
+<li><strong>Spot Filtering</strong>: If set to ’TRUE&quot;, this removes all probes that have a foreground intensity that is less than 2 standard deviations of the associated background.</li>
+<li><strong>Annotation Columns</strong> : Additional identifier columns for each array e.g., ID, Flags, Uniprot ID etc.</li>
 </ul>
 </div>
 <div id="plot-properties" class="section level3">
 <h3>Plot Properties</h3>
-<p>Alter the colour palletes and themes of the plots generated in the app.</p>
+<p>Colour palettes and/or themes for plots generated in the app.</p>
 <ul>
 <li><strong>Plot Themes</strong>: a selection of ggplot themes that can be used</li>
-<li><strong>Grey Scale</strong>: ignores the colour pallete and creates greyscale plots</li>
-<li><strong>Colour Palettes</strong> : a selection of RColourBrewer palletes.</li>
+<li><strong>Grey Scale</strong>: Creates greyscale plots regardless of themes chosen (default is set to FALSE)</li>
+<li><strong>Colour Palettes</strong> : a selection of RColourBrewer pallets.</li>
 </ul>
 </div>
 </div>
 <div id="mainpanel" class="section level1">
 <h1>MainPanel</h1>
-<p>The MainPanel to the right of the SidePanel, displays the array processing outputs. The Main Panel is arranged as a series of tabs. The tabs will appear sequentially as sections of the analysis are completed. Click on the <strong>Next &gt;&gt;</strong> tab to continue with the processing steps.</p>
+<p>The Main Panel to the right of the aforementioned Side Panel, displays the array processing outputs. The Main Panel is arranged as a series of tabs, which appear sequentially as sections of the analysis are completed. Click on the <strong>Next &gt;&gt;</strong> tab to navigate through processing steps.</p>
 <div id="file-details" class="section level2">
 <h2>File Details</h2>
-<p>When array files are uploaded into the app, the files are first checked for consistency. Information on the number of array files uploaded, the number of probes and annotation columns are dispayed. If there are any errors or inconsistencies in the uploaded file, warnings (orange) or errors (red) are displayed. Errors will prevent further processing, while warnings should be taken note of, as some data may be missing from the final analysis due to the inconsistency in the data upload.</p>
+<p>Following the upload of data to the app, array files are checked for consistency. Information on the number of array files uploaded, number of probes, as well as annotation columns is displayed. If there are any errors or inconsistencies in the uploaded file, warnings (orange) or errors (red) are shown. Errors prevent further processing unless addressed. However, users should take note of warnings as they may affect analyses downstream.</p>
 </div>
 </div>
 <div id="metadata" class="section level1">
-<h1>MetaData</h1>
-<p>A sample template is extracted from the uploaded array files. This sample template can be downloaded (<strong>Download</strong>) as a tab-delimited file (targets.txt) and edited in Excel. The file can then be uploaded again (<strong>Upload Sample File</strong>). Keep this file safe if you are intending to use the app again.</p>
-<p>An uploaded sample file needs to be a tab-delimted file with extension .txt. It needs a FileName column that corresponds to the array file names. It needs a Name column that will be used to label samples throughtout the app. Entries in the Name column need to be unique.</p>
-<p>Additional annotation columns can be added. One of these annotation columns can be selected to group the samples into conditions (<strong>Select Condition Column</strong>). The condition column is used to colour subsequent plots in the app. This is not essential to the app functioning, but it does enhance the visualisation of data. The dataset can be subsetted by selecting some of the assigned conditions (<strong>Select Conditions</strong>). This can be useful in assessing the reproducibility of replicates. When sample annotaion is complete click <strong>Next &gt;&gt;</strong> to view the probes tab.</p>
+<h1>Metadata</h1>
+<p>An editable metadata template is extracted from the uploaded array files and can be downloaded by the user (<strong>Download</strong>) as a tab-delimited file (targets.txt) and edited in Excel to be re-uploaded by (<strong>Upload Sample File</strong>). Only tab-delimited file are accepted.</p>
+<p>Each targets file requires a FileName column that corresponds to the array file names. It also requires a Name column, which should include unique values that will be used to identify each array downstream. Additional metadata columns, such as Disease state (most crucial), Age, Gender, and Race, can be added and modified at the user’s discretion.</p>
+<p>Any of the metadata columns can be selected to subset data into conditions (<strong>Select Condition Column</strong>). This is not an essential step; however, if applied, it is used to group samples in the resulting pre-processing plots, enhancing data visualisation. It is also helpful for assessing the reproducibility of replicates. Click <strong>Next &gt;&gt;</strong> to view the next tab.</p>
 </div>
 <div id="probes" class="section level1">
 <h1>Probes</h1>
-<p>A probes template is extracted from the uploaded array files. Array files assign annotation columns to probes, a default probe identification column will be assigned, but can be altered using the <strong>Probe Column</strong> dropdown menu. The app adds a ‘Category’ column to the probe template. This is used to group the probes and annotate the subsequent plots.</p>
-<p>Dropdown menu’s allow easy annotation of the probes using the <strong>Control Probes</strong> and <strong>Probes to Remove</strong> dropdown menus, which will will assign “control” and “remove” to the Category column respectively. Probes annotated as remove will be removed before the normalisation step, so that they do not interfere with normalisation. Probes annotated as ‘control’ will be labelled in plots, and can be selected to be removed in the “Proteins Tab”.</p>
-<p>This probe template can be downloaded (<strong>Download</strong>) as a tab-delimited file (spots.txt) and edited in Excel. The file can then be Uploaded again (<strong>Upload Probe File</strong>). Additional annotations can be added to the Category column; these will be labelled in the plots and can also be selected for removal.</p>
+<p>An editable Probes template is produced based on the uploaded array files. A default probe identification column will be assigned but can be altered using the <strong>Probe Column</strong> dropdown menu, the contents of which are linked to the annotation column in the Side Panel. The probe template’s ‘Category’ column is used to group the probes and annotate resulting pre-processing plots. This column can be edited by the user using the: <strong>Control Probes</strong> dropdown menu. This enables users to identify control probes downstream; these will be removed after the normalisation step and are therefore not present in the final data outputs. <strong>Probes to Remove</strong> dropdown menu enables the user to select probes, such as EMPTY probes, that should be removed prior to normalisation.</p>
+<p>Alternatively, the probe template can be downloaded (<strong>Download</strong>) as a tab-delimited file (probes.txt) and edited in Excel to be re-uploaded by the user (<strong>Upload Probe File</strong>). Additional annotations can be added to the Category column at the user’s discretion to be labelled in resulting plots and or selected for removal.</p>
 <div id="data-tables" class="section level2">
 <h2>Data Tables</h2>
-<p>The uploaded array files are processed using the limma function ‘read.maimages’. This creates a EListRaw object, which is used for all subsequent data processing. The Data Tables tab shows the raw data within the EListRaw object.</p>
+<p>The expression intensity and annotation data from uploaded array files are read into R, using the limma function ‘read.maimages’. This creates an EListRaw object within which the foreground spots are weighted according to the spot filtering threshold described in the Array Properties section. Raw data can be inspected and visualised in this Data Tables tab via three subtabs:</p>
 <ul>
-<li><strong>Foreground</strong> and <strong>Background</strong> : data can be visualised as
+<li>Within the <strong>Foreground</strong> and <strong>Background</strong> subtabs, users can visualise:
 <ul>
-<li><strong>Table</strong> : the raw intensity expression values as selected in the SidePanel</li>
-<li><strong>CV</strong> : Tables and plots of CV’s for duplicate measurements for each probe</li>
-<li><strong>Clustering</strong> : A heatmap or dendrogram of the raw intensity values.</li>
+<li>A <strong>Table</strong> which contains raw intensity expression values based on Array properties selected in the Side Panel,</li>
+<li><strong>CV</strong> data including tables, boxplots and density plots of replicate measurements for each probe,</li>
+<li>A <strong>Clustering</strong> of the raw intensity values as a Heatmap or dendrogram</li>
 </ul></li>
-<li><strong>Spot Filtering</strong>: within the EListRaw object there is a weights table. Filtered spots are given a zero, while other spots are given a 1. The results are visualised here as a table or a heatmap.</li>
+<li>Within the <strong>Spot Filtering</strong> subtab, users can visualise:
+<ul>
+<li>A weights <strong>Table</strong> which contains probe weights. Filtered spots are weighted as zero, while “good” spots are weighted as 1.</li>
+<li>A <strong>Heatmap</strong> of the weighted spots. However, if no filtering is needed for the arrays a message is shown to show this.</li>
+</ul></li>
 </ul>
 </div>
-<div id="proteins" class="section level2">
-<h2>Proteins</h2>
-<p>Probes expression intensity values are condensed by using the mean expression intensity for duplicate probes. This results in a more condensed data table. A protein template is extracted from the condensed data table. An annotation column from the spots table can be selected (<strong>Protein Column</strong>) as the protein id to use when condensing the data. Like the probe table a Category column is used to annotate protein. Controls are automatically assigned from the probe table annotation. An additional &quot;other’ annotation can be selected using the <strong>Other</strong> drop-down menu.</p>
-<p>The protein template can be downloaded (<strong>Download</strong>) as a tab-delimited file (proteins.txt) and edited in Excel. The file can then be Uploaded again (<strong>Upload Probe File</strong>). Additional annotations can be added to the Category column. Additional annotation columns can also be added and used to label plots. This additional protein annotation information is retained when saving expression sets at the end of the analysis.</p>
-<div id="proteins-removed-from-final-data" class="section level4">
-<h4>Proteins removed from final data</h4>
-<p>Probes labelled ‘remove’ are removed before normalisation. Additional proteins can be removed from the Final Data table, this occurs post normalisation. These proteins are selected using the protein template annotation columns. The column used is selected by <strong>Drop by</strong>. The annotations to be removed are then selected by <strong>Category to drop</strong>. ‘Control’ is usually selected by default.</p>
-</div>
-</div>
-<div id="pre-processing-pipeline" class="section level2">
-<h2>Pre-Processing Pipeline</h2>
-<p>This the sequential pre-processing of array data in the EListRaw object.</p>
-<div id="raw-data" class="section level3">
-<h3>Raw Data</h3>
-<p>Data is displayed as boxplot of heatmap of the expression intensity values, before any processing.</p>
-</div>
-<div id="background-correction." class="section level3">
-<h3>Background Correction.</h3>
-<p>Expression intensity values after spot filtering and background correction are diplayed as boxplots or a heatmap. The background correction method used is selected using <strong>Background Correction Method</strong> on the top of the main panel.</p>
-</div>
-<div id="normalisation" class="section level3">
-<h3>Normalisation</h3>
-<p>Expression intensity values are normalised using the method selected by <strong>Normalisation Method</strong>. The values are then log2 transformed and displayed as boxplots or a heatmap.</p>
-</div>
-<div id="array-weight" class="section level3">
-<h3>Array Weight</h3>
-<p>Samples are weighted using the limma function ‘arrayWeights’. The result are displayes as a downloadable table or barplot. These weight are applied when performing eBayes differential expression significance testing.</p>
-</div>
-<div id="final-data" class="section level3">
-<h3>Final Data</h3>
-<p>Post normalisation the the selected proteins are removed.</p>
-<p>The results are diplayed as</p>
+<div id="pre-processing" class="section level2">
+<h2>Pre-Processing</h2>
+<p>This includes the pre-processing analysis of the raw data as described in Mowoe et al., (2021). Here data is spot filtered, background corrected, normalised, array weighted, and consolidated into a downloadable tab-delimited Datatable and an ExpressionSet which can be directly opened in R for further analysis outside of the app if desired. Data can be inspected and visualised in five subtabs:</p>
 <ul>
-<li><strong>Table</strong>
+<li>Within the <strong>Raw Data</strong> subtabs, users can visualise:
 <ul>
-<li>the data table can be downloaded as tab-delimted file (data.txt)</li>
-<li>the data table can also be saved as an R expressionSet object, which incorporates sample and protein annotation information.
-<ul>
-<li>this would allow subsequence custom analysis to be performed in R.</li>
+<li>An <strong>Expression Intensity Boxplot</strong> of raw expression intensities. Data is grouped based on <strong>Conditions</strong> selected previously in the <strong>Metadata</strong> tab</li>
+<li><strong>Clustering</strong> showing hierarchical clustering of raw data as a heatmap or dendrogram.</li>
 </ul></li>
+<li>Within the <strong>Background corrected</strong> subtabs.
+<ul>
+<li>An <strong>Expression Intensity Boxplot</strong> of background corrected expression intensities.</li>
+<li>A barplot of <strong>Missing Values</strong> that result from negative values produced by some background correction methods.</li>
+<li><strong>Clustering</strong> showing hierarchical clustering of background corrected data as a heatmap or dendrogram.</li>
 </ul></li>
-<li><strong>boxplot</strong>: of expression intensities per sample</li>
-<li><strong>CV plot</strong>: by condition</li>
-<li><strong>MA plot</strong></li>
-<li><strong>Heatmap</strong></li>
+<li>Within the <strong>Normalised</strong> subtabs.
+<ul>
+<li>An <strong>Expression Intensity Boxplot</strong> normalised expression intensities.</li>
+<li>A boxplot and density plot of replicate probe <strong>CV’s</strong> for each sample.</li>
+<li><strong>Clustering</strong> showing hierarchical clustering of normalised data as a heatmap or dendrogram.</li>
+</ul></li>
 </ul>
+<p>Thus, users are able to visualise changes to the dataset after each pre-processing step.</p>
+<ul>
+<li>Within the <strong>Array weight</strong> subtab, users can visualise:
+<ul>
+<li>Calculated array weights in table form and as a barplot with data grouped based on <strong>Conditions</strong> selected.</li>
+</ul></li>
+<li>Within the <strong>Final data</strong> subtab, data has been pre-processed, previously selected control probes are removed, and data is consolidated using the means of replicate probes; users are able to visualise this as:
+<ul>
+<li>A <strong>Table</strong>, which contains pre-processed and consolidated expression intensity data</li>
+<li><strong>Expression Intensity Boxplot</strong> of pre-processed and consolidated expression intensities grouped based on the previously selected <strong>Conditions</strong></li>
+<li>A boxplot and density plot showing the <strong>CV’s</strong> of the proteins across samples based on previously selected <strong>Conditions</strong></li>
+<li>A barplot which contains the percentage of <strong>Missing values</strong> in each array</li>
+<li>An <strong>MA plot</strong> of the first array versus all the other arrays to give the user an idea of fold change within the dataset</li>
+<li>Euclidean hierarchical <strong>Clustering</strong> of the data based on the proteins and the arrays to determine relationships.</li>
+</ul></li>
+</ul>
+<p>Users may download data to be analysed elsewhere or move to the next tab for differential expression analysis within the app.</p>
 </div>
-</div>
-<div id="differential-expression-significance-testing" class="section level2">
-<h2>Differential Expression Significance Testing</h2>
+<div id="differential-expression-analysis" class="section level2">
+<h2>Differential Expression Analysis</h2>
+<p>Here, A linear model, using calculated array weights, fits the normalised data to fully model the systematic part of the data and determine variability between the groups. Contrasts matrices are then pulled from the metadata to determine the variability in the data based on comparisons of interest.</p>
+<ul>
+<li>The <strong>Controls</strong> dropdown allows users to select the condition to which all the other conditions should be compared. If no condition is selected here, all conditions will be compared to each other. Subsequently, an empirical Bayes method is used to moderate the standard errors of the estimated log-fold changes.</li>
+<li>The <strong>p-value</strong> dropdown allows the user to manually select or fill in a probability value below which probes will be considered differentially expressed between conditions. Commonly used p-values include 0.001, 0.01, and 0.5</li>
+<li>The <strong>Multiple Testing Correction</strong> dropdown allows the user to select the procedure used to adjust the p-values for multiple testing.</li>
+<li>The <strong>Fold change</strong> dropdown allows the user to manually select or fill in the fold change at and above which probes will be considered differentially expressed between conditions.</li>
+</ul>
+<p>In this tab users are able to visualise the data in two subtabs:</p>
+<ul>
+<li>The <strong>Table</strong> contains a dataframe with a row for the proteins and several colunms including
+<ul>
+<li>log fold change (logFC)</li>
+<li>average expression (AveExpr)</li>
+<li>moderated t statistic (t),</li>
+<li>p-value,</li>
+<li>adjusted p-value</li>
+<li>log odds that the probe is differentially expressed (B), and a</li>
+<li>threshold based on the p-value and fold change selected (TRUE: the proteins in significantly differentially expressed between conditions.)</li>
+</ul></li>
+<li>A <strong>Volcano Plot</strong>, which shows probes with large fold changes that may be of biological significance</li>
+<li>An interactive <strong>MA plot</strong> which potrays differential expression</li>
+<li><strong>Clustering</strong>, which shows relationships between arrays and probes based on a euclidean hierarchical clustering</li>
+</ul>
+<p>All tables are downloadable as tab-delimited datasets or ExpressionSets for use directly in R, and all plots are downloadable as vectorised png files</p>
+<p>For further assistance contact</p>
+<ul>
+<li>Dr. S. Garnett (<a href="mailto:shaun.garnett@uct.ac.za" class="email">shaun.garnett@uct.ac.za</a>)</li>
+<li>M. Mowoe (<a href="mailto:m_mowoe@yahoo.co.uk" class="email">m_mowoe@yahoo.co.uk</a>)</li>
+</ul>
 </div>
 </div>
 

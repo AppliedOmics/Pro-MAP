@@ -1805,6 +1805,52 @@ shinyServer(function(session, input, output) {
       df_cv
     }
     
+    CV_sample_plot_function = function(data,metadata,probes){
+      CV_df = data %>%  
+        left_join(probes)
+      q = quantile(CV_df$CV,na.rm = T)
+      
+      if(length(unique(CV_df$Condition)) == 1){
+        p = ggplot(CV_df) + 
+          geom_boxplot(aes(y = CV,x = Condition))
+        d = ggplot(CV_df,aes(x = CV)) +
+          geom_density()
+        
+      }else{
+        p = ggplot(CV_df) + 
+          geom_boxplot(aes(y = CV,x = Condition, fill = Condition))
+        
+        d = ggplot(CV_df,aes(x = CV,col = Condition)) +
+          geom_density()
+      }
+      if(length(unique(CV_df$Category)) > 1){
+        p = p +
+          facet_grid(Categroy ~ .)
+        
+        d = d + 
+          facet_grid(Categroy ~ .)
+      }
+      list(p = p, d = d)
+    }
+    
+    CV_sample_density_function = function(data,metadata,probes){
+      CV_df = data %>%  
+        left_join(probes)
+      q = quantile(CV_df$CV,na.rm = T)
+      
+      if(values$collapse_boxplots == F){
+       
+      }else{
+        d = ggplot(df_cv,aes(x = CV, col = Condition)) +
+          geom_density() + 
+          facet_grid(Category ~ .)
+      }
+   
+      
+    }
+
+    
+    
     CV_plot_function = function(data,metadata,probes){
       CV_df = data %>%  
         left_join(probes)
@@ -2627,20 +2673,38 @@ shinyServer(function(session, input, output) {
     })
     
     output[['Data-CV_plot_ui']] = renderUI({     
-      df = data_df()  
+      df = data_df()    
       data = CV_df_function(df,metadata())
       proteins = proteins() %>% 
         dplyr::rename('probe' = protein)
+      probes = proteins
+      result_list = CV_sample_plot_function(data,metadata(),proteins)
       
-      p = CV_plot_function(data,metadata(),proteins)
+      p = result_list$p
       p = gg_fill_function(p)
+      p
+      
+      d = result_list$d
+      d = gg_col_function(d)
       
       p
       id = 'Data'
       name = 'CV'
-      title = "Background Corrected & Normalised CV's across arrays for all probes"
+      title = "Boxplot of CV's for protein expression intensities across all samples"
       plot_Server(id,name,p)
-      do.call(tagList,plot_UI(id,name,title))
+      p_list = plot_UI(id,name,title)
+      
+      id = 'Data'
+      name = 'CV_density'
+      title = "Density plot of CV's for protein expression intensities across all samples"
+      plot_Server(id,name,d)
+      
+      
+      d_list = plot_UI(id,name,title)
+      
+      list(p_list,d_list)
+      
+      do.call(tagList,list(p_list,d_list))
       
     })
     
