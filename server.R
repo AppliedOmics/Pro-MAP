@@ -1823,12 +1823,20 @@ shinyServer(function(session, input, output) {
         d = ggplot(CV_df,aes(x = CV,col = Condition)) +
           geom_density()
       }
+      
+      if(values$plot_lim == 'Quantile'){
+        p = p +  ylim(q[2],q[4])
+      }
+      if(values$plot_lim == '2x Quantile'){
+        p = p +  ylim(q[2]/2,q[4]*2)
+      }
+      
       if(length(unique(CV_df$Category)) > 1){
         p = p +
-          facet_grid(Categroy ~ .)
+          facet_grid(Category ~ .)
         
         d = d + 
-          facet_grid(Categroy ~ .)
+          facet_grid(Category ~ .)
       }
       list(p = p, d = d)
     }
@@ -1858,13 +1866,20 @@ shinyServer(function(session, input, output) {
       
       if(length(unique(CV_df$Category)) == 1){
         p = ggplot(CV_df) + 
-          geom_boxplot(aes(y = CV,x = Condition)) + 
-          ylim(q[1],q[3])
+          geom_boxplot(aes(y = CV,x = Condition)) 
+        
         
       }else{
         p = ggplot(CV_df) + 
-          geom_boxplot(aes(y = CV,x = Condition, fill = Category)) + 
-          ylim(q[1],q[3])
+          geom_boxplot(aes(y = CV,x = Condition, fill = Category))
+         
+      }
+      
+      if(values$plot_lim == 'Quantile'){
+        p = p +  ylim(q[2],q[4])
+      }
+      if(values$plot_lim == '2x Quantile'){
+        p = p +  ylim(q[2]/2,q[4]*2)
       }
       
       p
@@ -2673,7 +2688,7 @@ shinyServer(function(session, input, output) {
     })
     
     output[['Data-CV_plot_ui']] = renderUI({     
-      df = data_df()    
+      df = data_df()     
       data = CV_df_function(df,metadata())
       proteins = proteins() %>% 
         dplyr::rename('probe' = protein)
