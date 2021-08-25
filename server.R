@@ -4032,7 +4032,7 @@ shinyServer(function(session, input, output) {
     df = eBayes_sig_data()
   })
   
-  output$eBayes_Heatmap_ui = renderUI({   
+  output$eBayes_Heatmap_ui = renderUI({    
     df = eBayes_sig_data() %>%     
       column_to_rownames('protein')
     #colnames(df)  
@@ -4042,16 +4042,29 @@ shinyServer(function(session, input, output) {
     m[is.na(m)] = 0
     m[is.infinite(m)] = 0
     m = m[,selected_metadata()$Name]
- 
-    if(dim(m)[1] == 0){
-      tags$h4('No significant proteins')
+    if(is.matrix(m)){
+
+      if(dim(m)[1] <= 1){
+        if(dim(m)[1] ==0){
+          tags$h4('No significant proteins')
+        }else{
+          tags$h4('Only one significant protein, more are required for clustering')
+        }
+        
+          
+        
+      }else{ 
+        
+        id = 'EBayes'
+        name = 'Hcluster'
+        ht_list = array_HeatMap_function(m,selected_metadata(),selected_metadata(),rownames(m),input$r_col,values$heatmap_order)
+        ht_list$p
+        ht_plot_Server(id,name,ht_list)
+        do.call(tagList,plot_UI(id,name,ht_list$warning))
+        
+      }
     }else{
-      id = 'EBayes'
-      name = 'Hcluster'
-      ht_list = array_HeatMap_function(m,selected_metadata(),selected_metadata(),rownames(m),input$r_col,values$heatmap_order)
-      ht_list$p
-      ht_plot_Server(id,name,ht_list)
-      do.call(tagList,plot_UI(id,name,ht_list$warning))
+      tags$h4('Not enough data to perform clustering')
       
     }
  
