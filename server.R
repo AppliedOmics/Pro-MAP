@@ -1861,7 +1861,7 @@ shinyServer(function(session, input, output) {
         d = d + 
           facet_grid(Category ~ .)
       }
-      list(p = p, d = d)
+      list(p = p, d = d, df = CV_df)
     }
     
 
@@ -2697,7 +2697,7 @@ shinyServer(function(session, input, output) {
     })
     
     output[['Data-CV_plot_ui']] = renderUI({     
-      df = data_df()     
+      df = data_df()      
       data = CV_df_function(df,metadata())
       proteins = proteins() %>% 
         dplyr::rename('probe' = protein)
