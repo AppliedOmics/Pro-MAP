@@ -32,7 +32,7 @@ Colour palettes and/or themes for plots generated in the app.
 - **Colour Palettes** : a selection of RColourBrewer pallets. 
 
 
-# MainPanel
+# Main Panel
 
 The Main Panel to the right of the aforementioned Side Panel, displays the array processing outputs. The Main Panel is arranged as a  series of tabs, which appear sequentially as sections of the analysis are completed. Click on the **Next >>** tab to navigate through processing steps. 
 
