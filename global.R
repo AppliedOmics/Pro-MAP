@@ -47,9 +47,9 @@ if(grepl('metaomics',node)){
 }
 
 #else{
-#	if(!grepl('Pro',getwd())){
-#		app_version = 'basic'
-#	}
+if(grepl('_Pro',getwd())){
+		app_version = 'pro'
+}
 #}
 
 app_version
