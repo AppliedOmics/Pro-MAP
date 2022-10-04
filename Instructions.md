@@ -1,5 +1,5 @@
 
-The **Single Channel Microarray Preprocessing pipeline (SCaMP)** enables the easy upload of antibody array data in various file formats. Users can view the raw data, perform spot filtering, background correction, normalisation, data consolidation and differential expression analysis. 
+**Pro-MAP** enables the easy upload of antibody array data in various file formats. Users can view the raw data, perform spot filtering, background correction, normalisation, data consolidation and differential expression analysis. 
 
 
 # Side Panel
@@ -134,7 +134,7 @@ All tables are downloadable as tab-delimited datasets or ExpressionSets for use 
 For further assistance contact
 
 - Dr. S. Garnett (shaun.garnett@uct.ac.za)
-- M. Mowoe (m_mowoe@yahoo.co.uk)
+- Dr. M. Mowoe (m_mowoe@yahoo.co.uk)
 
 
 

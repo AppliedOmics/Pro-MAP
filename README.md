@@ -1,12 +1,19 @@
-**Single Channel Microarray Preprocessing pipeline (SCaMP)** is a shiny app. It can be run within [Rstudio](https://www.rstudio.com/products/rstudio/download/) or hosted on a [shiny-server](https://shiny.rstudio.com/articles/shiny-server.html). 
+**Pro-MAP** is a shiny app that can be run within [Rstudio](https://www.rstudio.com/products/rstudio/download/) or hosted on a [shiny-server](https://shiny.rstudio.com/articles/shiny-server.html). 
 
-A running version of the app can be found at https://metaomics.uct.ac.za/shinyapps/SCaMP/
+A running version of the app can be found at https://metaomics.uct.ac.za/shinyapps/Pro-MAP/
 
-# R packages
 
-The following R pacakged need to be installed for the app to run
 
-Shiny libraries
+The app can be downloaded from [github](https://github.com/AppliedOmics/Pro-MAP)
+
+To run the app open any of the ui.R, server.R or global.R files in Rstudio. Click the Run App button in Rstudio to start the shiny app. 
+
+
+### R packages
+
+The following R packages need to be installed for the app to run
+
+#### Shiny libraries
 ```
 install.packages('shiny')
 install.packages('shinydashboard')
@@ -14,7 +21,7 @@ install.packages(shinydisconnect)
 
 ```
 
-Tideyverse Packages
+#### Tideyverse Packages
 
 ```
 install.packages('tidyverse')
@@ -31,7 +38,7 @@ install.packages('plotly')
 ```
 
 
-BioConductor Packages
+#### BioConductor Packages
 
 ```
 install.packages("BiocManager")
@@ -40,7 +47,7 @@ BiocManager::install('Biobase')
 BiocManager::install('MSnbase')
 
 ```
-ComplexHeatamp
+#### ComplexHeatamp
 May require some linux packages
 ```
 apt-get install libgtk2.0-dev, libcairo2-dev, xvfb, xauth, xfonts-base
@@ -56,7 +63,7 @@ install.packages('circlize')
 ```
 
 
-# EnhancedVolcano
+#### EnhancedVolcano
 
 ```
 sudo apt-get install libharfbuzz-dev
@@ -66,7 +73,7 @@ install.packages('textshaping')
 BiocManager::install('EnhancedVolcano')
 ```
 
-RColorBrewer
+#### RColorBrewer
 
 ```
 sudo apt-get install  libudunits2-dev
@@ -76,9 +83,10 @@ sudo apt-get install  libudunits2-dev
 install.packages('RColorBrewer')
 ```
 
-Other
+#### Other
 
 ```
 install.packages('OptimalCutpoints')
 install.packages('foreach')
 ```
+
