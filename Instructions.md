@@ -11,7 +11,7 @@ This section refers to the grey panel to the left, which contains file input set
 
 Array files, in .txt or .gpr format, and of any wavelength, can be selected from a file system or dragged into the browser by users.
 
-- **Example Datasets**: Four example datasets, showcased in the linked paper (Mowoe et al., 2021), are available here to explore app functionality.
+- **Example Datasets**: Four example datasets, showcased in the linked paper (Mowoe et al., 2022), are available here to explore app functionality.
 
 ### Array Properties
 

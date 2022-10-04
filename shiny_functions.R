@@ -31,15 +31,15 @@ header_UI = function(app_version){
 	#print(app_version)
 	#browser()
 	if(app_version == 'pro'){
-		lst = list(titlePanel("SCaMP Pro"))
+		lst = list(titlePanel("Pro-MAP Professional"))
 	}else{
 		lst = list(
-			titlePanel("SCaMP: Single Channel Microarray Preprocessing pipeline"),
+			titlePanel("Pro-MAP"),
 			tags$h5('A Robust Pipeline for the Pre-processing of Single Channel Microarrays'),
 			tags$h6('Metoboroghene O. Mowoe, Shaun Garnett, Katherine Lennard, Jade Talbot, Paul Townsend, Eduard Jonas, Jonathan M. Blackburn (',
 							tagList(a("doi link - not available yet", href="doi link")),')'),
 			tags$h6('R script for pipeline available on Github (',
-							tagList(a("github link", href="https://github.com/AppliedOmics/SCaMP")),')')
+							tagList(a("github link", href="https://github.com/AppliedOmics/Pro-MAP")),')')
 			)
 	}
 	#titlePanel("SPOT-Pro Full")
