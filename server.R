@@ -723,7 +723,7 @@ shinyServer(function(session, input, output) {
     
     # reactive object that decided which metadata file to upload. 
     metadata_upload = reactive({ withProgress(message = 'uploding metadata',{  
-      input$reset_metadata     
+      input$reset_metadata      
       input$dataset
       input$gpr_files
       metadata_file_path = NULL
@@ -742,7 +742,9 @@ shinyServer(function(session, input, output) {
         df = df_files
         
       }else{
-        if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'metadata.txt')) & values$metadata_file == 'dataset'){
+        #if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'metadata.txt')) & values$metadata_file == 'dataset'){
+          if(input$dataset != 'Upload' & file.exists(file.path(input$dataset,'metadata.txt'))){
+            
           metadata_file_path = file.path(input$dataset,'metadata.txt')
         }else{
           metadata_file_path = values$metadata_file$datapath
